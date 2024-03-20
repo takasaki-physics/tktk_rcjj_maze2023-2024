@@ -14,6 +14,14 @@ SoftwareSerial softSerial(2,3);
 Servo servo;
 MPU6050 mpu;
 SMS_STS sms_sts;
+#define trigPin 8  // トリガーピンをD8に
+#define echoPin 9  // エコーピンをD9に
+#define trigPin2 6  // トリガーピンをD8に
+#define echoPin2 7 // エコーピンをD9に
+float Duration = 0;  // 計測した時間
+float Distance = 0;  // 距離
+float Duration2 = 0;  // 計測した時間
+float Distance2 = 0;  // 距離
 int r, g, b;
 uint16_t clear;
 uint16_t red =500;
@@ -57,6 +65,7 @@ VectorFloat gravity;    // [x, y, z]            gravity vector
 VectorInt16 aa;         // [x, y, z]            accel sensor measurements
 VectorInt16 aaReal;     // [x, y, z]            gravity-free accel sensor measurements
 float ypr[3];           // [roll, pitch, yaw]   roll/pitch/yaw container and gravity vector
+double ragu =0;
 
 static uint16_t color16(uint16_t r, uint16_t g, uint16_t b) { //RGB値を24ビットから16ビットへ
   uint16_t _color;
@@ -348,6 +357,41 @@ void migi(){
              
 }
 void hidari(){
+  /*
+  tiziki_kaitenn();
+  if (kakudo_true2 >= 270){
+    mawasu = kakudo_true2 - 280; 
+    kakudo_true2 = kakudo_true2 - 360;
+    chousei = 1; 
+  }else if (kakudo_true2 >= 0){
+    mawasu = kakudo_true2 + 80;
+  }
+  while (kakudo_true2 < mawasu || chousei ==1){
+
+    
+  
+  Position[0] = 220; //右に回転
+  Position[1] = 220;
+  Position[2] = 220;
+  Position[3] = 220;
+  sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+  tiziki_kaitenn();
+  serialEvent();
+  if (chousei ==1){
+    if (kakudo_true2 >= 270){
+      kakudo_true2 =kakudo_true2 - 360;
+      
+    }else {
+      chousei =0;
+    }
+  }
+  delay(70);
+  }
+  */
+
+
+
+
   Position[0] = 4095;
   Position[1] = 4095;
   Position[2] = 4095;
@@ -374,49 +418,63 @@ void susumu_heitan(){
     count3=1;
     count2=susumu_kaisuu-1;
    }else if (digitalRead( BUMPER_PIN ) == LOW){
-    Position[0] = -1365; //右に回転
-    Position[1] = -1365;
-    Position[2] = -1365;
-    Position[3] = -1365;
-    sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(630);
-    delay(100);
-    Position[0] = -1327; //前に進む
-    Position[1] = 1327;
-    Position[2] = 1327;
-    Position[3] = -1327;
-    sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(650);
-    Position[0] = 1365; //右に回転
-    Position[1] = 1365;
-    Position[2] = 1365;
-    Position[3] = 1365;
-    sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(630);
-    delay(100);
-    count2--;
+    chouonnpa2();
+    if(Distance2 > 10){
+      Position[0] = -682; //右に回転
+      Position[1] = -682;
+      Position[2] = -682;
+      Position[3] = -682;
+      sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+      delay(315
+      
+      );
+      delay(100);
+      Position[0] = -1000; //前に進む
+      Position[1] = 1000;
+      Position[2] = 1000;
+      Position[3] = -1000;
+      sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+      delay(550);
+      Position[0] = 682; //右に回転
+      Position[1] = 682;
+      Position[2] = 682;
+      Position[3] = 682;
+      sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+      delay(315);
+      delay(100);
+      count2--;
+    } else {
+    count3=1;
+    count2=susumu_kaisuu-1;
+    }
    }else if (digitalRead( BUMPER_PIN2 ) == LOW){
-    Position[0] = 1365; //右に回転
-    Position[1] = 1365;
-    Position[2] = 1365;
-    Position[3] = 1365;
-    sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(630);
-    delay(100);
-    Position[0] = -1327; //前に進む
-    Position[1] = 1327;
-    Position[2] = 1327;
-    Position[3] = -1327;
-    sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(650);
-    Position[0] = -1365; //右に回転
-    Position[1] = -1365;
-    Position[2] = -1365;
-    Position[3] = -1365;
-    sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(630);
-    delay(100);
-    count2--;
+    chouonnpa();
+    if (Distance2 >10){
+      Position[0] = 682; //右に回転
+      Position[1] = 682;
+      Position[2] = 682;
+      Position[3] = 682;
+      sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+      delay(315);
+      delay(100);
+      Position[0] = -1000; //前に進む
+      Position[1] = 1000;
+      Position[2] = 1000;
+      Position[3] = -1000;
+      sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+      delay(550);
+      Position[0] = -682; //右に回転
+      Position[1] = -682;
+      Position[2] = -682;
+      Position[3] = -682;
+      sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+      delay(315);
+      delay(100);
+      count2--;
+    }else {
+    count3=1;
+    count2=susumu_kaisuu-1;
+    } 
    }
     count2++;
    
@@ -436,8 +494,47 @@ void susumu_heitan(){
      black_count=1;
     }
   }
+  chouonnpa(); //migi
+  chouonnpa2(); //hidari
+  ragu = Distance - Distance2;
+  if (Distance < 150 && Distance2 <150){
+    if (ragu > 1){
+      while (ragu > 0){  // hidrikaitenn
+        Position[0] = 30; //右に回転
+        Position[1] = 30;
+        Position[2] = 30;
+        Position[3] = 30;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        chouonnpa(); //migi
+        chouonnpa2(); //hidari
+        ragu = Distance - Distance2;
+      }
+    }else if (ragu < -1){
+      while (ragu < 0){  // hidrikaitenn
+        Position[0] = -30; //右に回転
+        Position[1] = -30;
+        Position[2] = -30;
+        Position[3] = -30;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        chouonnpa(); //migi
+        chouonnpa2(); //hidari
+        ragu = Distance - Distance2;
+      }
+    }
+    while (Distance < 6.5){
+      Position[0] = 50; //前に進む
+      Position[1] = -50;
+      Position[2] = -50;
+      Position[3] = 50;
+      sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+      chouonnpa(); 
+    }
+  }else {
+    
+    tiziki();
+
+  }
   color();
-  tiziki();
   susumu_kaisuu =0;
   count2 =0;
 
@@ -503,6 +600,38 @@ void SCServo(){
   delay(1000);
 }
 
+void chouonnpa(){
+    digitalWrite(trigPin,LOW);              // 計測前に一旦トリガーピンをLowに
+  delayMicroseconds(2);
+
+  digitalWrite(trigPin,HIGH);             // トリガーピンを10μsの時間だけHighに
+  delayMicroseconds(10);
+  digitalWrite(trigPin,LOW);
+
+  Duration = pulseIn(echoPin,HIGH);      // エコーピンからの入力
+  
+  Duration = Duration / 2;               // 距離を1/2に
+  Distance = Duration*340*100/1000000;   // 音速を掛けて単位をcmに
+
+  
+}
+void chouonnpa2(){
+    digitalWrite(trigPin2,LOW);              // 計測前に一旦トリガーピンをLowに
+  delayMicroseconds(2);
+
+  digitalWrite(trigPin2,HIGH);             // トリガーピンを10μsの時間だけHighに
+  delayMicroseconds(10);
+  digitalWrite(trigPin2,LOW);
+
+  Duration2 = pulseIn(echoPin2,HIGH);      // エコーピンからの入力
+  
+  Duration2 = Duration2 / 2;               // 距離を1/2に
+  Distance2 = Duration2*340*100/1000000;   // 音速を掛けて単位をcmに
+
+  
+}
+
+
 void setup(){
  Wire.begin();
  Wire.beginTransmission(0x68);
@@ -514,6 +643,10 @@ void setup(){
  Serial2.begin(19200);
  softSerial.begin(19200);
  servo.attach(10, 500, 2400);
+  pinMode(echoPin,INPUT);   // エコーピンを入力に
+  pinMode(trigPin,OUTPUT);  // トリガーピンを出力に
+  pinMode(echiPin2,INPUT);
+  pinMode(trigPin2,OUTPUT);
  setupMPU();
  pinMode(10, OUTPUT);
  pinMode( BUMPER_PIN, INPUT_PULLUP );
