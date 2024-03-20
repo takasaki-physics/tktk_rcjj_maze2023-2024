@@ -449,5 +449,5 @@ void loop(){
     /*if(x == 45 && y == 45){ //return bonus
       delay(20000);
     }*/
-    count++;
+    
 }
