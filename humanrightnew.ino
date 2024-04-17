@@ -190,7 +190,7 @@ void sekigaisenn()
         
         else if (channel == 4) {
           distance_migi = distance[channel];
-          if (distance[channel] <=120){
+          if (distance[channel] <=180){
             Serial.println("right");
             rightwall = 1;
             }
@@ -277,7 +277,7 @@ void setup() {
     zahyou[t][j] = 0;  //make it to begining 
     }
   }
-  delay(100);
+  delay(1500);
   sekigaisenn();
   hyouji();
   zahyou[45][45] = 1;
@@ -368,7 +368,7 @@ void loop(){
       count++;   
     }
 
-    while (myserial.available()==0 && count ==1){
+    while (myserial.available()==0 && count !=1){
       delay(200);
     }
     if(myserial.available()>0 ){
