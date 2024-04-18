@@ -1,5 +1,5 @@
 // Arduino入門編⑪ 超音波センサーHC-SR04で距離を測定する！
-// https://burariweb.info
+// https://burariweb.info    aaaaaaaaaaaa
 
 #define trigPin 8  // トリガーピンをD8に
 #define echoPin 9  // エコーピンをD9に
