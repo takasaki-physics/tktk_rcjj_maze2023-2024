@@ -12,7 +12,7 @@ HardwareSerial myserial(2);
 int val =0;
 int x = 45;
 int y = 45;
-int i = 1;//0=done,1=n,2=e,3=w,4=s,
+int i = 1;//0=done,1=n,2=e,3=w,4=saaaa,
 bool frontwall = 0;
 bool rightwall = 0;
 bool leftwall = 0;
