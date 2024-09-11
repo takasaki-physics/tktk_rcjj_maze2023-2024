@@ -452,7 +452,7 @@ void hidari(){
               
 }
 void susumu_heitan(){
-  while (count2  <susumu_kaisuu&&(red > 120 || blue > 120 || green > 120)) {
+  while (count2  <susumu_kaisuu&&(red > 50 || blue > 50 || green > 50)) {
     Position[0] = 576; //前に進む
     Position[1] = -576;
     Position[2] = -576;
