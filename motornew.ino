@@ -124,12 +124,12 @@ void setupMPU() {
   devStatus = mpu.dmpInitialize();
   // supply your own gyro offsets here, scaled for min sensitivity
 
-  mpu.setXAccelOffset(-3550);
-  mpu.setYAccelOffset(-1727);
-  mpu.setZAccelOffset(1087);
-  mpu.setXGyroOffset(25);
-  mpu.setYGyroOffset(-29);
-  mpu.setZGyroOffset(7);
+  mpu.setXAccelOffset(-4410);
+  mpu.setYAccelOffset(-2947);
+  mpu.setZAccelOffset(1015);
+  mpu.setXGyroOffset(143);
+  mpu.setYGyroOffset(48);
+  mpu.setZGyroOffset(30);
   
   // make sure it worked (returns 0 if so)
   if (devStatus == 0) {
@@ -163,82 +163,82 @@ void tiziki()
   Serial.println(kakudo_true);
   if (kakudo_true >= 0 && kakudo_true < 45) {
     for (int i =0; i < kakudo_true ;i++){
-        Position[0] = -21; //右に回転
-        Position[1] = -21;
-        Position[2] = -21;
-        Position[3] = -21;
+        Position[0] = -30; //右に回転
+        Position[1] = -30;
+        Position[2] = -30;
+        Position[3] = -30;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-        delay(13);
+        delay(18);
       
     }
   }else if (kakudo_true >= 45 && kakudo_true < 90) {
     for (int i =0; i < 90-kakudo_true ;i++){
-        Position[0] = 21; //右に回転
-        Position[1] = 21;
-        Position[2] = 21;
-        Position[3] = 21;
+        Position[0] = 30; //右に回転
+        Position[1] = 30;
+        Position[2] = 30;
+        Position[3] = 30;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-        delay(13);
+        delay(18);
       
     }
   }else if (kakudo_true >= 90 && kakudo_true < 135) {
     for (int i =0; i < kakudo_true-90 ;i++){
-        Position[0] = -21; //右に回転
-        Position[1] = -21;
-        Position[2] = -21;
-        Position[3] = -21;
+        Position[0] = -30; //右に回転
+        Position[1] = -30;
+        Position[2] = -30;
+        Position[3] = -30;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-        delay(13);
+        delay(18);
       
     }
   }else if (kakudo_true >= 135 && kakudo_true < 180) {
     for (int i =0; i < 180-kakudo_true ;i++){
-        Position[0] = 21; //右に回転
-        Position[1] = 21;
-        Position[2] = 21;
-        Position[3] = 21;
+        Position[0] = 30; //右に回転
+        Position[1] = 30;
+        Position[2] = 30;
+        Position[3] = 30;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-        delay(13);
+        delay(18);
       
     }
   }else if (kakudo_true >= 180 && kakudo_true < 225) {
     for (int i =0; i < kakudo_true-180 ;i++){
-        Position[0] = -21; //右に回転
-        Position[1] = -21;
-        Position[2] = -21;
-        Position[3] = -21;
+        Position[0] = -30; //右に回転
+        Position[1] = -30;
+        Position[2] = -30;
+        Position[3] = -30;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-        delay(13);
+        delay(18);
       
     }
   }else if (kakudo_true >= 225 && kakudo_true < 270) {
     for (int i =0; i < 270-kakudo_true ;i++){
-        Position[0] = 21; //右に回転
-        Position[1] = 21;
-        Position[2] = 21;
-        Position[3] = 21;
+        Position[0] = 30; //右に回転
+        Position[1] = 30;
+        Position[2] = 30;
+        Position[3] = 30;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-        delay(13);
+        delay(18);
       
     }
   }else if (kakudo_true >= 270 && kakudo_true < 315) {
     for (int i =0; i < kakudo_true-270 ;i++){
-        Position[0] = -21; //右に回転
-        Position[1] = -21;
-        Position[2] = -21;
-        Position[3] = -21;
+        Position[0] = -30; //右に回転
+        Position[1] = -30;
+        Position[2] = -30;
+        Position[3] = -30;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-        delay(13);
+        delay(18);
       
     }
   }else if (kakudo_true >= 315 && kakudo_true <= 360) {
     for (int i =0; i < 360-kakudo_true ;i++){
-        Position[0] = 21; //右に回転
-        Position[1] = 21;
-        Position[2] = 21;
-        Position[3] = 21;
+        Position[0] = 30; //右に回転
+        Position[1] = 30;
+        Position[2] = 30;
+        Position[3] = 30;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-        delay(13);
+        delay(18);
       
     }
   }
@@ -262,11 +262,19 @@ void serialEvent(){
   }
 }
 
+void serialEvent2(){
+    if (Serial3.available() >0){
+    int receivedData = Serial3.read();
+    Serial3.flush();
+    discover_hisaisha2();
+  }
+}
+
 void discover_hisaisha() {//追加分
   while ((Serial2.available() == 0)&&(count4 <50)){
     delay(200);
     count4++;
-
+  Serial.println(count4);
   }
   Serial.println("count4");
   if (Serial2.available() > 0) {
@@ -300,7 +308,44 @@ void discover_hisaisha() {//追加分
   
   
 }
-
+void discover_hisaisha2() {//追加分
+  while ((Serial3.available() == 0)&&(count4 <50)){
+    delay(200);
+    count4++;
+    Serial.println(count4);
+  }
+  Serial.println("count4");
+  if (Serial3.available() > 0) {
+   int receivedData = Serial3.read();
+   Serial.println(receivedData);
+   Serial.print("count");
+   Serial.println(count4);
+   delay(2000);
+   if (count4 < 25){
+    Serial.println("NONE");
+    count4 = 0;
+   }else if (count4 < 30){
+    Serial.println("red|| H");
+    //SCServo();
+    //SCServo();
+    count4 =0;
+   }else if(count4 < 35){
+    Serial.println("yellow||S");
+    //SCServo();
+    count4 = 0;
+   }else if(count4 < 50){
+    Serial.println("green||U");
+    count4 =0;
+   }else{
+    count4 =0;
+    
+   }
+  }else{
+    count4=0;
+  }
+  
+  
+}
 
 void motor_setup() {
   mySerial.begin( 9600 ); //softSerial通信の速さを9600bit/秒に設定
@@ -322,7 +367,7 @@ void motor_setup() {
 void migi(){
   tiziki_kaitenn();
   if (kakudo_true2 <=90){
-    mawasu = kakudo_true2 +275;
+    mawasu = kakudo_true2 +285;
     kakudo_true2 =kakudo_true2 +360;
     chousei =1;
   }else if (kakudo_true2 <= 360){
@@ -332,13 +377,14 @@ void migi(){
 
     
   
-  Position[0] = -410; //右に回転
-  Position[1] = -410;
-  Position[2] = -410;
-  Position[3] = -410;
+  Position[0] = -220; //右に回転
+  Position[1] = -220;
+  Position[2] = -220;
+  Position[3] = -220;
   sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
   tiziki_kaitenn();
-  serialEvent();
+  //serialEvent();
+  //serialEvent2();
   if (chousei ==1){
     if (kakudo_true2 <=90){
       kakudo_true2 =kakudo_true2 +360;
@@ -347,24 +393,24 @@ void migi(){
       chousei =0;
     }
   }
-  delay(120);
+  delay(70);
   }
   mawasu =0;
-  delay(300);
+  delay(200);
   tiziki();
   delay(200);
   
              
 }
 void hidari(){
-  /*
+  
   tiziki_kaitenn();
   if (kakudo_true2 >= 270){
-    mawasu = kakudo_true2 - 280; 
+    mawasu = kakudo_true2 - 285; 
     kakudo_true2 = kakudo_true2 - 360;
     chousei = 1; 
   }else if (kakudo_true2 >= 0){
-    mawasu = kakudo_true2 + 80;
+    mawasu = kakudo_true2 + 75;
   }
   while (kakudo_true2 < mawasu || chousei ==1){
 
@@ -376,7 +422,8 @@ void hidari(){
   Position[3] = 220;
   sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
   tiziki_kaitenn();
-  serialEvent();
+  //serialEvent();
+  //serialEvent2();
   if (chousei ==1){
     if (kakudo_true2 >= 270){
       kakudo_true2 =kakudo_true2 - 360;
@@ -387,61 +434,60 @@ void hidari(){
   }
   delay(70);
   }
-  */
+  
 
 
 
 
-  Position[0] = 4095;
+ /* Position[0] = 4095;
   Position[1] = 4095;
   Position[2] = 4095;
   Position[3] = 4095;
   sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
 
   delay(1884);
-  delay(100);
+  delay(100);*/
   tiziki();//1884ミリ秒待機(1.884秒)
   delay(200);
               
 }
 void susumu_heitan(){
-  while (count2 != susumu_kaisuu&&(red > 60 || blue > 70 || green > 80)) {
-    Position[0] = 1150; //前に進む
-    Position[1] = -1150;
-    Position[2] = -1150;
-    Position[3] = 1150;
+  while (count2  <susumu_kaisuu&&(red > 50 || blue > 50 || green > 50)) {
+    Position[0] = 576; //前に進む
+    Position[1] = -576;
+    Position[2] = -576;
+    Position[3] = 576;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     color();
-    delay(50);
-    serialEvent();
+    //serialEvent();
+    //serialEvent2();
    if (digitalRead( BUMPER_PIN ) == LOW &&digitalRead( BUMPER_PIN2 ) == LOW){
     count3=1;
     count2=susumu_kaisuu-1;
    }else if (digitalRead( BUMPER_PIN ) == LOW){
     chouonnpa2();
     if(Distance2 > 10){
+      delay(200);
       Position[0] = -682; //右に回転
       Position[1] = -682;
       Position[2] = -682;
       Position[3] = -682;
       sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-      delay(315
-      
-      );
-      delay(100);
-      Position[0] = -1000; //前に進む
-      Position[1] = 1000;
-      Position[2] = 1000;
-      Position[3] = -1000;
+      delay(315);
+      delay(150);
+      Position[0] = -620; //前に進む
+      Position[1] = 620;
+      Position[2] = 620;
+      Position[3] = -620;
       sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-      delay(550);
+      delay(420);
       Position[0] = 682; //右に回転
       Position[1] = 682;
       Position[2] = 682;
       Position[3] = 682;
       sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
       delay(315);
-      delay(100);
+      delay(150);
       count2--;
     } else {
     count3=1;
@@ -449,27 +495,28 @@ void susumu_heitan(){
     }
    }else if (digitalRead( BUMPER_PIN2 ) == LOW){
     chouonnpa();
-    if (Distance2 >10){
+    if (Distance >10){
+      delay(500);
       Position[0] = 682; //右に回転
       Position[1] = 682;
       Position[2] = 682;
       Position[3] = 682;
       sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
       delay(315);
-      delay(100);
-      Position[0] = -1000; //前に進む
-      Position[1] = 1000;
-      Position[2] = 1000;
-      Position[3] = -1000;
+      delay(150);
+      Position[0] = -620; //前に進む
+      Position[1] = 620;
+      Position[2] = 620;
+      Position[3] = -620;
       sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-      delay(550);
+      delay(420);
       Position[0] = -682; //右に回転
       Position[1] = -682;
       Position[2] = -682;
       Position[3] = -682;
       sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
       delay(315);
-      delay(100);
+      delay(150);
       count2--;
     }else {
     count3=1;
@@ -484,20 +531,21 @@ void susumu_heitan(){
   }
   if (count2 != susumu_kaisuu){
     while (count2 !=0){
-    Position[0] = -1150; //前に進む
-    Position[1] = 1150;
-    Position[2] = 1150;
-    Position[3] = -1150;
+    Position[0] = -576; //前に進む
+    Position[1] = 576;
+    Position[2] = 576;
+    Position[3] = -576;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(390);
+    delay(320);
      count2--;
      black_count=1;
     }
   }
+  delay(500);
   chouonnpa(); //migi
   chouonnpa2(); //hidari
   ragu = Distance - Distance2;
-  if (Distance < 150 && Distance2 <150){
+  if (Distance < 12 && Distance2 <12){
     if (ragu > 1){
       while (ragu > 0){  // hidrikaitenn
         Position[0] = 30; //右に回転
@@ -521,11 +569,11 @@ void susumu_heitan(){
         ragu = Distance - Distance2;
       }
     }
-    while (Distance < 6.5){
-      Position[0] = 50; //前に進む
-      Position[1] = -50;
-      Position[2] = -50;
-      Position[3] = 50;
+    while (Distance > 6.5){
+      Position[0] = 80; //前に進む
+      Position[1] = -80;
+      Position[2] = -80;
+      Position[3] = 80;
       sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
       chouonnpa(); 
     }
@@ -612,7 +660,9 @@ void chouonnpa(){
   
   Duration = Duration / 2;               // 距離を1/2に
   Distance = Duration*340*100/1000000;   // 音速を掛けて単位をcmに
-
+  Serial.print("Distance");
+  Serial.println(Distance);
+  
   
 }
 void chouonnpa2(){
@@ -627,7 +677,8 @@ void chouonnpa2(){
   
   Duration2 = Duration2 / 2;               // 距離を1/2に
   Distance2 = Duration2*340*100/1000000;   // 音速を掛けて単位をcmに
-
+  Serial.print("Distance2");
+  Serial.println(Distance2);
   
 }
 
@@ -638,14 +689,15 @@ void setup(){
  Wire.write(0x6B);
  Wire.write(0x00);
  Wire.endTransmission();
- Serial.begin(1000000); 
+ Serial.begin(9600); 
  Serial1.begin(9600);
  Serial2.begin(19200);
+ Serial3.begin(19200);
  softSerial.begin(19200);
  servo.attach(10, 500, 2400);
   pinMode(echoPin,INPUT);   // エコーピンを入力に
   pinMode(trigPin,OUTPUT);  // トリガーピンを出力に
-  pinMode(echiPin2,INPUT);
+  pinMode(echoPin2,INPUT);
   pinMode(trigPin2,OUTPUT);
  setupMPU();
  pinMode(10, OUTPUT);
@@ -664,7 +716,8 @@ void loop(){
     // 1バイト分のデータを読み取る
     delay(100);
 
-    serialEvent();
+    //serialEvent();
+    //serialEvent2();
  
     if(val == '1'){        
       Serial.println("hello 1");
@@ -675,43 +728,44 @@ void loop(){
     }
     else if(val== '3'){
       Serial.println("Hello 3");
-      susumu_kaisuu = 5;
+      susumu_kaisuu = 10;
+      delay(300);
       susumu_heitan();
       tiziki_2();
       delay(50);
-      if (katamuki_true >9){
+      if (katamuki_true >17){
         Serial.println("Saka_Ue");
-        while(katamuki_true >9){
+        while(katamuki_true >17){
           Serial.println("sakaue");
-          Position[0] = 1916; //前に進む
-          Position[1] = -1916;
-          Position[2] = -1916;
-          Position[3] = 1916;
+          Position[0] = 200; //前に進む
+          Position[1] = -200;
+          Position[2] = -200;
+          Position[3] = 200;
           sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
           tiziki_2();
-          delay(450);
+          delay(10);
           saka = 1;
         }
-        }else if(katamuki_true <-5&& katamuki_true >=17){
-              Position[0] = -1000; //前に進む
-              Position[1] = 1000;
-              Position[2] = 1000;
-              Position[3] = -1000;
+        }else if (katamuki_true <-17){
+        while(katamuki_true < -17){
+          Position[0] = 200; //前に進む
+          Position[1] = -200;
+          Position[2] = -200;
+          Position[3] = 200;
+          sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+          tiziki_2();
+          delay(10);
+          saka = 1;
+        }
+      }else if(katamuki_true <-5&& katamuki_true >=9){
+              Position[0] = 1000; //前に進む
+              Position[1] = -1000;
+              Position[2] = -1000;
+              Position[3] = 1000;
               sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
               delay(270);
           
-        }else if (katamuki_true <-17){
-        while(katamuki_true < -17){
-          Position[0] = 1916; //前に進む
-          Position[1] = -1916;
-          Position[2] = -1916;
-          Position[3] = 1916;
-          sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-          tiziki_2();
-          delay(450);
-          saka = 1;
         }
-      }
    //discover_hisaisha();
    if (tiziki_restart == 30){
     setupMPU();
