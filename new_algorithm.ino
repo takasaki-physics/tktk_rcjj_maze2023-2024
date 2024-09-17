@@ -114,6 +114,7 @@ void judge(){//重みづけによる拡張右手法
 
 
     //どこへ行くか決める
+    int n = 0;
     if (right_weight < front_weight){
         n = right_weight;
         go_to = 1;
