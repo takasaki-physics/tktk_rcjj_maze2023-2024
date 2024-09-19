@@ -15,7 +15,7 @@ bool left_wall = 0;
 
 void write_down_wall(){
     //壁情報の記入(ここは帰還アルゴリズム用の関数)
-    if(kabe_zahyou[x][y] == 0){//記録されていない場合（そうしないと延々と加算されちゃう）test
+    if(kabe_zahyou[x][y] == 0){//記録されていない場合（そうしないと延々と加算されちゃうuuuuuuu）test
         switch (i){
             case 1://east
                 if(right_wall == 1){
