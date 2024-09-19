@@ -13,61 +13,60 @@ bool right_wall = 0;
 bool front_wall = 0;
 bool left_wall = 0;
 
-void write_down_wall(){//壁情報の記入(ここは帰還アルゴリズム用の関数)
+void write_down_wall(){
+    //壁情報の記入(ここは帰還アルゴリズム用の関数)
+    switch (i){
+        case 1://east
+            if(right_wall == 1){
+                kabe_zahyou[x][y] += 2;
+            }
+            if(front_wall == 1){
+                kabe_zahyou[x][y] += 8;
+            }
+            if(left_wall == 1){
+                kabe_zahyou[x][y] += 1;
+            }
+            break;
+        
+        case 2://north
+            if(right_wall == 1){
+                kabe_zahyou[x][y] += 8;
+            }
+            if(front_wall == 1){
+                kabe_zahyou[x][y] += 1;
+            }
+            if(left_wall == 1){
+                kabe_zahyou[x][y] += 4;
+            }
+            break;
 
-//
- switch (i){
-    case 1://east
-        if(right_wall == 1){
-            kabe_zahyou[x][y] += 2;
-        }
-        if(front_wall == 1){
-            kabe_zahyou[x][y] += 8;
-        }
-        if(left_wall == 1){
-            kabe_zahyou[x][y] += 1;
-        }
-        break;
-    
-    case 2://north
-        if(right_wall == 1){
-            kabe_zahyou[x][y] += 8;
-        }
-        if(front_wall == 1){
-            kabe_zahyou[x][y] += 1;
-        }
-        if(left_wall == 1){
-            kabe_zahyou[x][y] += 4;
-        }
-        break;
+        case 3://west
+            if(right_wall == 1){
+                kabe_zahyou[x][y] += 1;
+            }
+            if(front_wall == 1){
+                kabe_zahyou[x][y] += 4;
+            }
+            if(left_wall == 1){
+                kabe_zahyou[x][y] += 2;
+            }
+            break;
 
-    case 3://west
-        if(right_wall == 1){
-            kabe_zahyou[x][y] += 1;
+        case 4://south
+            if(right_wall == 1){
+                kabe_zahyou[x][y] += 4;
+            }
+            if(front_wall == 1){
+                kabe_zahyou[x][y] += 2;
+            }
+            if(left_wall == 1){
+                kabe_zahyou[x][y] += 8;
+            }
+            break;
         }
-        if(front_wall == 1){
-            kabe_zahyou[x][y] += 4;
-        }
-        if(left_wall == 1){
-            kabe_zahyou[x][y] += 2;
-        }
-        break;
-
-    case 4://south
-        if(right_wall == 1){
-            kabe_zahyou[x][y] += 4;
-        }
-        if(front_wall == 1){
-            kabe_zahyou[x][y] += 2;
-        }
-        if(left_wall == 1){
-            kabe_zahyou[x][y] += 8;
-        }
-        break;
-    }
-    //対応
-    //e n w s
-    //8 4 2 1
+        //対応
+        //e n w s
+        //8 4 2 1
 }
 
 
@@ -103,13 +102,13 @@ void judge(){//重みづけによる拡張右手法
 
     //壁がある場合更にプラスする
     if (right_wall == 1){
-        right_weight += 99;
+        right_weight += 100;
     }
     if (front_wall == 1){
-        front_weight += 99;
+        front_weight += 100;
     }
     if (left_wall == 1){
-        left_weight += 99;
+        left_weight += 100;
     }
 
 
@@ -126,8 +125,16 @@ void judge(){//重みづけによる拡張右手法
         n = left_weight;
         go_to = 3;
     }
+
+    if ((right_weight > 100) && (front_weight > 100) && (left_weight > 100)){//if all wall
+        go_to = 4;
+    }
+
+    right_weight = 0;//怖いから初期化
+    front_weight = 0;
+    left_weight = 0;
     
-    //return go_to //go_to 1:right 2:front 3:left
+    //return go_to //go_to 1:right 2:front 3:left 4:back
 }
 
 void move(){
@@ -151,6 +158,13 @@ void move(){
                     y += -1;
                     i = 2;
                     break;
+
+                case 4://back
+                    //send return moving signal
+                    toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
+                    x += -1;
+                    i = 3;
+                    break;
                 }
             break;
         
@@ -172,6 +186,13 @@ void move(){
                     //send left moving signal
                     x += -1;
                     i = 3;
+                    break;
+
+                case 4://back
+                    //send return moving signal
+                    toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
+                    y += -1;
+                    i = 4;
                     break;
                 }
             break;
@@ -195,6 +216,13 @@ void move(){
                     y += 1;
                     i = 4;
                     break;
+                
+                case 4://back
+                    //send return moving signal
+                    toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
+                    x += 1;
+                    i = 1;
+                    break;
                 }
             break;
         
@@ -216,6 +244,13 @@ void move(){
                     //send left moving signal
                     x += 1;
                     i = 1;
+                    break;
+                
+                case 4://back
+                    //send return moving signal
+                    toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
+                    y += -1;
+                    i = 2;
                     break;
                 }
             break;
@@ -239,4 +274,8 @@ void loop(){
     //壁情報を取得
     judge();//拡張右手法で行く方法を決める
     move();//実際に移動して座標を変更+到達回数を加算
+
+    if((x == 50)&&(y == 50)){//動いた後に判定だから大丈夫なはず
+        //stop
+    }
 }
