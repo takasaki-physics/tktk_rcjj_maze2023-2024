@@ -1,6 +1,6 @@
 
 int toutatu_zahyou[90][90];
-int kabe_zahyou[90][90];//0000 に絶対値の東8西4南2北1をそれぞれ割り当てる
+int kabe_zahyou[90][90];//0000 の4ビットに絶対方向の東8西4南2北1をそれぞれ割り当てるみたいな
 int x = 50;
 int y = 50;
 int right_weight = 0;
@@ -15,58 +15,60 @@ bool left_wall = 0;
 
 void write_down_wall(){
     //壁情報の記入(ここは帰還アルゴリズム用の関数)
-    switch (i){
-        case 1://east
-            if(right_wall == 1){
-                kabe_zahyou[x][y] += 2;
-            }
-            if(front_wall == 1){
-                kabe_zahyou[x][y] += 8;
-            }
-            if(left_wall == 1){
-                kabe_zahyou[x][y] += 1;
-            }
-            break;
-        
-        case 2://north
-            if(right_wall == 1){
-                kabe_zahyou[x][y] += 8;
-            }
-            if(front_wall == 1){
-                kabe_zahyou[x][y] += 1;
-            }
-            if(left_wall == 1){
-                kabe_zahyou[x][y] += 4;
-            }
-            break;
+    if(kabe_zahyou[x][y] == 0){//記録されていない場合（そうしないと延々と加算されちゃう）
+        switch (i){
+            case 1://east
+                if(right_wall == 1){
+                    kabe_zahyou[x][y] += 2;
+                }
+                if(front_wall == 1){
+                    kabe_zahyou[x][y] += 8;
+                }
+                if(left_wall == 1){
+                    kabe_zahyou[x][y] += 1;
+                }
+                break;
+            
+            case 2://north
+                if(right_wall == 1){
+                    kabe_zahyou[x][y] += 8;
+                }
+                if(front_wall == 1){
+                    kabe_zahyou[x][y] += 1;
+                }
+                if(left_wall == 1){
+                    kabe_zahyou[x][y] += 4;
+                }
+                break;
 
-        case 3://west
-            if(right_wall == 1){
-                kabe_zahyou[x][y] += 1;
-            }
-            if(front_wall == 1){
-                kabe_zahyou[x][y] += 4;
-            }
-            if(left_wall == 1){
-                kabe_zahyou[x][y] += 2;
-            }
-            break;
+            case 3://west
+                if(right_wall == 1){
+                    kabe_zahyou[x][y] += 1;
+                }
+                if(front_wall == 1){
+                    kabe_zahyou[x][y] += 4;
+                }
+                if(left_wall == 1){
+                    kabe_zahyou[x][y] += 2;
+                }
+                break;
 
-        case 4://south
-            if(right_wall == 1){
-                kabe_zahyou[x][y] += 4;
+            case 4://south
+                if(right_wall == 1){
+                    kabe_zahyou[x][y] += 4;
+                }
+                if(front_wall == 1){
+                    kabe_zahyou[x][y] += 2;
+                }
+                if(left_wall == 1){
+                    kabe_zahyou[x][y] += 8;
+                }
+                break;
             }
-            if(front_wall == 1){
-                kabe_zahyou[x][y] += 2;
-            }
-            if(left_wall == 1){
-                kabe_zahyou[x][y] += 8;
-            }
-            break;
-        }
-        //対応
-        //e n w s
-        //8 4 2 1
+            //対応
+            //e n w s
+            //8 4 2 1
+    }
 }
 
 
