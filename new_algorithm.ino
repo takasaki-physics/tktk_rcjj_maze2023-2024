@@ -1,6 +1,11 @@
 
+#include <stdio.h>
+#include <cmath>
+#include <iostream>
 int toutatu_zahyou[90][90];
 int kabe_zahyou[90][90];//0000 の4ビットに絶対方向の東8西4南2北1をそれぞれ割り当てるみたいな
+int cost[90][90];//マス目のコスト
+bool reach_time[90][90];//到達の有無（帰還用）
 int x = 50;
 int y = 50;
 int right_weight = 0;
@@ -12,6 +17,86 @@ int i = 2;//1:east 2:north 3:west 4:south
 bool right_wall = 0;
 bool front_wall = 0;
 bool left_wall = 0;
+
+const int MAX = 1000; // キュー配列の最大サイズ
+
+int st[MAX]; // スタックを表す配列
+int top = 0; // スタックの先頭を表すポインタ
+
+// スタックを初期化する
+void st_init() {
+    top = 0; // スタックポインタを初期位置に
+}
+
+// スタックが空かどうかを判定する
+bool st_isEmpty() {
+    return (top == 0); // スタックサイズが 0 かどうか
+}
+
+// スタックが満杯かどうかを判定する
+bool st_isFull() {
+    return (top == MAX); // スタックサイズが MAX かどうか
+}
+
+// push (top を進めて要素を格納)
+void push(int v) {
+    if (st_isFull()) {
+        //cout << "error: stack is full." << endl;
+        return;
+    }
+    st[top++] = v; // st[top] = v; と top++; をまとめてこのように表せます
+}
+
+// pop (top をデクリメントして、top の位置にある要素を返す)
+int pop() {
+    if (st_isEmpty()) {
+        //cout << "error: stack is empty." << endl;
+        return -1;
+    }
+    return st[--top]; // --top; と return st[top]; をまとめてこのように表せます
+}
+
+
+
+int qu[MAX]; // キューを表す配列
+int tail = 0, head = 0; // キューの要素区間を表す変数
+
+// キューを初期化する
+void init() {
+    head = tail = 0;
+}
+
+// キューが空かどうかを判定する
+bool isEmpty() {
+    return (head == tail);
+}
+
+// スタックが満杯かどうかを判定する
+bool isFull() {
+    return (head == (tail + 1) % MAX);
+}
+
+// enqueue (tail に要素を格納してインクリメント)
+void enqueue(int v) {
+    if (isFull()) {
+        //cout << "error: queue is full." << endl;
+        return;
+    }
+    qu[tail++] = v;
+    if (tail == MAX) tail = 0; // リングバッファの終端に来たら 0 に
+}
+
+// dequeue (head にある要素を返して head をインクリメント)
+int dequeue() {
+    if (isEmpty()) {
+        //cout << "error: stack is empty." << endl;
+        return -1;
+    }
+    int res = qu[head];
+    ++head;
+    if (head == MAX) head = 0;
+    return res;
+}
 
 void write_down_wall(){
     //壁情報の記入(ここは帰還アルゴリズム用の関数)
@@ -71,6 +156,83 @@ void write_down_wall(){
     }
 }
 
+
+void BFS(){
+    int a = x;
+    int b = y;
+    cost[a][b] = 1;//現在地のコストを1にする
+
+    while(1){
+
+        reach_time[a][b] = 1;//そのマスを訪問済みにする
+
+        for(int i = 1; i <= 4; i++){//そのマスの周りのマスのコストを＋１する
+            int result = static_cast<int>(pow(2, i));
+            if(kabe_zahyou[a][b] % result == 0){//kabe_zahyou[][]は0000 の4ビットに絶対方向の東8西4南2北1をそれぞれ割り当てる
+                switch(i){
+                    case 1://北の壁がない
+                        if(!reach_time[a][b-1]){//その先のマスが訪問済みでない
+                            cost[a][b-1] = cost[a][b] + 1;
+                            //キューの末尾に入れる
+                            enqueue(a);
+                            enqueue(b-1);
+                        }
+                        break;
+
+                    case 2://南の壁がない
+                        if(!reach_time[a][b+1]){//その先のマスが訪問済みでない
+                            cost[a][b+1] = cost[a][b] + 1;
+                            //キューの末尾に入れる
+                            enqueue(a);
+                            enqueue(b+1);
+                        }
+                        break;
+
+                    case 3://西の壁がない
+                        if(!reach_time[a-1][b]){//その先のマスが訪問済みでない
+                            cost[a-1][b] = cost[a][b] + 1;
+                            //キューの末尾に入れる
+                            enqueue(a-1);
+                            enqueue(b);
+                        }
+                        break;
+
+                    case 4://東の壁がない
+                        if(!reach_time[a+1][b]){//その先のマスが訪問済みでない
+                            cost[a+1][b] = cost[a][b] + 1;
+                            //キューの末尾に入れる
+                            enqueue(a+1);
+                            enqueue(b);
+                        }
+                        break;
+                }
+
+            }else{//その方向に壁があるとき
+                kabe_zahyou[a][b] = kabe_zahyou[a][b] - result;
+            }
+        }
+        //キューの先頭を取り出す
+        a = dequeue();
+        b = dequeue();
+
+        if((a == -1)||(b == -1)){//error
+            break;
+        }
+
+        if((a == 50)&&(b == 50)){
+            break;
+        }
+    }
+    //スタックを使って逆探索
+    a = 50;
+    b = 50;
+    //右のマスのコストとの差が１の場合
+    if(cost[a][b] - cost[a+1][b] == 1){
+        push(2);//曲がるについてどうすればいいかわかんね～～
+    }
+    
+    
+}
 
 
 void judge(){//重みづけによる拡張右手法
@@ -268,8 +430,12 @@ void setup(){
     for (int j = 0; j < 90; j++) {
         toutatu_zahyou[t][j] = 0;  //make it to begining 
         kabe_zahyou[t][j] = 0;
+        reach_time[t][j] = 0;
+        cost[t][j] = 0;
         }
     }
+    init();
+    st_init();
 }
 
 void loop(){
