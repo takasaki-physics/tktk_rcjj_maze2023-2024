@@ -1,8 +1,9 @@
 
 #include <stdio.h>
+#include <time.h>
 #include <cmath>
 #include <iostream>
-int toutatu_zahyou[90][90];
+int toutatu_zahyou[90][90];//そのマスの到達回数
 int kabe_zahyou[90][90];//0000 の4ビットに絶対方向の東8西4南2北1をそれぞれ割り当てるみたいな
 int cost[90][90];//マス目のコスト
 bool reach_time[90][90];//到達の有無（帰還用）
@@ -18,7 +19,7 @@ bool right_wall = 0;
 bool front_wall = 0;
 bool left_wall = 0;
 
-const int MAX = 1000; // キュー配列の最大サイズ
+const int MAX = 3000; // キュー配列の最大サイズ
 
 int st[MAX]; // スタックを表す配列
 int top = 0; // スタックの先頭を表すポインタ
@@ -100,7 +101,7 @@ int dequeue() {
 
 void write_down_wall(){
     //壁情報の記入(ここは帰還アルゴリズム用の関数)
-    if(kabe_zahyou[x][y] == 0){//記録されていない場合（そうしないと延々と加算されちゃう）
+    if(kabe_zahyou[x][y] == 100){//記録されていない場合（そうしないと延々と加算されちゃう）
         switch (i){
             case 1://east
                 if(right_wall == 1){
@@ -153,11 +154,26 @@ void write_down_wall(){
             //対応
             //e n w s
             //8 4 2 1
+        kabe_zahyou[a][b] += -100;
     }
 }
 
+int WhichWay(a,b){
+    if(cost[a][b] - cost[a+1][b] == 1){
+        return 1;
+    }
+    if(cost[a][b] - cost[a][b-1] == 1){
+        return 2;
+    }
+    if(cost[a][b] - cost[a-1][b] == 1){
+        return 3;
+    }
+    if(cost[a][b] - cost[a][b+1] == 1){
+        return 4;
+    }
+}
 
-void BFS(){
+void BFS(){//幅優先探索をする関数
     int a = x;
     int b = y;
     cost[a][b] = 1;//現在地のコストを1にする
@@ -165,13 +181,12 @@ void BFS(){
     while(1){
 
         reach_time[a][b] = 1;//そのマスを訪問済みにする
-
         for(int i = 1; i <= 4; i++){//そのマスの周りのマスのコストを＋１する
             int result = static_cast<int>(pow(2, i));
             if(kabe_zahyou[a][b] % result == 0){//kabe_zahyou[][]は0000 の4ビットに絶対方向の東8西4南2北1をそれぞれ割り当てる
                 switch(i){
                     case 1://北の壁がない
-                        if(!reach_time[a][b-1]){//その先のマスが訪問済みでない
+                        if((!reach_time[a][b-1])&&(kabe_zahyou[a][b-1] != 100)){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a][b-1] = cost[a][b] + 1;
                             //キューの末尾に入れる
                             enqueue(a);
@@ -180,7 +195,7 @@ void BFS(){
                         break;
 
                     case 2://南の壁がない
-                        if(!reach_time[a][b+1]){//その先のマスが訪問済みでない
+                        if((!reach_time[a][b+1])&&(kabe_zahyou[a][b+1] != 100)){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a][b+1] = cost[a][b] + 1;
                             //キューの末尾に入れる
                             enqueue(a);
@@ -189,7 +204,7 @@ void BFS(){
                         break;
 
                     case 3://西の壁がない
-                        if(!reach_time[a-1][b]){//その先のマスが訪問済みでない
+                        if((!reach_time[a-1][b])&&(kabe_zahyou[a-1][b] != 100)){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a-1][b] = cost[a][b] + 1;
                             //キューの末尾に入れる
                             enqueue(a-1);
@@ -198,7 +213,7 @@ void BFS(){
                         break;
 
                     case 4://東の壁がない
-                        if(!reach_time[a+1][b]){//その先のマスが訪問済みでない
+                        if((!reach_time[a+1][b])&&(kabe_zahyou[a+1][b] != 100)){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a+1][b] = cost[a][b] + 1;
                             //キューの末尾に入れる
                             enqueue(a+1);
@@ -226,12 +241,116 @@ void BFS(){
     //スタックを使って逆探索
     a = 50;
     b = 50;
-    //右のマスのコストとの差が１の場合
-    if(cost[a][b] - cost[a+1][b] == 1){
-        push(2);//曲がるについてどうすればいいかわかんね～～
+    while(1){
+
+        switch(i){//東西南北が1234
+            case 1://east
+                switch(WhichWay(a,b)){//前後左右のどこが最短になるか（ここは）１：右折、２：左折、３：直進
+
+                    case 2://北マスからきたとき（ここのシグナルは探索時の曲がる→進むとは逆で、進む→曲がるじゃないとかも。pushの順番は曲がる、進む）
+                        push(2);
+                        push(3);
+                        b += -1;
+                        i = 4:
+
+                    case 3://西マスからきたとき
+                        push(3);
+                        a += -1;
+
+                    case 4://南マスからきたとき
+                        push(1);
+                        push(3);
+                        b += 1;
+                        i = 2;
+
+                }
+
+            case 2://north
+                switch(WhichWay(a,b)){//前後左右のどこが最短になるか
+                    case 1:
+                        push(1);
+                        push(3);
+                        a += 1;
+                        i = 3;
+
+                    case 3:
+                        push(2);
+                        push(3);
+                        a += -1;
+                        i = 1;
+
+                    case 4:
+                        push(3);
+                        b += -1;
+
+                }
+
+            case 3://west
+                switch(WhichWay(a,b)){//前後左右のどこが最短になるか
+                    case 1:
+                        push(3);
+                        a += 1;
+
+                    case 2:
+                        push(1);
+                        push(3);
+                        b += -1;
+                        i = 4;
+
+                    case 4:
+                    push(2);
+                    push(3);
+                    i = 2;
+
+                }
+
+            case 4://south
+                switch(WhichWay(a,b)){//前後左右のどこが最短になるか
+                    case 1:
+                        push(2);
+                        push(3);
+                        a += 1;
+                        i = 3;
+
+                    case 2:
+                        push(3);
+                        b += -1;
+
+                    case 3:
+                        push(1);
+                        push(3);
+                        a += -1;
+                        i = 1;
+
+                }
+        }
+        if((a == x)&&(b == y)){
+            break;
+        }
     }
     
     
+}
+
+void GoHomeSignal(){//スタックに入れた数字を動きのシグナルに変換する関数
+    int GoSignal = 0;
+    while(1){
+        //ここ以下を「相手から動き終わったという信号が送られたら」とかにしないとバババッて送られちゃうかも（RTOSだから大丈夫かも？）
+        GoSignal = pop();
+        switch(GoSignal){
+            case 1:
+                //TurnRight
+
+            case 2:
+                //TurnLeft
+
+            case 3:
+                //GoStraight
+        }
+        if ((x == 50)&&(y == 50)){
+            break;
+        }
+    }
 }
 
 
@@ -302,6 +421,7 @@ void judge(){//重みづけによる拡張右手法
 }
 
 void move(){
+    write_down_wall();
     switch (i){
         case 1://east
             switch (go_to){
@@ -429,13 +549,17 @@ void setup(){
     for (int t = 0; t < 90; t++) {
     for (int j = 0; j < 90; j++) {
         toutatu_zahyou[t][j] = 0;  //make it to begining 
-        kabe_zahyou[t][j] = 0;
+        kabe_zahyou[t][j] = 100;
         reach_time[t][j] = 0;
         cost[t][j] = 0;
         }
     }
     init();
     st_init();
+    // 現在の時刻を取得
+    time_t FirstTime;
+    time(&FirstTime);  // 現在の時刻を取得して FirstTime に格納
+    long first_seconds = static_cast<long>(FirstTime); 
 }
 
 void loop(){
@@ -443,7 +567,14 @@ void loop(){
     judge();//拡張右手法で行く方法を決める
     move();//実際に移動して座標を変更+到達回数を加算
 
-    if((x == 50)&&(y == 50)){//動いた後に判定だから大丈夫なはず
-        //stop
+    // 現在の時刻を取得
+    time_t NowTime;
+    time(&NowTime);  // 現在の時刻を取得して NowTime に格納
+    long now_seconds = static_cast<long>(NowTime); 
+    //330秒（＝5分半）経ったら幅優先探索を始める
+    if(now_seconds - first_seconds >= 330){
+        BFS();
+        GoHomeSignal();
+        //停止
     }
 }
