@@ -1,6 +1,7 @@
 #pragma once
-//#include <cmath>
-//#include <iostream>
+#include <stdio.h>
+#include <cmath>
+#include <iostream>
 
 const int MAX = 30; // キュー配列の最大サイズ
 

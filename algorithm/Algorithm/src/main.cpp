@@ -3,8 +3,6 @@
 #include <time.h>
 #include <go_home.h>
 #include <move.h>
-//#include <cmath>
-//#include <iostream>
 
 go_home Gh;
 move M;
