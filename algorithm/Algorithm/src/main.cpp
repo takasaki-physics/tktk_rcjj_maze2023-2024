@@ -1,8 +1,8 @@
 
 #include <stdio.h>
 #include <time.h>
-#include <go_home.h>
-#include <move.h>
+#include <go_home.cpp>
+#include <move.cpp>
 
 go_home Gh;
 move M;
