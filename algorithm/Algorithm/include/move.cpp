@@ -86,26 +86,26 @@ switch (i){
                 case Right:
                     //send right moving signal
                     y += 1;
-                    i = 4;
+                    i = South;
                     break;
                 
                 case Front:
                     //send front moving signal
                     x += 1;
-                    i = 1;
+                    i = East;
                     break;
                 
                 case Left:
                     //send left moving signal
                     y += -1;
-                    i = 2;
+                    i = North;
                     break;
 
                 case Back:
                     //send return moving signal
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     x += -1;
-                    i = 3;
+                    i = West;
                     break;
                 }
             break;
@@ -115,26 +115,26 @@ switch (i){
                 case Right:
                     //send right moving signal
                     x += 1;
-                    i = 1;
+                    i = East;
                     break;
                 
                 case Front:
                     //send front moving signal
                     y += -1;
-                    i = 2;
+                    i = North;
                     break;
                 
                 case Left:
                     //send left moving signal
                     x += -1;
-                    i = 3;
+                    i = West;
                     break;
 
                 case Back:
                     //send return moving signal
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     y += -1;
-                    i = 4;
+                    i = South;
                     break;
                 }
             break;
@@ -144,26 +144,26 @@ switch (i){
                 case Right:
                     //send right moving signal
                     y += -1;
-                    i = 2;
+                    i = North;
                     break;
                 
                 case Front:
                     //send front moving signal
                     x += -1;
-                    i = 3;
+                    i = West;
                     break;
                 
                 case Left:
                     //send left moving signal
                     y += 1;
-                    i = 4;
+                    i = South;
                     break;
                 
                 case Back:
                     //send return moving signal
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     x += 1;
-                    i = 1;
+                    i = East;
                     break;
                 }
             break;
@@ -173,26 +173,26 @@ switch (i){
                 case Right:
                     //send right moving signal
                     x += -1;
-                    i = 3;
+                    i = West;
                     break;
                 
                 case Front:
                     //send front moving signal
                     y += 1;
-                    i = 4;
+                    i = South;
                     break;
                 
                 case Left:
                     //send left moving signal
                     x += 1;
-                    i = 1;
+                    i = East;
                     break;
                 
                 case Back:
                     //send return moving signal
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     y += -1;
-                    i = 2;
+                    i = North;
                     break;
                 }
             break;
