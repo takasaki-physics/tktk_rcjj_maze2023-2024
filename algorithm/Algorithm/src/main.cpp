@@ -1,14 +1,16 @@
 
 #include <stdio.h>
+#include <arduino.h>
 #include <time.h>
 #include <go_home.cpp>
+#include <move.h>
 #include <move.cpp>
 
 go_home Gh;
 move M;
 int8_t x = 50;
 int8_t y = 50;
-int8_t i = 2;//1:east 2:north 3:west 4:south
+int8_t i = North ;//1:east 2:north 3:west 4:south
 long firstseconds;
 
 bool right_wall = false;//ここもセンサーの値を取得するファイルとして分けたい
@@ -33,6 +35,7 @@ void loop(){
     x = M.returnX;
     y = M.returnY;
     i = M.returnI;
+
 
     // 現在の時刻を取得
     time_t NowTime;

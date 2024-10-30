@@ -15,25 +15,25 @@ void move::judge(int8_t x,int8_t y,int8_t i,bool right_wall,bool front_wall,bool
 {
     
     switch (i){//向きによって重みをつける
-        case 1://east
+        case East:
             right_weight = toutatu_zahyou[x][y+1] * 5 + 1;
             front_weight = toutatu_zahyou[x+1][y] * 5 + 2;
             left_weight = toutatu_zahyou[x][y-1] * 5 + 3;
             break;
 
-        case 2://north
+        case North:
             right_weight = toutatu_zahyou[x+1][y] * 5 + 1;
             front_weight = toutatu_zahyou[x][y-1] * 5 + 2;
             left_weight = toutatu_zahyou[x-1][y] * 5 + 3;
             break;
 
-        case 3://west
+        case West:
             right_weight = toutatu_zahyou[x][y-1] * 5 + 1;
             front_weight = toutatu_zahyou[x-1][y] * 5 + 2;
             left_weight = toutatu_zahyou[x][y+1] * 5 + 3;
             break;
 
-        case 4://south
+        case South:
             right_weight = toutatu_zahyou[x-1][y] * 5 + 1;
             front_weight = toutatu_zahyou[x][y+1] * 5 + 2;
             left_weight = toutatu_zahyou[x+1][y] * 5 + 3;
@@ -57,51 +57,51 @@ void move::judge(int8_t x,int8_t y,int8_t i,bool right_wall,bool front_wall,bool
     int n = 0;
     if (right_weight < front_weight){
         n = right_weight;
-        go_to = 1;
+        go_to = Right;
     }else{
         n = front_weight;
-        go_to = 2;
+        go_to = Front;
     }
     if (left_weight < n){
         n = left_weight;
-        go_to = 3;
+        go_to = Left;
     }
 
     if ((right_weight > 100) && (front_weight > 100) && (left_weight > 100)){//if all wall
-        go_to = 4;
+        go_to = Back;
     }
 
     right_weight = 0;//怖いから初期化
     front_weight = 0;
     left_weight = 0;
     
-    //return go_to //go_to 1:right 2:front 3:left 4:back
+    //return go_to;いらない？ //go_to 1:right 2:front 3:left 4:back
 }
 
 void move::MoveTo(int8_t x,int8_t y,int8_t i)
 {
 switch (i){
-        case 1://east
+        case East:
             switch (go_to){
-                case 1://right
+                case Right:
                     //send right moving signal
                     y += 1;
                     i = 4;
                     break;
                 
-                case 2://front
+                case Front:
                     //send front moving signal
                     x += 1;
                     i = 1;
                     break;
                 
-                case 3://left
+                case Left:
                     //send left moving signal
                     y += -1;
                     i = 2;
                     break;
 
-                case 4://back
+                case Back:
                     //send return moving signal
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     x += -1;
@@ -110,27 +110,27 @@ switch (i){
                 }
             break;
         
-        case 2://north
+        case North:
             switch (go_to){
-                case 1://right
+                case Right:
                     //send right moving signal
                     x += 1;
                     i = 1;
                     break;
                 
-                case 2://front
+                case Front:
                     //send front moving signal
                     y += -1;
                     i = 2;
                     break;
                 
-                case 3://left
+                case Left:
                     //send left moving signal
                     x += -1;
                     i = 3;
                     break;
 
-                case 4://back
+                case Back:
                     //send return moving signal
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     y += -1;
@@ -139,27 +139,27 @@ switch (i){
                 }
             break;
         
-        case 3://west
+        case West:
             switch (go_to){
-                case 1://right
+                case Right:
                     //send right moving signal
                     y += -1;
                     i = 2;
                     break;
                 
-                case 2://front
+                case Front:
                     //send front moving signal
                     x += -1;
                     i = 3;
                     break;
                 
-                case 3://left
+                case Left:
                     //send left moving signal
                     y += 1;
                     i = 4;
                     break;
                 
-                case 4://back
+                case Back:
                     //send return moving signal
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     x += 1;
@@ -168,27 +168,27 @@ switch (i){
                 }
             break;
         
-        case 4://south
+        case South:
             switch (go_to){
-                case 1://right
+                case Right:
                     //send right moving signal
                     x += -1;
                     i = 3;
                     break;
                 
-                case 2://front
+                case Front:
                     //send front moving signal
                     y += 1;
                     i = 4;
                     break;
                 
-                case 3://left
+                case Left:
                     //send left moving signal
                     x += 1;
                     i = 1;
                     break;
                 
-                case 4://back
+                case Back:
                     //send return moving signal
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     y += -1;

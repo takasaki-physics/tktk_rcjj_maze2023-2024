@@ -1,4 +1,5 @@
-#include<go_home.h>
+#include <go_home.h>
+#include <move.h>
 #include <StackAndQue.h>
 StackAndQue stq;
 
@@ -13,19 +14,19 @@ go_home::go_home()
     }
 }
 
-int8_t go_home::WhichWay(int a,int b)
+int8_t go_home::WhichWay(int a,int b)//前後左右のどこが最短になるか
 {
     if(cost[a][b] - cost[a+1][b] == 1){
-        return 1;
+        return East;
        }
     if(cost[a][b] - cost[a][b-1] == 1){
-        return 2;
+        return North;
     }
     if(cost[a][b] - cost[a-1][b] == 1){
-        return 3;
+        return West;
     }
     if(cost[a][b] - cost[a][b+1] == 1){
-        return 4;
+        return South;
     }
     return 0;
 }
@@ -40,11 +41,11 @@ void go_home::BFS(int8_t x,int8_t y,int8_t i)//現在地の座標を取得
     while(1){
 
         reach_time[a][b] = 1;//そのマスを訪問済みにする
-        for(int n = 1; n <= 4; n++){//そのマスの周りのマスのコストを＋１する
-            int result = static_cast<int>(pow(2, n));
-            if(kabe_zahyou[a][b] % result == 0){//kabe_zahyou[][]は0000 の4ビットに絶対方向の東8西4南2北1をそれぞれ割り当てる
-                switch(i){
-                    case 1://北の壁がない
+        for(int n = 2; n <= 16; n *= 2){//そのマスの周りのマスのコストを＋１する
+            //int result = static_cast<int>(pow(2, n));
+            if(kabe_zahyou[a][b] % n == 0){//kabe_zahyou[][]は0000 の4ビットに絶対方向の東8西4南2北1をそれぞれ割り当てる
+                switch(n){
+                    case 2://北の壁がない
                         if((!reach_time[a][b-1])&&(kabe_zahyou[a][b-1] != 100)){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a][b-1] = cost[a][b] + 1;
                             //キューの末尾に入れる
@@ -53,7 +54,7 @@ void go_home::BFS(int8_t x,int8_t y,int8_t i)//現在地の座標を取得
                         }
                         break;
 
-                    case 2://南の壁がない
+                    case 4://南の壁がない
                         if((!reach_time[a][b+1])&&(kabe_zahyou[a][b+1] != 100)){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a][b+1] = cost[a][b] + 1;
                             //キューの末尾に入れる
@@ -62,7 +63,7 @@ void go_home::BFS(int8_t x,int8_t y,int8_t i)//現在地の座標を取得
                         }
                         break;
 
-                    case 3://西の壁がない
+                    case 8://西の壁がない
                         if((!reach_time[a-1][b])&&(kabe_zahyou[a-1][b] != 100)){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a-1][b] = cost[a][b] + 1;
                             //キューの末尾に入れる
@@ -71,7 +72,7 @@ void go_home::BFS(int8_t x,int8_t y,int8_t i)//現在地の座標を取得
                         }
                         break;
 
-                    case 4://東の壁がない
+                    case 16://東の壁がない
                         if((!reach_time[a+1][b])&&(kabe_zahyou[a+1][b] != 100)){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a+1][b] = cost[a][b] + 1;
                             //キューの末尾に入れる
@@ -82,7 +83,7 @@ void go_home::BFS(int8_t x,int8_t y,int8_t i)//現在地の座標を取得
                 }
 
             }else{//その方向に壁があるとき
-                kabe_zahyou[a][b] = kabe_zahyou[a][b] - result;
+                kabe_zahyou[a][b] = kabe_zahyou[a][b] - (n/2);
             }
         }
         //キューの先頭を取り出す
@@ -103,83 +104,83 @@ void go_home::BFS(int8_t x,int8_t y,int8_t i)//現在地の座標を取得
     while(1){
 
         switch(i){//東西南北が1234
-            case 1://east
-                switch(WhichWay(a,b)){//前後左右のどこが最短になるか（ここは）１：右折、２：左折、３：直進
+            case East:
+                switch(WhichWay(a,b)){//前後左右のどこが最短になるか１：右折、２：左折、３：直進
 
-                    case 2://北マスからきたとき（ここのシグナルは探索時の曲がる→進むとは逆で、進む→曲がるじゃないとかも。pushの順番は曲がる、進む）
+                    case North://北マスからきたとき（ここのシグナルは探索時の曲がる→進むとは逆で、進む→曲がるじゃないとかも。pushの順番は曲がる、進む）
                         stq.push(2);
                         stq.push(3);
                         b += -1;
-                        i = 4;
+                        i = South;
 
-                    case 3://西マスからきたとき
+                    case West://西マスからきたとき
                         stq.push(3);
                         a += -1;
 
-                    case 4://南マスからきたとき
+                    case South://南マスからきたとき
                         stq.push(1);
                         stq.push(3);
                         b += 1;
-                        i = 2;
+                        i = North;
 
                 }
 
-            case 2://north
+            case North:
                 switch(WhichWay(a,b)){//前後左右のどこが最短になるか
-                    case 1:
+                    case East:
                         stq.push(1);
                         stq.push(3);
                         a += 1;
-                        i = 3;
+                        i = West;
 
-                    case 3:
+                    case West:
                         stq.push(2);
                         stq.push(3);
                         a += -1;
-                        i = 1;
+                        i = East;
 
-                    case 4:
+                    case South:
                         stq.push(3);
                         b += -1;
 
                 }
 
-            case 3://west
+            case West:
                 switch(WhichWay(a,b)){//前後左右のどこが最短になるか
-                    case 1:
+                    case East:
                         stq.push(3);
                         a += 1;
 
-                    case 2:
+                    case North:
                         stq.push(1);
                         stq.push(3);
                         b += -1;
-                        i = 4;
+                        i = South;
 
-                    case 4:
+                    case South:
                         stq.push(2);
                         stq.push(3);
-                        i = 2;
+                        i = North;
 
                 }
 
-            case 4://south
+            case South:
                 switch(WhichWay(a,b)){//前後左右のどこが最短になるか
-                    case 1:
+                    case East:
                         stq.push(2);
                         stq.push(3);
                         a += 1;
-                        i = 3;
+                        i = West;
 
-                    case 2:
+                    case North:
                         stq.push(3);
                         b += -1;
 
-                    case 3:
+                    case West:
                         stq.push(1);
                         stq.push(3);
                         a += -1;
-                        i = 1;
+                        i = East;
 
                 }
         }
@@ -196,7 +197,7 @@ void go_home::WriteDownWall(int8_t x,int8_t y,int8_t i,bool right_wall,bool fron
     //壁情報の記入(ここは帰還アルゴリズム用の関数)
     if(kabe_zahyou[x][y] == 100){//記録されていない場合（そうしないと延々と加算されちゃう）
         switch (i){
-            case 1://east
+            case East:
                 if(right_wall){
                     kabe_zahyou[x][y] += 2;
                 }
@@ -208,7 +209,7 @@ void go_home::WriteDownWall(int8_t x,int8_t y,int8_t i,bool right_wall,bool fron
                 }
                 break;
             
-            case 2://north
+            case North:
                 if(right_wall){
                     kabe_zahyou[x][y] += 8;
                 }
@@ -220,7 +221,7 @@ void go_home::WriteDownWall(int8_t x,int8_t y,int8_t i,bool right_wall,bool fron
                 }
                 break;
 
-            case 3://west
+            case West:
                 if(right_wall){
                     kabe_zahyou[x][y] += 1;
                 }
@@ -232,7 +233,7 @@ void go_home::WriteDownWall(int8_t x,int8_t y,int8_t i,bool right_wall,bool fron
                 }
                 break;
 
-            case 4://south
+            case South:
                 if(right_wall){
                     kabe_zahyou[x][y] += 4;
                 }

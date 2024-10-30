@@ -1,6 +1,14 @@
 #pragma once
 #include <stdio.h>
+#define East 1
+#define North 2
+#define West 3
+#define South 4
 
+#define Right 1
+#define Front 2
+#define Left 3
+#define Back 4
 class move
 {
 private:
