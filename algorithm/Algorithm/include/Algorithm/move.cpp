@@ -1,4 +1,5 @@
-#include <move.h>
+#include <Algorithm\move.h>
+#include <C:\Users\hinat\Documents\repository\tktk_rcjj_maze\algorithm\Algorithm\include\sensor\sensor.h>
 
 move::move()
 {
@@ -11,7 +12,7 @@ move::move()
 
 
 
-void move::judge(int8_t x,int8_t y,int8_t i,bool right_wall,bool front_wall,bool left_wall)
+void move::judge(int8_t x,int8_t y,int8_t i)
 {
     
     switch (i){//向きによって重みをつける
@@ -42,13 +43,13 @@ void move::judge(int8_t x,int8_t y,int8_t i,bool right_wall,bool front_wall,bool
     }
 
     //壁がある場合更にプラスする
-    if (right_wall){
+    if (S.right_wall){
         right_weight += 100;
     }
-    if (front_wall){
+    if (S.front_wall){
         front_weight += 100;
     }
-    if (left_wall){
+    if (S.left_wall){
         left_weight += 100;
     }
 
@@ -198,6 +199,7 @@ switch (i){
             break;
     }
     toutatu_zahyou[x][y] += 1;//移動先のマスの到達回数をプラスしている
+
     returnX = x;
     returnY = y;
     returnI = i;

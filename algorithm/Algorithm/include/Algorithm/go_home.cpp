@@ -1,6 +1,9 @@
-#include <go_home.h>
-#include <move.h>
-#include <StackAndQue.h>
+#include <Algorithm\go_home.h>
+#include <Algorithm\move.h>
+#include <Algorithm\StackAndQue.h>
+#include <sensor\sensor.h>
+
+sensor S;
 StackAndQue stq;
 
 go_home::go_home()
@@ -103,7 +106,7 @@ void go_home::BFS(int8_t x,int8_t y,int8_t i)//現在地の座標を取得
     b = 50;
     while(1){
 
-        switch(i){//東西南北が1234
+        switch(i){
             case East:
                 switch(WhichWay(a,b)){//前後左右のどこが最短になるか１：右折、２：左折、３：直進
 
@@ -192,55 +195,55 @@ void go_home::BFS(int8_t x,int8_t y,int8_t i)//現在地の座標を取得
     
 }
 
-void go_home::WriteDownWall(int8_t x,int8_t y,int8_t i,bool right_wall,bool front_wall,bool left_wall)
+void go_home::WriteDownWall(int8_t x,int8_t y,int8_t i)
 {
     //壁情報の記入(ここは帰還アルゴリズム用の関数)
     if(kabe_zahyou[x][y] == 100){//記録されていない場合（そうしないと延々と加算されちゃう）
         switch (i){
             case East:
-                if(right_wall){
+                if(S.right_wall){
                     kabe_zahyou[x][y] += 2;
                 }
-                if(front_wall){
+                if(S.front_wall){
                     kabe_zahyou[x][y] += 8;
                 }
-                if(left_wall){
+                if(S.left_wall){
                     kabe_zahyou[x][y] += 1;
                 }
                 break;
             
             case North:
-                if(right_wall){
+                if(S.right_wall){
                     kabe_zahyou[x][y] += 8;
                 }
-                if(front_wall){
+                if(S.front_wall){
                     kabe_zahyou[x][y] += 1;
                 }
-                if(left_wall){
+                if(S.left_wall){
                     kabe_zahyou[x][y] += 4;
                 }
                 break;
 
             case West:
-                if(right_wall){
+                if(S.right_wall){
                     kabe_zahyou[x][y] += 1;
                 }
-                if(front_wall){
+                if(S.front_wall){
                     kabe_zahyou[x][y] += 4;
                 }
-                if(left_wall){
+                if(S.left_wall){
                     kabe_zahyou[x][y] += 2;
                 }
                 break;
 
             case South:
-                if(right_wall){
+                if(S.right_wall){
                     kabe_zahyou[x][y] += 4;
                 }
-                if(front_wall){
+                if(S.front_wall){
                     kabe_zahyou[x][y] += 2;
                 }
-                if(left_wall){
+                if(S.left_wall){
                     kabe_zahyou[x][y] += 8;
                 }
                 break;

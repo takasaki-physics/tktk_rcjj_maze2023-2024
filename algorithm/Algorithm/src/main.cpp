@@ -1,23 +1,17 @@
 
 #include <stdio.h>
-#include <arduino.h>
+#include <Arduino.h>
 #include <time.h>
-#include <go_home.cpp>
-#include <move.h>
-#include <move.cpp>
+#include <Algorithm\go_home.cpp>
+#include <Algorithm\move.h>
+#include <Algorithm\move.cpp>
 
 go_home Gh;
 move M;
+long firstseconds;
 int8_t x = 50;
 int8_t y = 50;
-int8_t i = North ;//1:east 2:north 3:west 4:south
-long firstseconds;
-
-bool right_wall = false;//ここもセンサーの値を取得するファイルとして分けたい
-bool front_wall = false;
-bool left_wall = false;
-
-
+int8_t i = North;
 
 void setup(){
     // 現在の時刻を取得
@@ -29,8 +23,8 @@ void setup(){
 
 void loop(){
     //壁情報を取得
-    M.judge(x,y,i,right_wall,front_wall,left_wall);//拡張右手法で行く方法を決める
-    Gh.WriteDownWall(x,y,i,right_wall,front_wall,left_wall);//帰還用の記録
+    M.judge(x,y,i);//拡張右手法で行く方法を決める
+    Gh.WriteDownWall(x,y,i);//帰還用の記録
     M.MoveTo(x,y,i);//実際に移動して座標を変更+到達回数を加算
     x = M.returnX;
     y = M.returnY;

@@ -16,6 +16,6 @@ private:
 public:
     go_home();
     void BFS(int8_t x,int8_t y,int8_t i);
-    void WriteDownWall(int8_t x,int8_t y,int8_t i,bool right_wall,bool front_wall,bool left_wall);
+    void WriteDownWall(int8_t x,int8_t y,int8_t i);
     void GoHome(int8_t x,int8_t y);
 };
