@@ -12,7 +12,6 @@
 #define Left 3
 #define Back 4
 
-long firstseconds;
 int8_t x = 50;
 int8_t y = 50;
 int8_t i = North;//向き
@@ -236,4 +235,5 @@ void setup(){
 void loop(){
     WriteWall();
     move(i,Judge(x,y,i));
+    //このあとに一定時間がたったら帰還するプログラムを入れる
 }
