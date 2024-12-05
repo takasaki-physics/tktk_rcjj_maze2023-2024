@@ -1,5 +1,5 @@
 #include <Algorithm\move.h>
-#include <Algorithm\include\sensor\sensor.h>
+#include <C:\Users\hinat\Documents\repository\tktk_rcjj_maze\algorithm\Algorithm\include\sensor\sensor.h>
 
 move::move()
 {
@@ -12,94 +12,115 @@ move::move()
 
 
 
-void move::judge(int8_t x,int8_t y,int8_t i)
+int8_t move::judge(int8_t x,int8_t y,int8_t i)
 {
     
     switch (i){//向きによって重みをつける
         case East:
-            right_weight = toutatu_zahyou[x][y+1] * 5 + 1;
-            front_weight = toutatu_zahyou[x+1][y] * 5 + 2;
-            left_weight = toutatu_zahyou[x][y-1] * 5 + 3;
+            RightWeight = toutatu_zahyou[x][y+1] * 5 + 1;
+            FrontWeight = toutatu_zahyou[x+1][y] * 5 + 2;
+            LeftWeight = toutatu_zahyou[x][y-1] * 5 + 3;
             break;
 
         case North:
-            right_weight = toutatu_zahyou[x+1][y] * 5 + 1;
-            front_weight = toutatu_zahyou[x][y-1] * 5 + 2;
-            left_weight = toutatu_zahyou[x-1][y] * 5 + 3;
+            RightWeight = toutatu_zahyou[x+1][y] * 5 + 1;
+            FrontWeight = toutatu_zahyou[x][y-1] * 5 + 2;
+            LeftWeight = toutatu_zahyou[x-1][y] * 5 + 3;
             break;
 
         case West:
-            right_weight = toutatu_zahyou[x][y-1] * 5 + 1;
-            front_weight = toutatu_zahyou[x-1][y] * 5 + 2;
-            left_weight = toutatu_zahyou[x][y+1] * 5 + 3;
+            RightWeight = toutatu_zahyou[x][y-1] * 5 + 1;
+            FrontWeight = toutatu_zahyou[x-1][y] * 5 + 2;
+            LeftWeight = toutatu_zahyou[x][y+1] * 5 + 3;
             break;
 
         case South:
-            right_weight = toutatu_zahyou[x-1][y] * 5 + 1;
-            front_weight = toutatu_zahyou[x][y+1] * 5 + 2;
-            left_weight = toutatu_zahyou[x+1][y] * 5 + 3;
+            RightWeight = toutatu_zahyou[x-1][y] * 5 + 1;
+            FrontWeight = toutatu_zahyou[x][y+1] * 5 + 2;
+            LeftWeight = toutatu_zahyou[x+1][y] * 5 + 3;
             break;
 
     }
 
     //壁がある場合更にプラスする
     if (S.right_wall){
-        right_weight += 100;
+        RightWeight += 100;
     }
     if (S.front_wall){
-        front_weight += 100;
+        FrontWeight += 100;
     }
     if (S.left_wall){
-        left_weight += 100;
+        LeftWeight += 100;
     }
 
+    int8_t GoTo = 0;
 
     //どこへ行くか決める
-    int n = 0;
-    if (right_weight < front_weight){
-        n = right_weight;
-        go_to = Right;
+    if(RightWeight < FrontWeight){
+        GoTo = Right;
     }else{
-        n = front_weight;
-        go_to = Front;
+        GoTo = Front;
     }
-    if (left_weight < n){
-        n = left_weight;
-        go_to = Left;
+    if(LeftWeight < min(RightWeight,FrontWeight)){
+        GoTo = Left;
     }
 
-    if ((right_weight > 100) && (front_weight > 100) && (left_weight > 100)){//if all wall
-        go_to = Back;
+    return GoTo;
+
+    if ((RightWeight > 100) && (FrontWeight > 100) && (LeftWeight > 100)){//if all wall
+        GoTo = Back;
     }
 
-    right_weight = 0;//怖いから初期化
-    front_weight = 0;
-    left_weight = 0;
-    
-    //go_to 1:right 2:front 3:left 4:back
+    RightWeight = 0;//怖いから初期化
+    FrontWeight = 0;
+    LeftWeight = 0;
 }
 
-void move::MoveTo(int8_t x,int8_t y,int8_t i)
+void move::MoveTo(int8_t x,int8_t y,int8_t i,int8_t GoTo)
 {
 switch (i){
         case East:
-            switch (go_to){
+            switch (GoTo){
                 case Right:
                     //send right moving signal
                     y += 1;
                     i = South;
+                    if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
+                        y += -1;
+                        S.BlackTile = false;
+                    }
+                    if(S.Slope){//坂の信号が送られていた場合座標を更に進める
+                        y += 1;
+                        S.Slope = false;
+                    }
                     break;
                 
                 case Front:
                     //send front moving signal
                     x += 1;
                     i = East;
+                    if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
+                        x += -1;
+                        S.BlackTile = false;
+                    }
+                    if(S.Slope){//坂の信号が送られていた場合座標を更に進める
+                        x += 1;
+                        S.Slope = false;
+                    }
                     break;
                 
                 case Left:
                     //send left moving signal
                     y += -1;
                     i = North;
+                    if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
+                        y += 1;
+                        S.BlackTile = false;
+                    }
+                    if(S.Slope){//坂の信号が送られていた場合座標を更に進める
+                        y += -1;
+                        S.Slope = false;
+                    }
                     break;
 
                 case Back:
@@ -107,28 +128,56 @@ switch (i){
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     x += -1;
                     i = West;
+                    if(S.Slope){//坂の信号が送られていた場合座標を更に進める
+                        x += -1;
+                        S.Slope = false;
+                    }
                     break;
                 }
             break;
         
         case North:
-            switch (go_to){
+            switch (GoTo){
                 case Right:
                     //send right moving signal
                     x += 1;
                     i = East;
+                    if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
+                        x += -1;
+                        S.BlackTile = false;
+                    }
+                    if(S.Slope){//坂の信号が送られていた場合座標を更に進める
+                        x += 1;
+                        S.Slope = false;
+                    }
                     break;
                 
                 case Front:
                     //send front moving signal
                     y += -1;
                     i = North;
+                    if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
+                        y += 1;
+                        S.BlackTile = false;
+                    }
+                    if(S.Slope){//坂の信号が送られていた場合座標を更に進める
+                        y += -1;
+                        S.Slope = false;
+                    }
                     break;
                 
                 case Left:
                     //send left moving signal
                     x += -1;
                     i = West;
+                    if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
+                        x += 1;
+                        S.BlackTile = false;
+                    }
+                    if(S.Slope){//坂の信号が送られていた場合座標を更に進める
+                        x += -1;
+                        S.Slope = false;
+                    }
                     break;
 
                 case Back:
@@ -136,28 +185,56 @@ switch (i){
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     y += -1;
                     i = South;
+                    if(S.Slope){//坂の信号が送られていた場合座標を更に進める
+                        y += -1;
+                        S.Slope = false;
+                    }
                     break;
                 }
             break;
         
         case West:
-            switch (go_to){
+            switch (GoTo){
                 case Right:
                     //send right moving signal
                     y += -1;
                     i = North;
+                    if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
+                        y += 1;
+                        S.BlackTile = false;
+                    }
+                    if(S.Slope){//坂の信号が送られていた場合座標を更に進める
+                        y += -1;
+                        S.Slope = false;
+                    }
                     break;
                 
                 case Front:
                     //send front moving signal
                     x += -1;
                     i = West;
+                    if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
+                        x += 1;
+                        S.BlackTile = false;
+                    }
+                    if(S.Slope){//坂の信号が送られていた場合座標を更に進める
+                        x += -1;
+                        S.Slope = false;
+                    }
                     break;
                 
                 case Left:
                     //send left moving signal
                     y += 1;
                     i = South;
+                    if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
+                        y += -1;
+                        S.BlackTile = false;
+                    }
+                    if(S.Slope){//坂の信号が送られていた場合座標を更に進める
+                        y += 1;
+                        S.Slope = false;
+                    }
                     break;
                 
                 case Back:
@@ -165,28 +242,56 @@ switch (i){
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     x += 1;
                     i = East;
+                    if(S.Slope){//坂の信号が送られていた場合座標を更に進める
+                        x += 1;
+                        S.Slope = false;
+                    }
                     break;
                 }
             break;
         
         case South:
-            switch (go_to){
+            switch (GoTo){
                 case Right:
                     //send right moving signal
                     x += -1;
                     i = West;
+                    if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
+                        x += 1;
+                        S.BlackTile = false;
+                    }
+                    if(S.Slope){//坂の信号が送られていた場合座標を更に進める
+                        x += -1;
+                        S.Slope = false;
+                    }
                     break;
                 
                 case Front:
                     //send front moving signal
                     y += 1;
                     i = South;
+                    if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
+                        y += -1;
+                        S.BlackTile = false;
+                    }
+                    if(S.Slope){//坂の信号が送られていた場合座標を更に進める
+                        y += 1;
+                        S.Slope = false;
+                    }
                     break;
                 
                 case Left:
                     //send left moving signal
                     x += 1;
                     i = East;
+                    if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
+                        x += -1;
+                        S.BlackTile = false;
+                    }
+                    if(S.Slope){//坂の信号が送られていた場合座標を更に進める
+                        x += 1;
+                        S.Slope = false;
+                    }
                     break;
                 
                 case Back:
@@ -194,6 +299,10 @@ switch (i){
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     y += -1;
                     i = North;
+                    if(S.Slope){//坂の信号が送られていた場合座標を更に進める
+                        y += -1;
+                        S.Slope = false;
+                    }
                     break;
                 }
             break;

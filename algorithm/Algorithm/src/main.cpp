@@ -23,9 +23,8 @@ void setup(){
 
 void loop(){
     //壁情報を取得
-    M.judge(x,y,i);//拡張右手法で行く方法を決める
     Gh.WriteDownWall(x,y,i);//帰還用の記録
-    M.MoveTo(x,y,i);//実際に移動して座標を変更+到達回数を加算
+    M.MoveTo(x,y,i,M.judge(x,y,i));//拡張右手法で行く方法を決める,実際に移動して座標を変更+到達回数を加算
     x = M.returnX;
     y = M.returnY;
     i = M.returnI;
