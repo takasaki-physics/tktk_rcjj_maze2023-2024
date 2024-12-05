@@ -1,5 +1,5 @@
 #include <Algorithm\move.h>
-#include <C:\Users\hinat\Documents\repository\tktk_rcjj_maze\algorithm\Algorithm\include\sensor\sensor.h>
+#include <Algorithm\include\sensor\sensor.h>
 
 move::move()
 {
@@ -76,7 +76,7 @@ void move::judge(int8_t x,int8_t y,int8_t i)
     front_weight = 0;
     left_weight = 0;
     
-    //return go_to;いらない？ //go_to 1:right 2:front 3:left 4:back
+    //go_to 1:right 2:front 3:left 4:back
 }
 
 void move::MoveTo(int8_t x,int8_t y,int8_t i)
