@@ -16,9 +16,9 @@ byte ID[4]; //IDはそれぞれのモーターのID
 s16 Position[4]; //Positionはモーターが回る角度(右一回転＝4095)
 u16 Speed[4]; 
 byte ACC[4];
-
-int black_count =0;
-int blue_count =0;
+bool while_out = 0;//susumu_heitannのwhileから抜け出す
+bool black_count =0;
+bool blue_count =0;
 int susumu_kaisuu= 10;
 int i=1;
 int n=1;
@@ -238,7 +238,7 @@ void hidari(){
 
 //go straight
 void susumu_heitan() {
-    Serial3.flush();
+    Serial1.flush();
   while (count2  <susumu_kaisuu) {
     Position[0] = 576; //go
     Position[1] = -576;
@@ -246,10 +246,15 @@ void susumu_heitan() {
     Position[3] = 576;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     delay(320);
-    //serialEvent3();_color_or_loadcell
-    //serialEvent1();_victim_camera1
-    //serialEvent2();_victim_camera2
+    //serialEvent3();//color_or_loadcell
+    //serialEvent1();//victim_camera1
+    //serialEvent2();//victim_camera2
     count2++;
+    if (while_out == 1)[
+        Serial.println("go out susumu");
+        while_out = 0;
+        break;
+    ]
   }
   if (count2 != susumu_kaisuu){
     while (count2 !=0){
@@ -266,13 +271,17 @@ void susumu_heitan() {
   delay(300);
 
   }else {
+    if ( blue_count == 1)[
+        delay(5500);//青タイルで5秒待機
+        blue_count =0;
+    ]
     
     tiziki();
 
   }
 
-　　tiziki_2();
-　　delay(50);
+        tiziki_2();
+        delay(50);
     if (katamuki_true >17){
         Serial.println("Saka_Ue");
         while(katamuki_true >17){
@@ -312,7 +321,84 @@ void susumu_heitan() {
     
 }
 
+
+void discover_hisaisha() {//追加分
+  while ((Serial7.available() == 0)&&(count4 <50)){
+    delay(200);
+    count4++;
+  Serial.println(count4);
+  }
+  Serial.println("count4");
+  if (Serial7.available() > 0) {
+   int receivedData = Serial7.read();
+   Serial.println(receivedData);
+   Serial.print("count");
+   Serial.println(count4);
+   delay(2000);
+   if (count4 < 25){
+    Serial.println("NONE");
+    count4 = 0;
+   }else if (count4 < 30){
+    Serial.println("red|| H");
+    //SCServo();
+    //SCServo();
+    count4 =0;
+   }else if(count4 < 35){
+    Serial.println("yellow||S");
+    //SCServo();
+    count4 = 0;
+   }else if(count4 < 50){
+    Serial.println("green||U");
+    count4 =0;
+   }else{
+    count4 =0;
+    
+   }
+  }else{
+    count4=0;
+  }
+  
+  
 }
+void discover_hisaisha2() {//追加分
+  while ((Serial8.available() == 0)&&(count4 <50)){
+    delay(200);
+    count4++;
+    Serial.println(count4);
+  }
+  Serial.println("count4");
+  if (Serial8.available() > 0) {
+   int receivedData = Serial8.read();
+   Serial.println(receivedData);
+   Serial.print("count");
+   Serial.println(count4);
+   delay(2000);
+   if (count4 < 25){
+    Serial.println("NONE");
+    count4 = 0;
+   }else if (count4 < 30){
+    Serial.println("red|| H");
+    //SCServo();
+    //SCServo();
+    count4 =0;
+   }else if(count4 < 35){
+    Serial.println("yellow||S");
+    //SCServo();
+    count4 = 0;
+   }else if(count4 < 50){
+    Serial.println("green||U");
+    count4 =0;
+   }else{
+    count4 =0;
+    
+   }
+  }else{
+    count4=0;
+  }
+  
+  
+}
+
 
 void get_tof_data(){
   static char jsonBuffer[256];
@@ -361,7 +447,7 @@ void get_tof_data(){
                 }
                 
             }
-            else [
+            else {
                 if (i == 1 || i== 4){
                     front_wall == false;
                     Serial.println("no_frontwall");
@@ -374,7 +460,7 @@ void get_tof_data(){
                     right_wall == false;
                     Serial.println("no_rightwall");
                 }
-            ]        
+            }        
           }
           Serial.println(); // データ区切り
         }
@@ -395,6 +481,70 @@ void get_tof_data(){
     }
 
 void move_colororbump(){
+    // black_tile
+    if (receivedData2 == 'B'){
+        Serial.println("Black_tile");
+        while_out = 1;
+
+    }
+
+    
+    //blue_tile"Ao"
+    else if (receivedData2 == 'A'){
+        Serial.println("Blue_tile");
+        blue_count = 1;
+    }
+    else if (receivedData2 =='1'){
+       Serial.println("Bunp_left");
+      delay(100);
+      Position[0] = -341; //右に回転
+      Position[1] = -341;
+      Position[2] = -341;
+      Position[3] = -341;
+      sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+      delay(315);
+      delay(150);
+      Position[0] = -620; //前に進む
+      Position[1] = 620;
+      Position[2] = 620;
+      Position[3] = -620;
+      sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+      delay(420);
+      Position[0] = 341; //右に回転
+      Position[1] = 341;
+      Position[2] = 341;
+      Position[3] = 341;
+      sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+      delay(315);
+      delay(150);
+      count2--;
+    }
+    else if (receivedData2 =='2'){
+       Serial.println("Bunp_right");
+      delay(100);
+      Position[0] = 341; //右に回転
+      Position[1] = 341;
+      Position[2] = 341;
+      Position[3] = 341;
+      sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+      delay(315);
+      delay(150);
+      Position[0] = -620; //前に進む
+      Position[1] = 620;
+      Position[2] = 620;
+      Position[3] = -620;
+      sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+      delay(420);
+      Position[0] = -341; //右に回転
+      Position[1] = -341;
+      Position[2] = -341;
+      Position[3] = -341;
+      sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+      delay(315);
+      delay(150);
+      count2--;
+    }
+
     
     }
 //collect_tof_data
@@ -437,7 +587,7 @@ void serialEvent3(){
     receivedData2 = Serial1.read();
     move_colororbump();
     }
-
+}
 void setup(){
     Serial.begin(115200);//using_serial_monitor
     Wire.begin();
