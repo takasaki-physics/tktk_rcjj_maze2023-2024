@@ -1,9 +1,9 @@
 #include <Algorithm\go_home.h>
 #include <Algorithm\move.h>
 #include <Algorithm\StackAndQue.h>
-#include <sensor\sensor.h>
+#include <sensor\move_2024_2025.h>
 
-sensor S;
+move_2024_2025 S;
 StackAndQue stq;
 
 go_home::go_home()

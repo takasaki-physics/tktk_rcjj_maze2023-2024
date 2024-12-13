@@ -1,5 +1,4 @@
 #include <Algorithm\move.h>
-#include <C:\Users\hinat\Documents\repository\tktk_rcjj_maze\algorithm\Algorithm\include\sensor\sensor.h>
 
 move::move()
 {
@@ -82,7 +81,8 @@ switch (i){
         case East:
             switch (GoTo){
                 case Right:
-                    //send right moving signal
+                    Move.migi();//send right moving signal
+                    Move.susumu_heitan();
                     y += 1;
                     i = South;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
@@ -96,7 +96,7 @@ switch (i){
                     break;
                 
                 case Front:
-                    //send front moving signal
+                    Move.susumu_heitan();//send front moving signal
                     x += 1;
                     i = East;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
@@ -110,7 +110,8 @@ switch (i){
                     break;
                 
                 case Left:
-                    //send left moving signal
+                    Move.hidari();//send left moving signal
+                    Move.susumu_heitan();
                     y += -1;
                     i = North;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
@@ -124,7 +125,9 @@ switch (i){
                     break;
 
                 case Back:
-                    //send return moving signal
+                    Move.migi();
+                    Move.migi();//send return moving signal
+                    Move.susumu_heitan();
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     x += -1;
                     i = West;
@@ -139,7 +142,8 @@ switch (i){
         case North:
             switch (GoTo){
                 case Right:
-                    //send right moving signal
+                    Move.migi();//send right moving signal
+                    Move.susumu_heitan();
                     x += 1;
                     i = East;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
@@ -153,7 +157,7 @@ switch (i){
                     break;
                 
                 case Front:
-                    //send front moving signal
+                    Move.susumu_heitan();//send front moving signal
                     y += -1;
                     i = North;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
@@ -167,7 +171,8 @@ switch (i){
                     break;
                 
                 case Left:
-                    //send left moving signal
+                    Move.hidari();//send left moving signal
+                    Move.susumu_heitan();
                     x += -1;
                     i = West;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
@@ -181,7 +186,9 @@ switch (i){
                     break;
 
                 case Back:
-                    //send return moving signal
+                    Move.migi();
+                    Move.migi();//send return moving signal
+                    Move.susumu_heitan();
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     y += -1;
                     i = South;
@@ -196,7 +203,8 @@ switch (i){
         case West:
             switch (GoTo){
                 case Right:
-                    //send right moving signal
+                    Move.migi();//send right moving signal
+                    Move.susumu_heitan();
                     y += -1;
                     i = North;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
@@ -210,7 +218,7 @@ switch (i){
                     break;
                 
                 case Front:
-                    //send front moving signal
+                    Move.susumu_heitan();//send front moving signal
                     x += -1;
                     i = West;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
@@ -224,7 +232,8 @@ switch (i){
                     break;
                 
                 case Left:
-                    //send left moving signal
+                    Move.hidari();//send left moving signal
+                    Move.susumu_heitan();
                     y += 1;
                     i = South;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
@@ -238,7 +247,9 @@ switch (i){
                     break;
                 
                 case Back:
-                    //send return moving signal
+                    Move.migi();
+                    Move.migi();//send return moving signal
+                    Move.susumu_heitan();
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     x += 1;
                     i = East;
@@ -253,7 +264,8 @@ switch (i){
         case South:
             switch (GoTo){
                 case Right:
-                    //send right moving signal
+                    Move.migi();//send right moving signal
+                    Move.susumu_heitan();
                     x += -1;
                     i = West;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
@@ -267,7 +279,7 @@ switch (i){
                     break;
                 
                 case Front:
-                    //send front moving signal
+                    Move.susumu_heitan();//send front moving signal
                     y += 1;
                     i = South;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
@@ -281,7 +293,8 @@ switch (i){
                     break;
                 
                 case Left:
-                    //send left moving signal
+                    Move.hidari();//send left moving signal
+                    Move.susumu_heitan();
                     x += 1;
                     i = East;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
@@ -295,7 +308,9 @@ switch (i){
                     break;
                 
                 case Back:
-                    //send return moving signal
+                    Move.migi();
+                    Move.migi();//send return moving signal
+                    Move.susumu_heitan();
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     y += -1;
                     i = North;
