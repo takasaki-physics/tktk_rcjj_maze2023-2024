@@ -19,11 +19,9 @@ private:
     int16_t FrontWeight = 0;
     int16_t LeftWeight = 0;
 public:
-    int8_t returnX;
-    int8_t returnY;
-    int8_t returnI;
+    
     move();
-    int8_t judge(int8_t x,int8_t y,int8_t i);
-    void MoveTo(int8_t x,int8_t y,int8_t i,int8_t GoTo);
+    int8_t judge();
+    void MoveTo(int8_t GoTo);
 };
 

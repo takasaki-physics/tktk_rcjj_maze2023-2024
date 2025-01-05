@@ -1,4 +1,7 @@
 #include <Algorithm\move.h>
+extern uint8_t x;
+extern uint8_t y;
+extern uint8_t Direction;
 
 move::move()
 {
@@ -11,10 +14,10 @@ move::move()
 
 
 
-int8_t move::judge(int8_t x,int8_t y,int8_t i)
+int8_t move::judge()
 {
     
-    switch (i){//向きによって重みをつける
+    switch (Direction){//向きによって重みをつける
         case East:
             RightWeight = toutatu_zahyou[x][y+1] * 5 + 1;
             FrontWeight = toutatu_zahyou[x+1][y] * 5 + 2;
@@ -64,7 +67,7 @@ int8_t move::judge(int8_t x,int8_t y,int8_t i)
         GoTo = Left;
     }
 
-    return GoTo;
+    
 
     if ((RightWeight > 100) && (FrontWeight > 100) && (LeftWeight > 100)){//if all wall
         GoTo = Back;
@@ -73,18 +76,20 @@ int8_t move::judge(int8_t x,int8_t y,int8_t i)
     RightWeight = 0;//怖いから初期化
     FrontWeight = 0;
     LeftWeight = 0;
+
+    return GoTo;
 }
 
-void move::MoveTo(int8_t x,int8_t y,int8_t i,int8_t GoTo)
+void move::MoveTo(int8_t GoTo)
 {
-switch (i){
+switch (Direction){
         case East:
             switch (GoTo){
                 case Right:
                     Move.migi();//send right moving signal
                     Move.susumu_heitan();
                     y += 1;
-                    i = South;
+                    Direction = South;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
                         y += -1;
                         S.BlackTile = false;
@@ -98,7 +103,7 @@ switch (i){
                 case Front:
                     Move.susumu_heitan();//send front moving signal
                     x += 1;
-                    i = East;
+                    Direction = East;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
                         x += -1;
                         S.BlackTile = false;
@@ -113,7 +118,7 @@ switch (i){
                     Move.hidari();//send left moving signal
                     Move.susumu_heitan();
                     y += -1;
-                    i = North;
+                    Direction = North;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
                         y += 1;
                         S.BlackTile = false;
@@ -130,7 +135,7 @@ switch (i){
                     Move.susumu_heitan();
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     x += -1;
-                    i = West;
+                    Direction = West;
                     if(S.Slope){//坂の信号が送られていた場合座標を更に進める
                         x += -1;
                         S.Slope = false;
@@ -145,7 +150,7 @@ switch (i){
                     Move.migi();//send right moving signal
                     Move.susumu_heitan();
                     x += 1;
-                    i = East;
+                    Direction = East;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
                         x += -1;
                         S.BlackTile = false;
@@ -159,7 +164,7 @@ switch (i){
                 case Front:
                     Move.susumu_heitan();//send front moving signal
                     y += -1;
-                    i = North;
+                    Direction = North;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
                         y += 1;
                         S.BlackTile = false;
@@ -174,7 +179,7 @@ switch (i){
                     Move.hidari();//send left moving signal
                     Move.susumu_heitan();
                     x += -1;
-                    i = West;
+                    Direction = West;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
                         x += 1;
                         S.BlackTile = false;
@@ -191,7 +196,7 @@ switch (i){
                     Move.susumu_heitan();
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     y += -1;
-                    i = South;
+                    Direction = South;
                     if(S.Slope){//坂の信号が送られていた場合座標を更に進める
                         y += -1;
                         S.Slope = false;
@@ -206,7 +211,7 @@ switch (i){
                     Move.migi();//send right moving signal
                     Move.susumu_heitan();
                     y += -1;
-                    i = North;
+                    Direction = North;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
                         y += 1;
                         S.BlackTile = false;
@@ -220,7 +225,7 @@ switch (i){
                 case Front:
                     Move.susumu_heitan();//send front moving signal
                     x += -1;
-                    i = West;
+                    Direction = West;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
                         x += 1;
                         S.BlackTile = false;
@@ -235,7 +240,7 @@ switch (i){
                     Move.hidari();//send left moving signal
                     Move.susumu_heitan();
                     y += 1;
-                    i = South;
+                    Direction = South;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
                         y += -1;
                         S.BlackTile = false;
@@ -252,7 +257,7 @@ switch (i){
                     Move.susumu_heitan();
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     x += 1;
-                    i = East;
+                    Direction = East;
                     if(S.Slope){//坂の信号が送られていた場合座標を更に進める
                         x += 1;
                         S.Slope = false;
@@ -267,7 +272,7 @@ switch (i){
                     Move.migi();//send right moving signal
                     Move.susumu_heitan();
                     x += -1;
-                    i = West;
+                    Direction = West;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
                         x += 1;
                         S.BlackTile = false;
@@ -281,7 +286,7 @@ switch (i){
                 case Front:
                     Move.susumu_heitan();//send front moving signal
                     y += 1;
-                    i = South;
+                    Direction = South;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
                         y += -1;
                         S.BlackTile = false;
@@ -296,7 +301,7 @@ switch (i){
                     Move.hidari();//send left moving signal
                     Move.susumu_heitan();
                     x += 1;
-                    i = East;
+                    Direction = East;
                     if(S.BlackTile){//黒タイルの信号が送られていた場合戻る
                         x += -1;
                         S.BlackTile = false;
@@ -313,7 +318,7 @@ switch (i){
                     Move.susumu_heitan();
                     toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     y += -1;
-                    i = North;
+                    Direction = North;
                     if(S.Slope){//坂の信号が送られていた場合座標を更に進める
                         y += -1;
                         S.Slope = false;
@@ -323,9 +328,5 @@ switch (i){
             break;
     }
     toutatu_zahyou[x][y] += 1;//移動先のマスの到達回数をプラスしている
-
-    returnX = x;
-    returnY = y;
-    returnI = i;
     
 }

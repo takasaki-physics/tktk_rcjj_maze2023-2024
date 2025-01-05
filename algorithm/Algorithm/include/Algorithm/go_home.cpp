@@ -5,6 +5,9 @@
 
 move_2024_2025 S;
 StackAndQue stq;
+extern uint8_t x;
+extern uint8_t y;
+extern uint8_t Direction;
 
 go_home::go_home()
 {
@@ -34,7 +37,7 @@ int8_t go_home::WhichWay(int a,int b)//前後左右のどこが最短になる�
     return 0;
 }
 
-void go_home::BFS(int8_t x,int8_t y,int8_t i)//現在地の座標を取得
+void go_home::BFS()//現在地の座標を取得
 {
 
     int a = x;
@@ -106,7 +109,7 @@ void go_home::BFS(int8_t x,int8_t y,int8_t i)//現在地の座標を取得
     b = 50;
     while(1){
 
-        switch(i){
+        switch(Direction){
             case East:
                 switch(WhichWay(a,b)){//前後左右のどこが最短になるか１：右折、２：左折、３：直進
 
@@ -114,7 +117,7 @@ void go_home::BFS(int8_t x,int8_t y,int8_t i)//現在地の座標を取得
                         stq.push(2);
                         stq.push(3);
                         b += -1;
-                        i = South;
+                        Direction = South;
 
                     case West://西マスからきたとき
                         stq.push(3);
@@ -124,7 +127,7 @@ void go_home::BFS(int8_t x,int8_t y,int8_t i)//現在地の座標を取得
                         stq.push(1);
                         stq.push(3);
                         b += 1;
-                        i = North;
+                        Direction = North;
 
                 }
 
@@ -134,13 +137,13 @@ void go_home::BFS(int8_t x,int8_t y,int8_t i)//現在地の座標を取得
                         stq.push(1);
                         stq.push(3);
                         a += 1;
-                        i = West;
+                        Direction = West;
 
                     case West:
                         stq.push(2);
                         stq.push(3);
                         a += -1;
-                        i = East;
+                        Direction = East;
 
                     case South:
                         stq.push(3);
@@ -158,12 +161,12 @@ void go_home::BFS(int8_t x,int8_t y,int8_t i)//現在地の座標を取得
                         stq.push(1);
                         stq.push(3);
                         b += -1;
-                        i = South;
+                        Direction = South;
 
                     case South:
                         stq.push(2);
                         stq.push(3);
-                        i = North;
+                        Direction = North;
 
                 }
 
@@ -173,7 +176,7 @@ void go_home::BFS(int8_t x,int8_t y,int8_t i)//現在地の座標を取得
                         stq.push(2);
                         stq.push(3);
                         a += 1;
-                        i = West;
+                        Direction = West;
 
                     case North:
                         stq.push(3);
@@ -183,7 +186,7 @@ void go_home::BFS(int8_t x,int8_t y,int8_t i)//現在地の座標を取得
                         stq.push(1);
                         stq.push(3);
                         a += -1;
-                        i = East;
+                        Direction = East;
 
                 }
         }
@@ -195,11 +198,11 @@ void go_home::BFS(int8_t x,int8_t y,int8_t i)//現在地の座標を取得
     
 }
 
-void go_home::WriteDownWall(int8_t x,int8_t y,int8_t i)
+void go_home::WriteDownWall()
 {
     //壁情報の記入(ここは帰還アルゴリズム用の関数)
     if(kabe_zahyou[x][y] == 100){//記録されていない場合（そうしないと延々と加算されちゃう）
-        switch (i){
+        switch (Direction){
             case East:
                 if(S.right_wall){
                     kabe_zahyou[x][y] += 2;
@@ -255,7 +258,7 @@ void go_home::WriteDownWall(int8_t x,int8_t y,int8_t i)
     }
 }
 
-void go_home::GoHome(int8_t x,int8_t y)
+void go_home::GoHome()
 {
     int GoSignal = 0;
     while(1){

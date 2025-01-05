@@ -9,9 +9,9 @@
 go_home Gh;
 move M;
 long firstseconds;
-int8_t x = 50;
-int8_t y = 50;
-int8_t i = North;
+uint8_t x = 50;
+uint8_t y = 50;
+uint8_t Direction = North;
 
 void setup(){
     // 現在の時刻を取得
@@ -23,11 +23,8 @@ void setup(){
 
 void loop(){
     //壁情報を取得
-    Gh.WriteDownWall(x,y,i);//帰還用の記録
-    M.MoveTo(x,y,i,M.judge(x,y,i));//拡張右手法で行く方法を決める,実際に移動して座標を変更+到達回数を加算
-    x = M.returnX;
-    y = M.returnY;
-    i = M.returnI;
+    Gh.WriteDownWall();//帰還用の記録
+    M.MoveTo(M.judge());//拡張右手法で行く方法を決める,実際に移動して座標を変更+到達回数を加
 
 
     // 現在の時刻を取得
@@ -36,8 +33,8 @@ void loop(){
     long now_seconds = static_cast<long>(NowTime); 
     //330秒（＝5分半）経ったら幅優先探索を始める
     if(now_seconds - firstseconds >= 330){
-        Gh.BFS(x,y,i);
-        Gh.GoHome(x,y);
+        Gh.BFS();
+        Gh.GoHome();
         //停止
     }
 }
