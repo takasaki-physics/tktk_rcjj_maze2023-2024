@@ -1,5 +1,10 @@
 #pragma once
 #include <stdio.h>
+#include <Algorithm\StackAndQue.h>
+#include <sensor\move_2024_2025.h>
+
+move_2024_2025 S;
+StackAndQue stq;
 //#include <cmath>
 //#include <iostream> 後でオンにする
 
