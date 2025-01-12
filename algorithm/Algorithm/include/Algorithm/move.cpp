@@ -2,6 +2,7 @@
 extern uint8_t x;
 extern uint8_t y;
 extern uint8_t Direction;
+extern uint8_t Status;
 
 move::move()
 {

@@ -1,7 +1,5 @@
 #pragma once
 #include <stdio.h>
-#include <sensor/move_2024_2025.cpp>
-move_2024_2025 Move;
 #define East 1
 #define North 2
 #define West 3
