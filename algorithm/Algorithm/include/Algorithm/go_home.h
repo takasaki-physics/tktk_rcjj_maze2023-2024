@@ -1,5 +1,7 @@
 #pragma once
 #include <stdio.h>
+#include <Algorithm\StackAndQue.h>
+StackAndQue stq;
 //#include <cmath>
 //#include <iostream> 後でオンにする
 
@@ -15,7 +17,7 @@ private:
 
 public:
     go_home();
-    void BFS(int8_t x,int8_t y,int8_t i);
-    void WriteDownWall(int8_t x,int8_t y,int8_t i);
-    void GoHome(int8_t x,int8_t y);
+    void BFS();
+    void WriteDownWall();
+    void GoHome();
 };

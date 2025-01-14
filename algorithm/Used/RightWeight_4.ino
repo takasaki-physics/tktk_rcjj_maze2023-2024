@@ -34,9 +34,9 @@ VectorInt16 aa;
 VectorInt16 aaReal;
 float ypr[3];
 
-int8_t x = 50;
-int8_t y = 50;
-int8_t i = North;//向き
+uint8_t x = 50;
+uint8_t y = 50;
+uint8_t Direction = North;//向き
 int8_t TileReach[90][90];//到達回数を格納
 
 bool RightWall = false;
@@ -720,28 +720,12 @@ void serialEvent(){
     }
   }
 
-void setup(){
-    Serial.begin(115200);//using_serial_monitor
-    Wire.begin();
-    Serial2.begin(1000000);//using_servo_sts3032
-    Serial3.begin(19200);//using_tof
-    Serial1.begin(19200);//using_Sub_Kairo
-    Serial7.begin(19200);//using_cam1
-    Serial8.begin(19200);//using_cam2
-    Serial.println("Start");
-    delay(10000);
-
-  for (int t = 0; t < 90; t++) {//到達回数を初期化
-    for (int j = 0; j < 90; j++) {
-        TileReach[t][j] = 0;
-        }
-    }
-    }
 
 
 
-int8_t Judge(int8_t x,int8_t y,int8_t i){//どこに行くかを返す関数
-    switch (i)//前後左右の重みを設定
+
+uint8_t Judge(uint8_t x,uint8_t y,uint8_t Direction){//どこに行くかを返す関数
+    switch (Direction)//前後左右の重みを設定
     {
     case East:
         RightWeight = TileReach[x][y+1] * 5 + 1;
@@ -796,15 +780,15 @@ int8_t Judge(int8_t x,int8_t y,int8_t i){//どこに行くかを返す関数
     return GoTo;
 }
 
-void move(int8_t i,int8_t GoTo){//動く関数
-    switch (i){//それぞれ向いている方向の場合分け
+void move(uint8_t Direction,int8_t GoTo){//動く関数
+    switch (Direction){//それぞれ向いている方向の場合分け
         case East:
             switch (GoTo){//それぞれ行く方向の場合分け
                 case Right:
                     migi();
                     susumu_heitan();//send right moving signal
                     y += 1;
-                    i = South;
+                    Direction = South;
                     if(black_count){//黒タイルの信号が送られていた場合戻る
                         y += -1;
                         black_count = false;
@@ -818,7 +802,7 @@ void move(int8_t i,int8_t GoTo){//動く関数
                 case Front:
                     susumu_heitan();//send front moving signal
                     x += 1;
-                    i = East;
+                    Direction = East;
                     if(black_count){//黒タイルの信号が送られていた場合戻る
                         x += -1;
                         black_count = false;
@@ -833,7 +817,7 @@ void move(int8_t i,int8_t GoTo){//動く関数
                     hidari();
                     susumu_heitan();//send left moving signal
                     y += -1;
-                    i = North;
+                    Direction = North;
                     if(black_count){//黒タイルの信号が送られていた場合戻る
                         y += 1;
                         black_count = false;
@@ -850,7 +834,7 @@ void move(int8_t i,int8_t GoTo){//動く関数
                     susumu_heitan();//send return moving signal
                     TileReach[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     x += -1;
-                    i = West;
+                    Direction = West;
                     if(black_count){//黒タイルの信号が送られていた場合戻る
                         x += 1;
                         black_count = false;
@@ -869,7 +853,7 @@ void move(int8_t i,int8_t GoTo){//動く関数
                     migi();
                     susumu_heitan();//send right moving signal
                     x += 1;
-                    i = East;
+                    Direction = East;
                     if(black_count){//黒タイルの信号が送られていた場合戻る
                         x += -1;
                         black_count = false;
@@ -883,7 +867,7 @@ void move(int8_t i,int8_t GoTo){//動く関数
                 case Front:
                     susumu_heitan();//send front moving signal
                     y += -1;
-                    i = North;
+                    Direction = North;
                     if(black_count){//黒タイルの信号が送られていた場合戻る
                         y += 1;
                         black_count = false;
@@ -898,7 +882,7 @@ void move(int8_t i,int8_t GoTo){//動く関数
                     hidari();
                     susumu_heitan();//send left moving signal
                     x += -1;
-                    i = West;
+                    Direction = West;
                     if(black_count){//黒タイルの信号が送られていた場合戻る
                         x += 1;
                         black_count = false;
@@ -915,7 +899,7 @@ void move(int8_t i,int8_t GoTo){//動く関数
                     susumu_heitan();//send return moving signal
                     TileReach[x][y] += 100;
                     y += 1;
-                    i = South;
+                    Direction = South;
                     if(black_count){//黒タイルの信号が送られていた場合戻る
                         y += -1;
                         black_count = false;
@@ -934,7 +918,7 @@ void move(int8_t i,int8_t GoTo){//動く関数
                     migi();
                     susumu_heitan();//send right moving signal
                     y += -1;
-                    i = North;
+                    Direction = North;
                     if(black_count){//黒タイルの信号が送られていた場合戻る
                         y += 1;
                         black_count = false;
@@ -948,7 +932,7 @@ void move(int8_t i,int8_t GoTo){//動く関数
                 case Front:
                     susumu_heitan();//send front moving signal
                     x += -1;
-                    i = West;
+                    Direction = West;
                     if(black_count){//黒タイルの信号が送られていた場合戻る
                         x += 1;
                         black_count = false;
@@ -963,7 +947,7 @@ void move(int8_t i,int8_t GoTo){//動く関数
                     hidari();//send left moving signal
                     susumu_heitan();
                     y += 1;
-                    i = South;
+                    Direction = South;
                     if(black_count){//黒タイルの信号が送られていた場合戻る
                         y += -1;
                         black_count = false;
@@ -980,7 +964,7 @@ void move(int8_t i,int8_t GoTo){//動く関数
                     susumu_heitan();//send return moving signal
                     TileReach[x][y] += 100;
                     x += 1;
-                    i = East;
+                    Direction = East;
                     if(black_count){//黒タイルの信号が送られていた場合戻る
                         x += -1;
                         black_count = false;
@@ -999,7 +983,7 @@ void move(int8_t i,int8_t GoTo){//動く関数
                     migi();
                     susumu_heitan();//send right moving signal
                     x += -1;
-                    i = West;
+                    Direction = West;
                     if(black_count){//黒タイルの信号が送られていた場合戻る
                         x += 1;
                         black_count = false;
@@ -1013,7 +997,7 @@ void move(int8_t i,int8_t GoTo){//動く関数
                 case Front:
                     susumu_heitan();//send front moving signal
                     y += 1;
-                    i = South;
+                    Direction = South;
                     if(black_count){//黒タイルの信号が送られていた場合戻る
                         y += -1;
                         black_count = false;
@@ -1028,7 +1012,7 @@ void move(int8_t i,int8_t GoTo){//動く関数
                     hidari();
                     susumu_heitan();//send left moving signal
                     x += 1;
-                    i = East;
+                    Direction = East;
                     if(black_count){//黒タイルの信号が送られていた場合戻る
                         x += -1;
                         black_count = false;
@@ -1045,7 +1029,7 @@ void move(int8_t i,int8_t GoTo){//動く関数
                     susumu_heitan();//send return moving signal
                     TileReach[x][y] += 100;
                     y += -1;
-                    i = North;
+                    Direction = North;
                     if(black_count){//黒タイルの信号が送られていた場合戻る
                         y += 1;
                         black_count = false;
@@ -1061,10 +1045,27 @@ void move(int8_t i,int8_t GoTo){//動く関数
     TileReach[x][y] += 1;//移動先のマスの到達回数をプラスしている
 }
 
+void setup(){
+    Serial.begin(115200);//using_serial_monitor
+    Wire.begin();
+    Serial2.begin(1000000);//using_servo_sts3032
+    Serial3.begin(19200);//using_tof
+    Serial1.begin(19200);//using_Sub_Kairo
+    Serial7.begin(19200);//using_cam1
+    Serial8.begin(19200);//using_cam2
+    Serial.println("Start");
+    delay(10000);
+
+  for (int t = 0; t < 90; t++) {//到達回数を初期化
+    for (int j = 0; j < 90; j++) {
+        TileReach[t][j] = 0;
+        }
+    }
+    }
 
 void loop(){
 
     serialEvent();
-    move(i,Judge(x,y,i));
+    move(Direction,Judge(x,y,Direction));
     //このあとに一定時間がたったら帰還するプログラムを入れる
 }
