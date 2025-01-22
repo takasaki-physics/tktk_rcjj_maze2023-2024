@@ -18,7 +18,7 @@ uint8_t Status = 0;
 long now_seconds;
 
 void setup(){
-    // 現在の時刻を取得
+    // 現在の時刻を取得します
     time_t FirstTime;
     time(&FirstTime);  // 現在の時刻を取得して FirstTime に格納
     firstseconds = static_cast<long>(FirstTime); 
