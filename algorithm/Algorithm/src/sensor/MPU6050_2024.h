@@ -2,6 +2,7 @@
 #include "MPU6050_6Axis_MotionApps20.h"
 
 MPU6050 mpu;
+
 class MPU6050_2024
 {
 private:

@@ -5,7 +5,7 @@
 #include <SCServo.h> //SCServoを使うと宣言]
 #include <sensor\MPU6050_2024.h>
 MPU6050_2024 Mpu;
-extern SMS_STS sms_sts;
+SMS_STS sms_sts;
 
 class move_2024_2025
 {
