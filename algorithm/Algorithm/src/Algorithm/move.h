@@ -1,5 +1,6 @@
 #pragma once
 #include <stdio.h>
+#include <cstdint>
 #define East 1
 #define North 2
 #define West 3
@@ -21,5 +22,6 @@ public:
     move();
     int8_t judge();
     void MoveTo(int8_t GoTo);
+    void TileColor();
 };
 

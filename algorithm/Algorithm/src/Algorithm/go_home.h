@@ -1,7 +1,6 @@
 #pragma once
 #include <stdio.h>
-#include <Algorithm\StackAndQue.h>
-StackAndQue stq;
+#include <cstdint>
 //#include <cmath>
 //#include <iostream> 後でオンにする
 

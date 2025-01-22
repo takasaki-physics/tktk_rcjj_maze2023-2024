@@ -1,10 +1,15 @@
 #include <Algorithm\go_home.h>
 #include <Algorithm\move.h>
+#include <sensor/move_2024_2025.h>
+#include <Algorithm\StackAndQue.h>
+
+StackAndQue stq;
 
 extern uint8_t x;
 extern uint8_t y;
 extern uint8_t Direction;
 extern uint8_t Status;
+extern move_2024_2025 S;
 
 go_home::go_home()
 {
@@ -259,22 +264,27 @@ void go_home::WriteDownWall()
 void go_home::GoHome()
 {
         //ここ以下を「相手(モーター)から動き終わったという信号が送られたら」とかにしないとバババッて送られちゃうかも（RTOSだから大丈夫かも？）
-        
+    while(1){
         switch(stq.pop()){
             case 1:
                 //TurnRight
+                S.migi();
                 break;
 
             case 2:
                 //TurnLeft
+                S.hidari();
                 break;
 
             case 3:
                 //GoStraight
+                S.susumu_heitan();
                 break;
             case 4:
                 //Stop
+
                 break;
         }
+    }
     
 }

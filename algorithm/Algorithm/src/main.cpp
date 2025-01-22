@@ -1,13 +1,13 @@
 
 #include <stdio.h>
+#include <cstdint>
 #include <Arduino.h>
 #include <time.h>
-#include <Algorithm\go_home.cpp>
+#include <Algorithm\go_home.h>
 #include <Algorithm\move.h>
-#include <Algorithm\move.cpp>
-#include <sensor/move_2024_2025.cpp>
+#include <sensor/move_2024_2025.h>
 
-move_2024_2025 Move;
+move_2024_2025 S;
 go_home Gh;
 move M;
 long firstseconds;
@@ -15,6 +15,7 @@ uint8_t x = 50;
 uint8_t y = 50;
 uint8_t Direction = North;
 uint8_t Status = 0;
+long now_seconds;
 
 void setup(){
     // 現在の時刻を取得
@@ -39,7 +40,7 @@ void loop(){
         // 現在の時刻を取得
         time_t NowTime;
         time(&NowTime);  // 現在の時刻を取得して NowTime に格納
-        long now_seconds = static_cast<long>(NowTime); 
+        now_seconds = static_cast<long>(NowTime); 
 
         //330秒（＝5分半）経ったら幅優先探索を始める
         if(now_seconds - firstseconds >= 330){
@@ -53,23 +54,27 @@ void loop(){
         break;
 
     case 3://直進
-        Move.susumu_heitan();
+        S.susumu_heitan();
+        M.TileColor();
         break;
 
     case 4://右折
-        Move.migi();
-        Move.susumu_heitan();
+        S.migi();
+        S.susumu_heitan();
+        M.TileColor();
         break;
 
     case 5://左折
-        Move.hidari();
-        Move.susumu_heitan();
+        S.hidari();
+        S.susumu_heitan();
+        M.TileColor();
         break;
 
     case 6://後進
-        Move.migi();
-        Move.migi();
-        Move.susumu_heitan();
+        S.migi();
+        S.migi();
+        S.susumu_heitan();
+        M.TileColor();
         break;
     }
 }
