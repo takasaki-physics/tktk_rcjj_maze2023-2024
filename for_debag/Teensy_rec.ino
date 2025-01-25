@@ -39,7 +39,10 @@ void get_tof_data() {
 void susumu_heitann(){
     Serial.println("susumu");
     delay(5000);
-    Serial1.clear();
+    while (Serial1.available()>0){
+      int RecievedData = Serial1.read();
+    }
+    
     delay(100);
     Status = 0;
 }
