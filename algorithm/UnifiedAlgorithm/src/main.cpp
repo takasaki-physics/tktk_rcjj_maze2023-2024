@@ -31,32 +31,31 @@ SMS_STS sms_sts;
 
 /*MPU変数*/
 // MPU control/status vars
-uint8_t mpuIntStatus;   // holds actual interrupt status byte from MPU
-uint8_t devStatus;      // return status after each device operation (0 = success, !0 = error)
-uint16_t packetSize;    // expected DMP packet size (default is 42 bytes)
-uint8_t fifoBuffer[64]; // FIFO storage buffer
-// orientation/motion vars
-Quaternion q;           // [w, x, y, z]         quaternion container
-VectorFloat gravity;    // [x, y, z]            gravity vector
-VectorInt16 aa;         // [x, y, z]            accel sensor measurements
-VectorInt16 aaReal;     // [x, y, z]            gravity-free accel sensor measurements
-float ypr[3];           // [roll, pitch, yaw]   roll/pitch/yaw container and gravity vector
 double pitch;
 double roll;
 double yaw;
 
+uint8_t mpuIntStatus;
+uint8_t devStatus;
+uint16_t packetSize;
+uint8_t fifoBuffer[64];
+
+Quaternion q;
+VectorFloat gravity;
+VectorInt16 aa;
+VectorInt16 aaReal;
+float ypr[3];
 
 
 /*******************************************************************************************/
-/* ヨーピッチを取得                                                                            
-/*処理：
+/* Yaw・Pitch・Roll角の取得                                                                            
+/*処理：MPU6050を用いて回転や坂検知のためのRoll・Yaw角の取得
 /*
-/*更新者：誰が作った
+/*更新者：清田侑希　2025/1/25
 /*
 /*******************************************************************************************/
-void getYawPitchRoll()
-{
-  if (mpu.dmpGetCurrentFIFOPacket(fifoBuffer)) {// Get the Latest packet
+void getYawPitchRoll() {
+  if (mpu.dmpGetCurrentFIFOPacket(fifoBuffer)) {
     mpu.dmpGetQuaternion(&q, fifoBuffer);
     mpu.dmpGetGravity(&gravity, &q);
     mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
@@ -65,13 +64,12 @@ void getYawPitchRoll()
     yaw = ypr[0] * 180 / M_PI;
     pitch = ypr[1] * 180 / M_PI;
     roll = ypr[2] * 180 / M_PI;
-
+    //yaw角のデータを常に正にする
     if (yaw < 0) {
-        yaw = 360 + yaw;
-      }
-      yaw = 360 - yaw;
-
-    // Output individual values to check if they are correctly obtained
+      yaw = 360 + yaw;
+    }
+    yaw = 360 - yaw;
+    
     Serial.print(" X: ");
     Serial.print(gravity.x);
     Serial.print(" Y: ");
@@ -84,10 +82,9 @@ void getYawPitchRoll()
     Serial.print(pitch);
     Serial.print(" Roll: ");
     Serial.println(roll);
+    
   }
 }
-
-
 
 
 /*センサー類変数*/
@@ -99,15 +96,15 @@ byte ACC[4];
 int susumu_kaisuu= 10;
 int i=1;
 int n=1;
-double kakudo;
-int kakudo_true;
-double kakudo2;
-int kakudo_true2;
-int mawasu;
-double katamuki;
-int katamuki_true;
+double kakudo; //tiziki()でのyawの代入
+int kakudo_true; //tiziki()でyawを整数化したあとの変数
+double kakudo2; //tiziki_kaitenn()でのyawの代入
+int kakudo_true2; //tiziki_kaitenn()でyawを整数化したあとの変数
+int mawasu; //どこまで機体を回すかの変数
+bool chousei =0; //MPUが0度と360度になったときの分岐
+double katamuki; //tiziki2()でのrollの代入
+int katamuki_true; //tiziki2()でrollを整数化したあとの変数
 int count2 = 0;//進んだ回数＿10回でわかれている
-bool chousei =0;
 
 bool right_wall = false;//ここもセンサーの値を取得するファイルとして分けたい
 bool front_wall = false;
@@ -120,9 +117,9 @@ bool Slope = false;//sloopがあるかどうか
 
 /*******************************************************************************************/
 /* 地磁気回転                                                                            
-/*処理：
+/*処理：回転の際に用いるYaw角のデータを整数化
 /*
-/*更新者：誰が作った
+/*更新者：清田侑希 2025/1/25
 /*
 /*******************************************************************************************/
 void tiziki_kaitenn()
@@ -139,9 +136,9 @@ void tiziki_kaitenn()
 
 /*******************************************************************************************/
 /* 地磁気                                                                              
-/*処理：
-/*
-/*更新者：誰が作った
+/*処理：回転後に発生する機体の方向の誤差をMPU6050によって補正
+/* 変更点：モーターにギアを導入したのでモーターの回転方向が逆になってます
+/*更新者：清田侑希 2025/1/25
 /*
 /*******************************************************************************************/
 void tiziki()
@@ -152,85 +149,86 @@ void tiziki()
   Serial.println(kakudo_true);
   if (kakudo_true >= 0 && kakudo_true < 45) {
     for (int i =0; i < kakudo_true ;i++){
-        Position[0] = -30; //右に回転
-        Position[1] = -30;
-        Position[2] = -30;
-        Position[3] = -30;
+        Position[0] = 60; //右に回転
+        Position[1] = 60;
+        Position[2] = 60;
+        Position[3] = 60;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
         delay(18);
       
     }
   }else if (kakudo_true >= 45 && kakudo_true < 90) {
     for (int i =0; i < 90-kakudo_true ;i++){
-        Position[0] = 30; //左に回転
-        Position[1] = 30;
-        Position[2] = 30;
-        Position[3] = 30;
+        Position[0] = -60; //左に回転
+        Position[1] = -60;
+        Position[2] = -60;
+        Position[3] = -60;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
         delay(18);
       
     }
   }else if (kakudo_true >= 90 && kakudo_true < 135) {
     for (int i =0; i < kakudo_true-90 ;i++){
-        Position[0] = -30; //右に回転
-        Position[1] = -30;
-        Position[2] = -30;
-        Position[3] = -30;
+        Position[0] = 60; //右に回転
+        Position[1] = 60;
+        Position[2] = 60;
+        Position[3] = 60;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
         delay(18);
       
     }
   }else if (kakudo_true >= 135 && kakudo_true < 180) {
     for (int i =0; i < 180-kakudo_true ;i++){
-        Position[0] = 30; //左に回転
-        Position[1] = 30;
-        Position[2] = 30;
-        Position[3] = 30;
+        Position[0] = -60; //左に回転
+        Position[1] = -60;
+        Position[2] = -60;
+        Position[3] = -60;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
         delay(18);
       
     }
   }else if (kakudo_true >= 180 && kakudo_true < 225) {
     for (int i =0; i < kakudo_true-180 ;i++){
-        Position[0] = -30; //右に回転
-        Position[1] = -30;
-        Position[2] = -30;
-        Position[3] = -30;
+        Position[0] = 60; //右に回転
+        Position[1] = 60;
+        Position[2] = 60;
+        Position[3] = 60;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
         delay(18);
       
     }
   }else if (kakudo_true >= 225 && kakudo_true < 270) {
     for (int i =0; i < 270-kakudo_true ;i++){
-        Position[0] = 30; //左に回転
-        Position[1] = 30;
-        Position[2] = 30;
-        Position[3] = 30;
+        Position[0] = -60; //左に回転
+        Position[1] = -60;
+        Position[2] = -60;
+        Position[3] = -60;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
         delay(18);
       
     }
   }else if (kakudo_true >= 270 && kakudo_true < 315) {
     for (int i =0; i < kakudo_true-270 ;i++){
-        Position[0] = -30; //右に回転
-        Position[1] = -30;
-        Position[2] = -30;
-        Position[3] = -30;
+        Position[0] = 60; //右に回転
+        Position[1] = 60;
+        Position[2] = 60;
+        Position[3] = 60;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
         delay(18);
       
     }
   }else if (kakudo_true >= 315 && kakudo_true <= 360) {
     for (int i =0; i < 360-kakudo_true ;i++){
-        Position[0] = 30; //左に回転
-        Position[1] = 30;
-        Position[2] = 30;
-        Position[3] = 30;
+        Position[0] = -60; //左に回転
+        Position[1] = -60;
+        Position[2] = -60;
+        Position[3] = -60;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
         delay(18);
       
     }
   }
+  Serial.println("kakudo_hosei");
   delay(100);
 }
 
@@ -238,15 +236,14 @@ void tiziki()
 
 /*******************************************************************************************/
 /* 地磁気２                                                                              
-/*処理：
-/*
-/*更新者：誰が作った
+/*処理：坂の検知に用いるRoll角の整数化
+/*変更点：MPU6050の設置方向の関係からPitch角からRoll角に仕様変更
+/*更新者：清田侑希 2025/1/25
 /*
 /*******************************************************************************************/
-void tiziki_2()
-{
+void tiziki_2(){
   getYawPitchRoll();
-  katamuki = pitch;
+  katamuki = roll;
   katamuki_true = int(katamuki);
   Serial.println(katamuki_true); 
   
@@ -256,81 +253,75 @@ void tiziki_2()
 
 /*******************************************************************************************/
 /* 右回転                                                                              
-/*処理：
-/*
-/*更新者：誰が作った
+/*処理：MPU6050で取得したデータをもとに90度右回転するまでモーターを回し続ける
+/*変更点：ギア搭載による回転方向の反転と適切なdelayの実装
+/*更新者：清田侑希　2025/1/25
 /*
 /*******************************************************************************************/
-void migi()
-{
+void migi(){
   tiziki_kaitenn();
   if (kakudo_true2 <=90){
-    mawasu = kakudo_true2 +285;
+    mawasu = kakudo_true2 +280;
     kakudo_true2 =kakudo_true2 +360;
     chousei =1;
   }else if (kakudo_true2 <= 360){
-    mawasu = kakudo_true2-75;
+    mawasu = kakudo_true2-80;
   }
   while (kakudo_true2 > mawasu || chousei ==1){
-
-    
-  
-  Position[0] = -220; //右に回転
-  Position[1] = -220;
-  Position[2] = -220;
-  Position[3] = -220;
+  Position[0] = 440; //右に回転
+  Position[1] = 440;
+  Position[2] = 440;
+  Position[3] = 440;
   sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+  delay(100);
   tiziki_kaitenn();
-  //serialEvent();
-  //serialEvent2();
+  //serialEvent7();
+  //serialEvent8();
   if (chousei ==1){
     if (kakudo_true2 <=90){
       kakudo_true2 =kakudo_true2 +360;
-      
     }else {
       chousei =0;
+      }
     }
-  }
-  delay(70);
+    delay(50);
   }
   mawasu =0;
   delay(200);
-  tiziki();
-  delay(200);
-  
-             
+  tiziki(); //角度補正            
 }
+
 
 
 
 /*******************************************************************************************/
 /* 左回転                                                                              
-/*処理：
-/*
-/*更新者：誰が作った
+/*処理：MPU6050で取得したデータをもとに90度左回転するまでモーターを回し続ける
+/*変更点：ギア搭載による回転方向の反転と適切なdelayの実装
+/*更新者：清田侑希　2025/1/25
 /*
 /*******************************************************************************************/
-void hidari()
-{
-  
+void hidari(){
+  //どこまで回すかの数値を処理
   tiziki_kaitenn();
   if (kakudo_true2 >= 270){
-    mawasu = kakudo_true2 - 285; 
+    mawasu = kakudo_true2 - 280; 
     kakudo_true2 = kakudo_true2 - 360;
     chousei = 1; 
   }else if (kakudo_true2 >= 0){
-    mawasu = kakudo_true2 + 75;
+    mawasu = kakudo_true2 + 80;
   }
+    //90度回転するまでモーターを回し続ける
   while (kakudo_true2 < mawasu || chousei ==1){
-
-    
-  
-  Position[0] = 220; //左に回転
-  Position[1] = 220;
-  Position[2] = 220;
-  Position[3] = 220;
+  Position[0] = -440; //左に回転
+  Position[1] = -440;
+  Position[2] = -440;
+  Position[3] = -440;
   sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+  delay(100);
   tiziki_kaitenn();
+  //serialEvent7();
+  //serialEvent8();
   if (chousei ==1){
     if (kakudo_true2 >= 270){
       kakudo_true2 =kakudo_true2 - 360;
@@ -339,12 +330,10 @@ void hidari()
       chousei =0;
     }
   }
-  delay(70);
+  delay(50);
   }
-  
-  tiziki();
   delay(200);
-              
+  tiziki(); //角度補正         
 }
 
 
@@ -1212,14 +1201,21 @@ void GoHome()
 /*******************************************************************************************/
 /* セットアップ                                                                              
 /*処理：MPU、センサー、モーター、座標の初期化
-/*
-/*更新者：吉ノ薗2025/01/22
+/*変更点：センサーのセットアップの部分を最初に持ってくる/Serialの初期化のための適切な待機/サーボモーターの速度設定を2倍にする
+/*更新者：清田侑希　2025/01/25
 /*
 /*******************************************************************************************/
 void setup(){
-
-  /*MPUのセットアップ***********************************************************************************************************/
+/*センサーのセットアップ***********************************************************************************************************/
+  Serial.begin(115200);//using_serial_monitor
   Wire.begin();
+  Serial2.begin(1000000);//using_servo_sts3032
+  Serial3.begin(19200);//using_tof
+  Serial1.begin(19200);//using_Sub_Kairo
+  Serial7.begin(19200);//using_cam1
+  Serial8.begin(19200);//using_cam2
+  delay(2000);
+  /*MPUのセットアップ***********************************************************************************************************/
   Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
   mpu.initialize();
   devStatus = mpu.dmpInitialize();
@@ -1242,20 +1238,6 @@ void setup(){
   } else {
     Serial.print("DMP Initialization failed.");
   }
-
-
-
-  /*センサーのセットアップ***********************************************************************************************************/
-  Serial.begin(115200);//using_serial_monitor
-  Wire.begin();
-  Serial2.begin(1000000);//using_servo_sts3032
-  Serial3.begin(19200);//using_tof
-  Serial1.begin(19200);//using_Sub_Kairo
-  Serial7.begin(19200);//using_cam1
-  Serial8.begin(19200);//using_cam2
-
-
-
   /*モーターのセットアップ***********************************************************************************************************/
   sms_sts.pSerial = &Serial2;
   delay(1000);
@@ -1263,10 +1245,10 @@ void setup(){
   ID[1] = 2; //左前
   ID[2] = 3; //右後
   ID[3] = 4; //左後
-  Speed[0] = 3400; //変数Speed[0]=0とする
-  Speed[1] = 3400;
-  Speed[2] = 3400;
-  Speed[3] = 3400;
+  Speed[0] = 6800; //変数Speed[0]=0とする
+  Speed[1] = 6800;
+  Speed[2] = 6800;
+  Speed[3] = 6800;
   ACC[0] = 50; //変数ACC[0]=0とする
   ACC[1] = 50;
   ACC[2] = 50;
