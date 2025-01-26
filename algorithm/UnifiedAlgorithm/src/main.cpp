@@ -12,10 +12,12 @@
 #include <time.h>
 #include <cstdint>
 #include <SCServo.h> //SCServoを使うと宣言]
+#include <SoftwareSerial.h> //SoftwareSerial(複数機器とシリアル通信)を使うと宣言
 #include "MPU6050_6Axis_MotionApps20.h"
 
 MPU6050 mpu;
 SMS_STS sms_sts;
+SoftwareSerial softSerial(36,37);
 
 #define East 1
 #define North 2
@@ -28,6 +30,7 @@ SMS_STS sms_sts;
 #define Back 4
 
 
+uint8_t Status = 0;
 
 /*MPU変数*/
 // MPU control/status vars
@@ -86,14 +89,19 @@ void getYawPitchRoll() {
   }
 }
 
+/*.....tof受信用の変数.......................................*/
 
+const byte HEADER = 255;  // ヘッダー (送信側と一致すること)
+bool headerDetected = false;
+byte receivedData[6];  // 受信データ格納用
+int receivedIndex = 0; // データ格納位置
 /*センサー類変数*/
 unsigned int SERVO_POS = 0; //変数SERVO_POS=0とする
 byte ID[4]; //IDはそれぞれのモーターのID
 s16 Position[4]; //Positionはモーターが回る角度(右一回転＝4095)
 u16 Speed[4]; 
 byte ACC[4]; 
-int susumu_kaisuu= 10;
+int susumu_kaisuu= 40;
 int i=1;
 int n=1;
 double kakudo; //tiziki()でのyawの代入
@@ -340,118 +348,223 @@ void hidari(){
 
 /*******************************************************************************************/
 /* 直進                                                                              
-/*処理：
+/*処理：モーターを回しながら直進この時カラーセンサーとロードセル、カメラの割り込みと坂の検知が入る
 /*
-/*更新者：誰が作った
+/*更新者：清田侑希　2025/1/26
 /*
 /*******************************************************************************************/
-void susumu_heitan()
-{
-    Serial3.flush();
+void susumu_heitan() {
+    while (Serial1.available() > 0) {
+      char receivedChar = Serial1.read(); // データを読み取る
+      // 必要に応じて受信データを処理する
+    }
   while (count2  <susumu_kaisuu) {
-    Position[0] = 576; //go
-    Position[1] = -576;
-    Position[2] = -576;
-    Position[3] = 576;
+    Serial.println("Going...");
+    Position[0] = 288; //go
+    Position[1] = -288;
+    Position[2] = -288;
+    Position[3] = 288;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    //serialEvent3();_color_or_loadcell
-    //serialEvent1();_victim_camera1
-    //serialEvent2();_victim_camera2
+    delay(80);
+    serialEvent1(); //color_load
+    serialEvent7();//_victim_camera1
+    serialEvent8();//_victim_camera2
     count2++;
   }
-  if (count2 != susumu_kaisuu){
-    while (count2 !=0){
-    Position[0] = -576; //back
-    Position[1] = 576;
-    Position[2] = 576;
-    Position[3] = -576;
-    sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(320);
-     count2--;
-    BlackTile=1;
-    }
-  
-  delay(300);
 
-  }else {
-    
-    tiziki();
+  /*............青タイルがある場合の待機............*/
 
+  if (blue_count == true){
+    Serial.println("Waiting...");
+    delay(5500);
   }
-
-    tiziki_2();
-    delay(50);
-    if (katamuki_true >17){
-        Serial.println("Saka_Ue");
-        while(katamuki_true >17){
-            Serial.println("sakaue");
-            Position[0] = 200; //前に進む
-            Position[1] = -200;
-            Position[2] = -200;
-            Position[3] = 200;
-            sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-            tiziki_2();
-            delay(10);
-            Slope = 1;
-        }
-    }else if (katamuki_true <-17){
-        while(katamuki_true < -17){
-            Position[0] = 200; //前に進む
-            Position[1] = -200;
-            Position[2] = -200;
-            Position[3] = 200;
-            sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-            tiziki_2();
-            delay(10);
-            Slope = 1;
-        }
-    }else if(katamuki_true <-5&& katamuki_true >=9){
-        Position[0] = 1000; //前に進む
-        Position[1] = -1000;
-        Position[2] = -1000;
-        Position[3] = 1000;
-        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-        delay(270);
-
-    }
-
-  count2 =0;
-
     
+    /*...........坂があるかどうか..............*/
+    tiziki_2(); //get_roll_data
+    delay(50);
+    if (katamuki_true <-21){
+        Serial.println("Slope_Ue");
+        while(katamuki_true <-21){
+            Serial.println("Climbing...");
+            Position[0] = 400; //前に進む
+            Position[1] = -400;
+            Position[2] = -400;
+            Position[3] = 400;
+            sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+            delay(100);
+            tiziki_2(); //get_roll_data
+            delay(100);
+            Slope = true;
+        }
+    }else if (katamuki_true >21){
+        while(katamuki_true > 21){
+            Serial.println("Down Hill...");
+            Position[0] = 400; //前に進む
+            Position[1] = -400;
+            Position[2] = -400;
+            Position[3] = 400;
+            sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+            delay(100);
+            tiziki_2(); //get_roll_data
+            delay(100);
+            Slope = true;
+        }
+    }
+    while (Serial3.available() > 0) {
+    char receivedChar = Serial3.read(); // データを読み取る
+    // 必要に応じて受信データを処理する
+    }
+  /*...............................................*/
+  count2 =0;
+  Status = 0;
 }
 
 
 
 /*******************************************************************************************/
 /*色タイルまたはバンプ                                                                              
-/*処理：
+/*処理：Serial1にデータが来たら1バイト読み込んで青、黒、ロードセルを検知する
 /*
-/*更新者：誰が作った
+/*更新者：清田侑希　2025/1/26
 /*
 /*******************************************************************************************/
-void move_colororbump(){
+void serialEvent1() {
+  if (Serial1.available()>0){
+  int receivedData2 = Serial1.read();
+  Serial.println(receivedData2);
+  delay(50);
+  if(receivedData2 == 1){
+    BlackTile = true;
+    while (count2 !=0){
+      Position[0] = -288; //back
+      Position[1] = 288;
+      Position[2] = 288;
+      Position[3] = -288;
+      sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+      Serial.println("Backing...");
+      delay(100);
+      count2--;
     }
+    count2 = 40; //進むwhile文から出る
+  }else if(receivedData2 == 2){
+    Serial.println("blue_tile");
+    delay(50);
+    blue_count = true;
+  }else if(receivedData2 == 3 ){
+    Serial.println("left");
+    Position[0] = -682; //左に回転
+    Position[1] = -682;
+    Position[2] = -682;
+    Position[3] = -682;
+    sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+    delay(157);
+    delay(150);
+    Position[0] = -620; //前に進む
+    Position[1] = 620;
+    Position[2] = 620;
+    Position[3] = -620;
+    sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+    delay(210);
+    delay(300);
+    Position[0] = 682; //右に回転
+    Position[1] = 682;
+    Position[2] = 682;
+    Position[3] = 682;
+    sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+    delay(157);
+    delay(300);
+    count2--;
+  }else if(receivedData2 == 4){
+    Serial.println("right");
+    Position[0] = 682; //右に回転
+    Position[1] = 682;
+    Position[2] = 682;
+    Position[3] = 682;
+    sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+    delay(157);
+    delay(150);
+    Position[0] = -620; //前に進む
+    Position[1] = 620;
+    Position[2] = 620;
+    Position[3] = -620;
+    sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+    delay(210);
+    delay(300);
+    Position[0] = -682; //左に回転
+    Position[1] = -682;
+    Position[2] = -682;
+    Position[3] = -682;
+    sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+    delay(157);
+    delay(300);
+    count2--;
+  }else{
+    Serial.println("No sensors");
+    delay(100);
+  }
+  }
+
+}
 
 
 
 /*******************************************************************************************/
 /* collect_tof_data                                                                              
-/*処理：
+/*処理： ヘッダーが来たら6バイト距離のデータを取得するこれによって各壁の検知を行う
 /*
-/*更新者：誰が作った
+/*更新者：清田侑希　2025/1/26
 /*
 /*******************************************************************************************/
-void serialEvent(){
-    Serial3.flush();
-    while (Serial3.available()== 0){
-        delay(100);
+void get_tof_data() {
+    while (Serial3.available() > 0) {
+      byte incomingByte = Serial3.read(); // Serial3から1バイト読み取り
+      if (!headerDetected) {
+        if (incomingByte == HEADER) {
+          headerDetected = true;  // ヘッダー検出
+          receivedIndex = 0;      // データ格納位置をリセット
+          Serial.println("Header detected!"); // デバッグ用
         }
-    if (Serial3.available() >0){
-        int receivedData = Serial3.read();
-        //get_data_json
+      } else {
+        receivedData[receivedIndex++] = incomingByte; // データを格納
+        if (receivedIndex == 6) {
+          // 6バイト受信完了
+          headerDetected = false;
+          // 受信したデータを表示
+        for (int i = 0; i < receivedIndex; i++) {
+            Serial.print("Sensor ");
+            Serial.print(i);
+            Serial.print(": ");
+            Serial.println(receivedData[i], BIN); // 受信データを2進数で表示
+            //壁の有無を変数に代入
+            if ((i == 0 || i == 3) && receivedData[i] == 1) {
+                front_wall = true;
+                Serial.println("front_wall");
+            } else if (i == 0 || i == 3) {
+                front_wall = false;
+            }
+            
+            if ((i == 1 || i == 2) && receivedData[i] == 1) {
+                left_wall = true;
+                Serial.println("left_wall");
+            } else if (i == 1 || i == 2) {
+                left_wall = false;
+            }
+            
+            if ((i == 4 || i == 5) && receivedData[i] == 1) {
+                right_wall = true;
+                Serial.println("right_wall");
+            } else if (i == 4 || i == 5) {
+                right_wall = false;
+            }
         }
-    
+        Serial.println("All data received");
+        //座標更新のフェーズに移行
+        Status = 1;
+   
+        }
+      }
     }
+}
 
 
 
@@ -490,22 +603,6 @@ void serialEvent2(){
   }
 }
 */
-
-
-
-/*******************************************************************************************/
-/* collect_color_and_bump_data                                                                              
-/*処理：
-/*
-/*更新者：誰が作った
-/*
-/*******************************************************************************************/
-void serialEvent3(){
-    if (Serial1.available() >0){
-    int receivedData = Serial1.read();
-    move_colororbump();
-    }
-}
 
 
 
@@ -602,7 +699,6 @@ int dequeue() {
 uint8_t x = 50;
 uint8_t y = 50;
 uint8_t Direction = North;
-uint8_t Status = 0;
 int8_t toutatu_zahyou[90][90];//そのマスの到達回数
 int16_t RightWeight = 0;
 int16_t FrontWeight = 0;
@@ -1207,13 +1303,13 @@ void GoHome()
 /*******************************************************************************************/
 void setup(){
 /*センサーのセットアップ***********************************************************************************************************/
-  Serial.begin(115200);//using_serial_monitor
-  Wire.begin();
+  Serial.begin(9600);   // デバッグ用
+  Serial1.begin(19200); //using_color_load
   Serial2.begin(1000000);//using_servo_sts3032
-  Serial3.begin(19200);//using_tof
-  Serial1.begin(19200);//using_Sub_Kairo
+  Serial3.begin(9600);  // using_tof
   Serial7.begin(19200);//using_cam1
   Serial8.begin(19200);//using_cam2
+  Wire.begin();
   delay(2000);
   /*MPUのセットアップ***********************************************************************************************************/
   Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
@@ -1239,20 +1335,24 @@ void setup(){
     Serial.print("DMP Initialization failed.");
   }
   /*モーターのセットアップ***********************************************************************************************************/
-  sms_sts.pSerial = &Serial2;
-  delay(1000);
-  ID[0] = 1; //右前のモーターのID
+ softSerial.begin( 9600 ); //softSerial通信の速さを9600bit/秒に設定
+ sms_sts.pSerial = &Serial2;
+ delay(1000);
+  ID[0] = 1; //右前のモーターのID  
   ID[1] = 2; //左前
   ID[2] = 3; //右後
   ID[3] = 4; //左後
+
   Speed[0] = 6800; //変数Speed[0]=0とする
   Speed[1] = 6800;
   Speed[2] = 6800;
   Speed[3] = 6800;
+
   ACC[0] = 50; //変数ACC[0]=0とする
   ACC[1] = 50;
   ACC[2] = 50;
   ACC[3] = 50;
+  Serial.println("test");
 
 
   /*スタック・キューのセットアップ***********************************************************************************************************/
@@ -1292,7 +1392,7 @@ void loop(){
     switch (Status)
     {
     case 0://壁情報取得
-        //get_tof_data();
+        get_tof_data();
         break;
 
     case 1://座標更新と探索
