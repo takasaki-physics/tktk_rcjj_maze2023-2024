@@ -1401,7 +1401,30 @@ void loop(){
         delay(10);
         Serial.println("Waiting...");
         if (digitalRead(6) == HIGH){
-            //setupMPU(); //主に進行停止の時に値がずれるので再初期化する
+             //主に進行停止の時に値がずれるので再初期化する
+            Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
+            mpu.initialize();
+            devStatus = mpu.dmpInitialize();
+            // supply your own gyro offsets here, scaled for min sensitivity
+
+            mpu.setXAccelOffset(-3550);
+            mpu.setYAccelOffset(-1727);
+            mpu.setZAccelOffset(1087);
+            mpu.setXGyroOffset(25);
+            mpu.setYGyroOffset(-29);
+            mpu.setZGyroOffset(7);
+
+            // make sure it worked (returns 0 if so)
+            if (devStatus == 0) {
+                // Calibration Time: generate offsets and calibrate our MPU6050
+                mpu.CalibrateAccel(6);
+                mpu.CalibrateGyro(6);
+                mpu.setDMPEnabled(true);
+                packetSize = mpu.dmpGetFIFOPacketSize();
+            } else {
+                Serial.print("DMP Initialization failed.");
+            }
+
         }
     }
     /*.................................................................*/
