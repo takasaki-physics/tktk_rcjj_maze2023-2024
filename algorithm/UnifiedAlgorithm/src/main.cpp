@@ -113,6 +113,7 @@ bool chousei =0; //MPUが0度と360度になったときの分岐
 double katamuki; //tiziki2()でのrollの代入
 int katamuki_true; //tiziki2()でrollを整数化したあとの変数
 int count2 = 0;//進んだ回数＿10回でわかれている
+int bump_giveup_count = 0; //障害物に当たった時それが前の壁なのかどうか見るための変数
 
 bool right_wall = false;//ここもセンサーの値を取得するファイルとして分けたい
 bool front_wall = false;
@@ -410,10 +411,6 @@ void susumu_heitan() {
             Slope = true;
         }
     }
-    while (Serial3.available() > 0) {
-    char receivedChar = Serial3.read(); // データを読み取る
-    // 必要に応じて受信データを処理する
-    }
   /*...............................................*/
   count2 =0;
   Status = 0;
@@ -474,6 +471,7 @@ void serialEvent1() {
     delay(314);
     delay(500);
     count2= count2-4;
+    bump_giveup_count++;
   }else if(receivedData2 == 4){
     Serial.println("right");
     Position[0] = 1023; //右に回転
@@ -498,15 +496,25 @@ void serialEvent1() {
     delay(314);
     delay(500);
     count2= count2-4;
-  }else if(receivedData2 == 5){
+    bump_giveup_count++;
+  }else if(receivedData2 == 5 || bump_giveup_count > 5){
+    Position[0] = -2025; //後ろに下がる
+    Position[1] = 2025;
+    Position[2] = 2025;
+    Position[3] = -2025;
+    sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     Serial.println("Backing...");
     delay(1000);
+    if (count2 < 20 || bump_giveup_count > 5){
+        //座標の変更をもとに戻す
+    }
+    bump_giveup_count = 0;//値を初期化
     count2 = 40;
-
   }else{
     Serial.println("No sensors");
     delay(100);
   }
+
   }
 
 }
@@ -1431,6 +1439,10 @@ void loop(){
     switch (Status)
     {
     case 0://壁情報取得
+        while (Serial3.available() > 0) {
+            char receivedChar = Serial3.read(); // データを読み取る
+            // 必要に応じて受信データを処理する
+        }
         get_tof_data();
         break;
 
