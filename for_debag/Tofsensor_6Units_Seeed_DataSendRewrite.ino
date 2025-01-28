@@ -4,7 +4,7 @@
 VL53L0X sensor1, sensor2, sensor3, sensor4, sensor5, sensor6;
 
 // 壁判定の閾値 (単位: mm)
-const int WALL_THRESHOLD = 200;
+const int WALL_THRESHOLD = 130;
 
 void setup() {
   Serial.begin(115200);
