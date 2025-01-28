@@ -360,12 +360,12 @@ void susumu_heitan() {
     }
   while (count2  <susumu_kaisuu) {
     Serial.println("Going...");
-    Position[0] = 288; //go
-    Position[1] = -288;
-    Position[2] = -288;
-    Position[3] = 288;
+    Position[0] = 303; //go
+    Position[1] = -303;
+    Position[2] = -303;
+    Position[3] = 303;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(80);
+    delay(90);
     serialEvent1(); //color_load
     serialEvent7();//_victim_camera1
     serialEvent8();//_victim_camera2
@@ -436,10 +436,10 @@ void serialEvent1() {
   if(receivedData2 == 1){
     BlackTile = true;
     while (count2 >0){
-      Position[0] = -288; //back
-      Position[1] = 288;
-      Position[2] = 288;
-      Position[3] = -288;
+      Position[0] = -303; //back
+      Position[1] = 303;
+      Position[2] = 303;
+      Position[3] = -303;
       sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
       Serial.println("Backing...");
       delay(100);
@@ -1390,7 +1390,7 @@ void setup(){
 /*      status2のとき幅優先探索 → 実際に動いて停止
 /*      status3,4,5,6のとき前後左右に移動 → 黒タイルや坂だった場合に合わせて座標を更新
 /*
-/*更新者：吉ノ薗2025/01/22
+/*更新者：吉ノ薗2025/01/22 ｜清田侑希 2025/1/28　変更点：動きの最適化のためにdelayを追加
 /*
 /*******************************************************************************************/
 void loop(){
@@ -1428,19 +1428,23 @@ void loop(){
 
     case 4://右折
         migi();
+        delay(500);
         susumu_heitan();
         TileColor();
         break;
 
     case 5://左折
         hidari();
+        delay(500);
         susumu_heitan();
         TileColor();
         break;
 
     case 6://後進
         migi();
+        delay(500);
         migi();
+        delay(500);
         susumu_heitan();
         TileColor();
         break;
