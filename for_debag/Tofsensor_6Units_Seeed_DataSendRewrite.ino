@@ -63,7 +63,7 @@ void loop() {
     Serial.println();
 
 
-  delay(1000); // 必要に応じて調整
+  delay(500); // 必要に応じて調整
 }
 
 void initializeSensor(VL53L0X &sensor, int pin, int address) {
