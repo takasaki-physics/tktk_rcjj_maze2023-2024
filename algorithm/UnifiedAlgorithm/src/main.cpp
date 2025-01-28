@@ -435,7 +435,7 @@ void serialEvent1() {
   delay(50);
   if(receivedData2 == 1){
     BlackTile = true;
-    while (count2 !=0){
+    while (count2 >0){
       Position[0] = -288; //back
       Position[1] = 288;
       Position[2] = 288;
@@ -452,10 +452,10 @@ void serialEvent1() {
     blue_count = true;
   }else if(receivedData2 == 3 ){
     Serial.println("left");
-    Position[0] = -1364; //左に回転
-    Position[1] = -1364;
-    Position[2] = -1364;
-    Position[3] = -1364;
+    Position[0] = -1023; //左に回転
+    Position[1] = -1023;
+    Position[2] = -1023;
+    Position[3] = -1023;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     delay(314);
     delay(500);
@@ -466,20 +466,20 @@ void serialEvent1() {
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     delay(420);
     delay(500);
-    Position[0] = 1364; //右に回転
-    Position[1] = 1364;
-    Position[2] = 1364;
-    Position[3] = 1364;
+    Position[0] = 1023; //右に回転
+    Position[1] = 1023;
+    Position[2] = 1023;
+    Position[3] = 1023;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     delay(314);
     delay(500);
     count2= count2-4;
   }else if(receivedData2 == 4){
     Serial.println("right");
-    Position[0] = 1364; //右に回転
-    Position[1] = 1364;
-    Position[2] = 1364;
-    Position[3] = 1364;
+    Position[0] = 1023; //右に回転
+    Position[1] = 1023;
+    Position[2] = 1023;
+    Position[3] = 1023;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     delay(314);
     delay(500);
@@ -490,10 +490,10 @@ void serialEvent1() {
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     delay(420);
     delay(500);
-    Position[0] = -1364; //左に回転
-    Position[1] = -1364;
-    Position[2] = -1364;
-    Position[3] = -1364;
+    Position[0] = -1023; //左に回転
+    Position[1] = -1023;
+    Position[2] = -1023;
+    Position[3] = -1023;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     delay(314);
     delay(500);
@@ -501,6 +501,7 @@ void serialEvent1() {
   }else if(receivedData2 == 5){
     Serial.println("Backing...");
     delay(1000);
+    count2 = 40;
 
   }else{
     Serial.println("No sensors");
