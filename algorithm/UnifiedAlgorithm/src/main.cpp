@@ -113,7 +113,7 @@ bool chousei =0; //MPUが0度と360度になったときの分岐
 double katamuki; //tiziki2()でのrollの代入
 int katamuki_true; //tiziki2()でrollを整数化したあとの変数
 int count2 = 0;//進んだ回数＿10回でわかれている
-int bump_giveup_count = 0; //障害物に当たった時それが前の壁なのかどうか見るための変数
+int bump_giveup_count = 0; //障害物に当たった時あきらめる変数
 
 bool right_wall = false;//ここもセンサーの値を取得するファイルとして分けたい
 bool front_wall = false;
@@ -1473,23 +1473,23 @@ void loop(){
 
     case 4://右折
         migi();
-        delay(500);
+        delay(300);
         susumu_heitan();
         TileColor();
         break;
 
     case 5://左折
         hidari();
-        delay(500);
+        delay(300);
         susumu_heitan();
         TileColor();
         break;
 
     case 6://後進
         migi();
-        delay(500);
+        delay(300);
         migi();
-        delay(500);
+        delay(300);
         susumu_heitan();
         TileColor();
         break;
