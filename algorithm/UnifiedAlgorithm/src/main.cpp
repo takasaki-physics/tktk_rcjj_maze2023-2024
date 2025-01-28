@@ -452,52 +452,56 @@ void serialEvent1() {
     blue_count = true;
   }else if(receivedData2 == 3 ){
     Serial.println("left");
-    Position[0] = -682; //左に回転
-    Position[1] = -682;
-    Position[2] = -682;
-    Position[3] = -682;
+    Position[0] = -1364; //左に回転
+    Position[1] = -1364;
+    Position[2] = -1364;
+    Position[3] = -1364;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(157);
-    delay(150);
-    Position[0] = -620; //前に進む
-    Position[1] = 620;
-    Position[2] = 620;
-    Position[3] = -620;
+    delay(314);
+    delay(500);
+    Position[0] = -1240; //後ろに下がる
+    Position[1] = 1240;
+    Position[2] = 1240;
+    Position[3] = -1240;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(210);
-    delay(300);
-    Position[0] = 682; //右に回転
-    Position[1] = 682;
-    Position[2] = 682;
-    Position[3] = 682;
+    delay(420);
+    delay(500);
+    Position[0] = 1364; //右に回転
+    Position[1] = 1364;
+    Position[2] = 1364;
+    Position[3] = 1364;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(157);
-    delay(300);
-    count2--;
+    delay(314);
+    delay(500);
+    count2= count2-4;
   }else if(receivedData2 == 4){
     Serial.println("right");
-    Position[0] = 682; //右に回転
-    Position[1] = 682;
-    Position[2] = 682;
-    Position[3] = 682;
+    Position[0] = 1364; //右に回転
+    Position[1] = 1364;
+    Position[2] = 1364;
+    Position[3] = 1364;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(157);
-    delay(150);
-    Position[0] = -620; //前に進む
-    Position[1] = 620;
-    Position[2] = 620;
-    Position[3] = -620;
+    delay(314);
+    delay(500);
+    Position[0] = -1240; //後ろに下がる
+    Position[1] = 1240;
+    Position[2] = 1240;
+    Position[3] = -1240;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(210);
-    delay(300);
-    Position[0] = -682; //左に回転
-    Position[1] = -682;
-    Position[2] = -682;
-    Position[3] = -682;
+    delay(420);
+    delay(500);
+    Position[0] = -1364; //左に回転
+    Position[1] = -1364;
+    Position[2] = -1364;
+    Position[3] = -1364;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(157);
-    delay(300);
-    count2--;
+    delay(314);
+    delay(500);
+    count2= count2-4;
+  }else if(receivedData2 == 5){
+    Serial.println("Backing...");
+    delay(1000);
+
   }else{
     Serial.println("No sensors");
     delay(100);
