@@ -943,11 +943,14 @@ switch (Direction){
 /*******************************************************************************************/
 void TileColor()
 {
+    if(BlackTile){
+        toutatu_zahyou[x][y] += 100;
+    }
+
     switch (Direction)
     {
     case North:
         if(BlackTile){//黒タイルの信号が送られていた場合戻る
-            toutatu_zahyou[x][y] += 100;
             y += 1;
         }
         if(Slope){//坂の信号が送られていた場合座標を更に進める
@@ -957,7 +960,6 @@ void TileColor()
 
     case East:
         if(BlackTile){//黒タイルの信号が送られていた場合戻る
-            toutatu_zahyou[x][y] += 100;
             x += -1;
         }
         if(Slope){//坂の信号が送られていた場合座標を更に進める
@@ -967,7 +969,6 @@ void TileColor()
     
     case West:
         if(BlackTile){//黒タイルの信号が送られていた場合戻る
-            toutatu_zahyou[x][y] += 100;
             x += 1;
         }
         if(Slope){//坂の信号が送られていた場合座標を更に進める
@@ -977,7 +978,6 @@ void TileColor()
 
     case South:
         if(BlackTile){//黒タイルの信号が送られていた場合戻る
-            toutatu_zahyou[x][y] += 100;
             y += -1;
         }
         if(Slope){//坂の信号が送られていた場合座標を更に進める
