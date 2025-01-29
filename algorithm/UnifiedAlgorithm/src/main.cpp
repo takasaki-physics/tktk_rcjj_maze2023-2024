@@ -121,6 +121,7 @@ bool left_wall = false;
 int8_t BlackTile =false;
 int8_t blue_count =false;
 bool Slope = false;//sloopがあるかどうか
+bool Gap = false;
 
 
 
@@ -258,7 +259,63 @@ void tiziki_2(){
   
 }
 
-
+/*******************************************************************************************/
+/* collect_tof_data                                                                              
+/*処理： ヘッダーが来たら6バイト距離のデータを取得するこれによって各壁の検知を行う
+/*
+/*更新者：清田侑希　2025/1/26
+/*
+/*******************************************************************************************/
+void get_tof_data() {
+    while (Serial3.available() > 0) {
+      byte incomingByte = Serial3.read(); // Serial3から1バイト読み取り
+      if (!headerDetected) {
+        if (incomingByte == HEADER) {
+          headerDetected = true;  // ヘッダー検出
+          receivedIndex = 0;      // データ格納位置をリセット
+          Serial.println("Header detected!"); // デバッグ用
+        }
+      } else {
+        receivedData[receivedIndex++] = incomingByte; // データを格納
+        if (receivedIndex == 6) {
+          // 6バイト受信完了
+          headerDetected = false;
+          // 受信したデータを表示
+        for (int i = 0; i < receivedIndex; i++) {
+            Serial.print("Sensor ");
+            Serial.print(i);
+            Serial.print(": ");
+            Serial.println(receivedData[i], BIN); // 受信データを2進数で表示
+            //壁の有無を変数に代入
+            if ((i == 0 || i == 3) && receivedData[i] == 1) {
+                front_wall = true;
+                Serial.println("front_wall");
+            } else if (i == 0 || i == 3) {
+                front_wall = false;
+            }
+            
+            if ((i == 1 || i == 2) && receivedData[i] == 1) {
+                left_wall = true;
+                Serial.println("left_wall");
+            } else if (i == 1 || i == 2) {
+                left_wall = false;
+            }
+            
+            if ((i == 4 || i == 5) && receivedData[i] == 1) {
+                right_wall = true;
+                Serial.println("right_wall");
+            } else if (i == 4 || i == 5) {
+                right_wall = false;
+            }
+        }
+        Serial.println("All data received");
+        //座標更新のフェーズに移行
+        Status = 1;
+   
+        }
+      }
+    }
+}
 
 /*******************************************************************************************/
 /* 右回転                                                                              
@@ -411,8 +468,13 @@ void susumu_heitan() {
             Slope = true;
         }
     }
-  /*...............................................*/
+    while (Serial3.available() > 0) {
+        char receivedChar = Serial3.read(); // データを読み取る
+        // 必要に応じて受信データを処理する
+    }
+  /*..............変数初期化.................................*/
   count2 =0;
+  bump_giveup_count =0;
   Status = 0;
 }
 
@@ -497,19 +559,28 @@ void serialEvent1() {
     delay(500);
     count2= count2-4;
     bump_giveup_count++;
-  }else if(receivedData2 == 5 || bump_giveup_count > 5){
-    Position[0] = -2025; //後ろに下がる
-    Position[1] = 2025;
-    Position[2] = 2025;
-    Position[3] = -2025;
-    sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    Serial.println("Backing...");
-    delay(1000);
-    if (count2 < 20 || bump_giveup_count > 5){
-        //座標の変更をもとに戻す
+  }else if(receivedData2 == 5 || bump_giveup_count > 2){
+    if (bump_giveup_count == 3){
+        receivedIndex = 0; //tofデータを取得するためにバイト数を初期化する
+        while (receivedIndex == 6){
+            get_tof_data();
+        }       
     }
-    bump_giveup_count = 0;//値を初期化
-    count2 = 40;
+    if(receivedData2== 5 ||front_wall == true || bump_giveup_count > 5){
+        Position[0] = -2025; //後ろに下がる
+        Position[1] = 2025;
+        Position[2] = 2025;
+        Position[3] = -2025;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        Serial.println("Backing...");
+        delay(1000);
+        if (count2 < 20 && bump_giveup_count > 2){
+            //座標の変更をもとに戻す
+            Gap = true;
+        }
+        count2 = 40;
+    }
+
   }else{
     Serial.println("No sensors");
     delay(100);
@@ -521,63 +592,6 @@ void serialEvent1() {
 
 
 
-/*******************************************************************************************/
-/* collect_tof_data                                                                              
-/*処理： ヘッダーが来たら6バイト距離のデータを取得するこれによって各壁の検知を行う
-/*
-/*更新者：清田侑希　2025/1/26
-/*
-/*******************************************************************************************/
-void get_tof_data() {
-    while (Serial3.available() > 0) {
-      byte incomingByte = Serial3.read(); // Serial3から1バイト読み取り
-      if (!headerDetected) {
-        if (incomingByte == HEADER) {
-          headerDetected = true;  // ヘッダー検出
-          receivedIndex = 0;      // データ格納位置をリセット
-          Serial.println("Header detected!"); // デバッグ用
-        }
-      } else {
-        receivedData[receivedIndex++] = incomingByte; // データを格納
-        if (receivedIndex == 6) {
-          // 6バイト受信完了
-          headerDetected = false;
-          // 受信したデータを表示
-        for (int i = 0; i < receivedIndex; i++) {
-            Serial.print("Sensor ");
-            Serial.print(i);
-            Serial.print(": ");
-            Serial.println(receivedData[i], BIN); // 受信データを2進数で表示
-            //壁の有無を変数に代入
-            if ((i == 0 || i == 3) && receivedData[i] == 1) {
-                front_wall = true;
-                Serial.println("front_wall");
-            } else if (i == 0 || i == 3) {
-                front_wall = false;
-            }
-            
-            if ((i == 1 || i == 2) && receivedData[i] == 1) {
-                left_wall = true;
-                Serial.println("left_wall");
-            } else if (i == 1 || i == 2) {
-                left_wall = false;
-            }
-            
-            if ((i == 4 || i == 5) && receivedData[i] == 1) {
-                right_wall = true;
-                Serial.println("right_wall");
-            } else if (i == 4 || i == 5) {
-                right_wall = false;
-            }
-        }
-        Serial.println("All data received");
-        //座標更新のフェーズに移行
-        Status = 1;
-   
-        }
-      }
-    }
-}
 
 
 
@@ -931,21 +945,22 @@ switch (Direction){
 
 
 /*******************************************************************************************/
-/* タイルの色                                                                              
+/* タイルの状態                                                                              
 /*処理：それぞれの方向について、
-/*      黒タイルの信号が送られていたら一マス戻る
+/*      黒タイルまたは"少しずれている"の信号が送られていたら一マス戻る
 /*      坂の信号が送られていたら一マス進む
 /*      黒タイルと坂信号の初期化
 /*
 /*更新者：吉ノ薗2025/01/22
+/*　　　　吉ノ薗2025/01/29：関数の名前を変更
 /*
 /*******************************************************************************************/
-void TileColor()
+void TileStatus()
 {
     switch (Direction)
     {
     case North:
-        if(BlackTile){//黒タイルの信号が送られていた場合戻る
+        if(BlackTile || Gap){//黒タイルまたはずれの信号が送られていた場合戻る
             y += 1;
         }
         if(Slope){//坂の信号が送られていた場合座標を更に進める
@@ -954,7 +969,7 @@ void TileColor()
         break;
 
     case East:
-        if(BlackTile){//黒タイルの信号が送られていた場合戻る
+        if(BlackTile || Gap){//黒タイルの信号が送られていた場合戻る
             x += -1;
         }
         if(Slope){//坂の信号が送られていた場合座標を更に進める
@@ -963,7 +978,7 @@ void TileColor()
         break;
     
     case West:
-        if(BlackTile){//黒タイルの信号が送られていた場合戻る
+        if(BlackTile || Gap){//黒タイルの信号が送られていた場合戻る
             x += 1;
         }
         if(Slope){//坂の信号が送られていた場合座標を更に進める
@@ -972,7 +987,7 @@ void TileColor()
         break;
 
     case South:
-        if(BlackTile){//黒タイルの信号が送られていた場合戻る
+        if(BlackTile || Gap){//黒タイルの信号が送られていた場合戻る
             y += -1;
         }
         if(Slope){//坂の信号が送られていた場合座標を更に進める
@@ -984,6 +999,7 @@ void TileColor()
     }
     BlackTile = false;
     Slope = false;
+    Gap = false;
 }
 
 
@@ -1275,6 +1291,7 @@ void WriteDownWall()
 /*      全て終わる、つまりpopした値が一番最初に入れた"4"になっていたら停止（まだ停止部分はつくってない）
 /*
 /*更新者：吉ノ薗2025/01/22
+/*　　　　吉ノ薗2025/01/29：20秒停止するようにした
 /*
 /*******************************************************************************************/
 void GoHome()
@@ -1298,7 +1315,7 @@ void GoHome()
                 break;
             case 4:
                 //Stop
-
+                delay(20000);
                 break;
         }
     }
@@ -1439,10 +1456,7 @@ void loop(){
     switch (Status)
     {
     case 0://壁情報取得
-        while (Serial3.available() > 0) {
-            char receivedChar = Serial3.read(); // データを読み取る
-            // 必要に応じて受信データを処理する
-        }
+
         get_tof_data();
         break;
 
@@ -1468,30 +1482,30 @@ void loop(){
 
     case 3://直進
         susumu_heitan();
-        TileColor();
+        TileStatus();
         break;
 
     case 4://右折
         migi();
-        delay(300);
+        delay(400);
         susumu_heitan();
-        TileColor();
+        TileStatus();
         break;
 
     case 5://左折
         hidari();
-        delay(300);
+        delay(400);
         susumu_heitan();
-        TileColor();
+        TileStatus();
         break;
 
     case 6://後進
         migi();
-        delay(300);
+        delay(400);
         migi();
         delay(300);
         susumu_heitan();
-        TileColor();
+        TileStatus();
         break;
     }
 }
