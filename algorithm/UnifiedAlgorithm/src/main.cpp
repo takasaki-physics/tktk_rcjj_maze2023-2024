@@ -731,6 +731,8 @@ int16_t RightWeight = 0;
 int16_t FrontWeight = 0;
 int16_t LeftWeight = 0;
 
+bool start_Gohome = false; //SSD1306に帰還アルゴリズムに入っているかどうかを送信するかの変数
+
 
 
 /*******************************************************************************************/
@@ -1325,7 +1327,48 @@ void GoHome()
     
 }
 
+/*******************************************************************************************/
+/* 座標などのデータ送信                                                                             
+/*処理：Serial1を用いて帰還しているかどうか、右、前、左の重み、X,Y座標、方向のデータをSSD1306に送信する
+/*
+/*更新者：清田侑希　2025/1/30
+/*　　　　
+/*
+/*******************************************************************************************/
 
+void send_display(){
+  // 各センサーの距離を取得し壁の有無を判定
+
+
+  byte data_for_send[7];
+  data_for_send[0] = (start_Gohome) ? 0x01 : 0x00;
+  data_for_send[1] = (RightWeight);
+  data_for_send[2] = (LeftWeight);
+  data_for_send[3] = (FrontWeight);
+  data_for_send[4] = (x);
+  data_for_send[5] = (y);
+  data_for_send[6] = (Direction);
+
+  Serial3.write(255);
+  Serial.println("Sent header: 255");
+  delay(50);//wait
+  // 判定データ送信
+  for (int i = 0; i < 7; i++) {
+    Serial3.write(data_for_send[i]);
+  }
+    
+  
+
+    Serial.print("Sent data:");//デバック用にシリアルモニタに送信
+    for (int i = 0; i < 7; i++) {
+      Serial.print(data_for_send[i], BIN);
+      if (i < 6) Serial.print(", ");
+    }
+    Serial.println();
+
+
+  delay(200); // 必要に応じて調整
+}
 
 /*******************************************************************************************/
 /* セットアップ                                                                              
@@ -1422,7 +1465,7 @@ void setup(){
 /*
 /*更新者：吉ノ薗2025/01/22
 /*　　　　清田侑希 2025/1/28　変更点：動きの最適化のためにdelayを追加|スタートスイッチの導入
-/*
+/*        清田侑希 2025/1/30｜SSD1306にデータを送る関数の導入
 /*******************************************************************************************/
 void loop(){
     /*.............スタートスイッチがオンになるまで待機する部分...........*/
@@ -1476,7 +1519,9 @@ void loop(){
         //330秒（＝5分半）経ったら幅優先探索を始める
         if(now_seconds - firstseconds >= 330){
             Status = 2;//帰還開始
+            start_Gohome = true;
         }
+        send_display();
         break;
     
     case 2://帰還(このとき探索に戻らないよう入れ子構造にする or ここだけは関数内に直接migi()とかを入れてwhile文)   
@@ -1491,21 +1536,21 @@ void loop(){
 
     case 4://右折
         migi();
-        delay(400);
+        delay(300);
         susumu_heitan();
         TileStatus();
         break;
 
     case 5://左折
         hidari();
-        delay(400);
+        delay(300);
         susumu_heitan();
         TileStatus();
         break;
 
     case 6://後進
         migi();
-        delay(400);
+        delay(300);
         migi();
         delay(300);
         susumu_heitan();
