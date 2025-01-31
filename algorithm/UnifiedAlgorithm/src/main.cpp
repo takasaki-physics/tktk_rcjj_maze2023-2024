@@ -30,7 +30,13 @@ SoftwareSerial softSerial(36,37);
 #define Back 4
 
 
+uint8_t x = 50;
+uint8_t y = 50;
+uint8_t Direction = North;
 uint8_t Status = 0;
+
+uint8_t CheckX = 0;
+uint8_t CheckY = 0;
 
 /*MPU変数*/
 // MPU control/status vars
@@ -506,6 +512,9 @@ void serialEvent1() {
   }else if(receivedData2 == 6){
         Serial.println("Check_Point");
         //現在の座標をチェックポイントの座標として代入する
+        CheckX = x;
+        CheckY = y;
+
   }else{
     Serial.println("No sensors");
     delay(100);
@@ -720,9 +729,6 @@ int dequeue() {
 
 
 /*アルゴリズム用変数*/
-uint8_t x = 50;
-uint8_t y = 50;
-uint8_t Direction = North;
 int8_t toutatu_zahyou[90][90];//そのマスの到達回数
 int16_t RightWeight = 0;
 int16_t FrontWeight = 0;
@@ -1461,6 +1467,7 @@ void setup(){
 /*
 /*更新者：吉ノ薗2025/01/22
 /*　　　　清田侑希 2025/1/28　変更点：動きの最適化のためにdelayを追加|スタートスイッチの導入
+/*　　　　吉ノ薗 2025/01/31　変更点：途中で進行停止になった場合座標をチェックポイントの場所に戻すようにした。
 /*        
 /*******************************************************************************************/
 void loop(){
@@ -1493,6 +1500,8 @@ void loop(){
                 Serial.print("DMP Initialization failed.");
             }
             //チェックポイントとして保存した座標を現在の座標として代入する
+            x = CheckX;
+            y = CheckY;
         }
     }
     /*.................................................................*/
