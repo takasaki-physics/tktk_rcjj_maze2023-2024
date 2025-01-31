@@ -437,6 +437,28 @@ void serialEvent1() {
     Serial.println("blue_tile");
     delay(50);
     blue_count = true;
+  }else if(receivedData2 == 5 || bump_giveup_count > 1){
+    if (bump_giveup_count == 2){
+        receivedIndex = 0; //tofデータを取得するためにバイト数を初期化する
+        while (receivedIndex != 6){
+            get_tof_data();
+        }       
+    }
+    if(receivedData2== 5 ||front_wall == true || bump_giveup_count > 3){
+        Position[0] = -2025; //後ろに下がる
+        Position[1] = 2025;
+        Position[2] = 2025;
+        Position[3] = -2025;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        Serial.println("Backing...");
+        delay(1000);
+        if (count2 < 20 && bump_giveup_count > 1){
+            //座標の変更をもとに戻す
+            Gap = true;
+        }
+        count2 = 40;
+    }
+
   }else if(receivedData2 == 3 ){
     Serial.println("left");
     Position[0] = -1023; //左に回転
@@ -487,28 +509,6 @@ void serialEvent1() {
     delay(500);
     count2= count2-4;
     bump_giveup_count++;
-  }else if(receivedData2 == 5 || bump_giveup_count > 2){
-    if (bump_giveup_count == 3){
-        receivedIndex = 0; //tofデータを取得するためにバイト数を初期化する
-        while (receivedIndex == 6){
-            get_tof_data();
-        }       
-    }
-    if(receivedData2== 5 ||front_wall == true || bump_giveup_count > 5){
-        Position[0] = -2025; //後ろに下がる
-        Position[1] = 2025;
-        Position[2] = 2025;
-        Position[3] = -2025;
-        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-        Serial.println("Backing...");
-        delay(1000);
-        if (count2 < 20 && bump_giveup_count > 2){
-            //座標の変更をもとに戻す
-            Gap = true;
-        }
-        count2 = 40;
-    }
-
   }else if(receivedData2 == 6){
         Serial.println("Check_Point");
         //現在の座標をチェックポイントの座標として代入する
