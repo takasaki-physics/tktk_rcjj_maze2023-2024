@@ -402,88 +402,10 @@ void hidari(){
   tiziki(); //角度補正         
 }
 
-
-
-/*******************************************************************************************/
-/* 直進                                                                              
-/*処理：モーターを回しながら直進この時カラーセンサーとロードセル、カメラの割り込みと坂の検知が入る
-/*
-/*更新者：清田侑希　2025/1/26
-/*
-/*******************************************************************************************/
-void susumu_heitan() {
-    while (Serial1.available() > 0) {
-      char receivedChar = Serial1.read(); // データを読み取る
-      // 必要に応じて受信データを処理する
-    }
-  while (count2  <susumu_kaisuu) {
-    Serial.println("Going...");
-    Position[0] = 303; //go
-    Position[1] = -303;
-    Position[2] = -303;
-    Position[3] = 303;
-    sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(90);
-    serialEvent1(); //color_load
-    serialEvent7();//_victim_camera1
-    serialEvent8();//_victim_camera2
-    count2++;
-  }
-
-  /*............青タイルがある場合の待機............*/
-
-  if (blue_count == true){
-    Serial.println("Waiting...");
-    delay(5500);
-  }
-    
-    /*...........坂があるかどうか..............*/
-    tiziki_2(); //get_roll_data
-    delay(50);
-    if (katamuki_true <-21){
-        Serial.println("Slope_Ue");
-        while(katamuki_true <-21){
-            Serial.println("Climbing...");
-            Position[0] = 400; //前に進む
-            Position[1] = -400;
-            Position[2] = -400;
-            Position[3] = 400;
-            sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-            delay(100);
-            tiziki_2(); //get_roll_data
-            delay(100);
-            Slope = true;
-        }
-    }else if (katamuki_true >21){
-        while(katamuki_true > 21){
-            Serial.println("Down Hill...");
-            Position[0] = 400; //前に進む
-            Position[1] = -400;
-            Position[2] = -400;
-            Position[3] = 400;
-            sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-            delay(100);
-            tiziki_2(); //get_roll_data
-            delay(100);
-            Slope = true;
-        }
-    }
-    while (Serial3.available() > 0) {
-        char receivedChar = Serial3.read(); // データを読み取る
-        // 必要に応じて受信データを処理する
-    }
-  /*..............変数初期化.................................*/
-  count2 =0;
-  bump_giveup_count =0;
-  Status = 0;
-}
-
-
-
 /*******************************************************************************************/
 /*色タイルまたはバンプ                                                                              
 /*処理：Serial1にデータが来たら1バイト読み込んで青、黒、ロードセルを検知する
-/*
+/*Data 1:黒タイル　2：青タイル　3：左の障害物　4：右の障害物　5：前の壁　6：銀のタイル
 /*更新者：清田侑希　2025/1/26
 /*
 /*******************************************************************************************/
@@ -581,6 +503,9 @@ void serialEvent1() {
         count2 = 40;
     }
 
+  }else if(receivedData2 == 6){
+        Serial.println("Check_Point");
+        //現在の座標をチェックポイントの座標として代入する
   }else{
     Serial.println("No sensors");
     delay(100);
@@ -590,7 +515,79 @@ void serialEvent1() {
 
 }
 
+/*******************************************************************************************/
+/* 直進                                                                              
+/*処理：モーターを回しながら直進この時カラーセンサーとロードセル、カメラの割り込みと坂の検知が入る
+/*
+/*更新者：清田侑希　2025/1/26
+/*
+/*******************************************************************************************/
+void susumu_heitan() {
+    while (Serial1.available() > 0) {
+      char receivedChar = Serial1.read(); // データを読み取る
+      // 必要に応じて受信データを処理する
+    }
+  while (count2  <susumu_kaisuu) {
+    Serial.println("Going...");
+    Position[0] = 303; //go
+    Position[1] = -303;
+    Position[2] = -303;
+    Position[3] = 303;
+    sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+    delay(90);
+    serialEvent1(); //color_load
+    serialEvent7();//_victim_camera1
+    serialEvent8();//_victim_camera2
+    count2++;
+  }
 
+  /*............青タイルがある場合の待機............*/
+
+  if (blue_count == true){
+    Serial.println("Waiting...");
+    delay(5500);
+  }
+    
+    /*...........坂があるかどうか..............*/
+    tiziki_2(); //get_roll_data
+    delay(50);
+    if (katamuki_true <-21){
+        Serial.println("Slope_Ue");
+        while(katamuki_true <-21){
+            Serial.println("Climbing...");
+            Position[0] = 400; //前に進む
+            Position[1] = -400;
+            Position[2] = -400;
+            Position[3] = 400;
+            sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+            delay(100);
+            tiziki_2(); //get_roll_data
+            delay(100);
+            Slope = true;
+        }
+    }else if (katamuki_true >21){
+        while(katamuki_true > 21){
+            Serial.println("Down Hill...");
+            Position[0] = 400; //前に進む
+            Position[1] = -400;
+            Position[2] = -400;
+            Position[3] = 400;
+            sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+            delay(100);
+            tiziki_2(); //get_roll_data
+            delay(100);
+            Slope = true;
+        }
+    }
+    while (Serial3.available() > 0) {
+        char receivedChar = Serial3.read(); // データを読み取る
+        // 必要に応じて受信データを処理する
+    }
+  /*..............変数初期化.................................*/
+  count2 =0;
+  bump_giveup_count =0;
+  Status = 0;
+}
 
 
 
@@ -1495,7 +1492,7 @@ void loop(){
             } else {
                 Serial.print("DMP Initialization failed.");
             }
-
+            //チェックポイントとして保存した座標を現在の座標として代入する
         }
     }
     /*.................................................................*/
