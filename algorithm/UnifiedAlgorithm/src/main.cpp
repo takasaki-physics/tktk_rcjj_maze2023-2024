@@ -1541,6 +1541,9 @@ void loop(){
             Status = 2;//帰還開始
             start_Gohome = true;
         }
+
+
+        /*デバッグ用*/
         Homecount += 1;
         if(Homecount >= 8){
             Status = 2;//帰還開始
