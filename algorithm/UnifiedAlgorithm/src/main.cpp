@@ -14,7 +14,11 @@
 #include <SCServo.h> //SCServoを使うと宣言]
 #include <SoftwareSerial.h> //SoftwareSerial(複数機器とシリアル通信)を使うと宣言
 #include "MPU6050_6Axis_MotionApps20.h"
+#include <queue>
+#include <stack>
 
+std::stack <int> S;
+std::queue<int> Q;
 MPU6050 mpu;
 SMS_STS sms_sts;
 SoftwareSerial softSerial(36,37);
@@ -28,6 +32,9 @@ SoftwareSerial softSerial(36,37);
 #define Front 2
 #define Left 3
 #define Back 4
+
+/*デバッグ用*/
+uint8_t Homecount = 0;
 
 
 uint8_t x = 50;
@@ -638,11 +645,9 @@ void serialEvent2(){
 */
 
 
-
-/*スタック・キュー用変数*/
-const int MAX = 30; // キュー配列の最大サイズ
-
-
+/*スタック・キュー用変数
+const int MAX = 100; // キュー配列の最大サイズ
+*/
 
 /*******************************************************************************************/
 /* スタック・キュー用の関数                                                                             
@@ -651,7 +656,8 @@ const int MAX = 30; // キュー配列の最大サイズ
 /*更新者：吉ノ薗2025/01/22「既存のライブラリだとリングバッファがないからつくった」
 /*
 /*******************************************************************************************/
-int st[MAX]; // スタックを表す配列
+
+/*int st[MAX]; // スタックを表す配列
 int top = 0; // スタックの先頭を表すポインタ
 // スタックを初期化する
 void st_init() {
@@ -667,7 +673,9 @@ bool st_isEmpty() {
 bool st_isFull() {
     return (top == MAX); // スタックサイズが MAX かどうか
 }
+*/
 
+/*
 int qu[MAX]; // キューを表す配列
 int tail = 0, head = 0; // キューの要素区間を表す変数
 
@@ -725,7 +733,7 @@ int dequeue() {
     if (head == MAX) head = 0;
     return res;
 }
-
+*/
 
 
 /*アルゴリズム用変数*/
@@ -1101,11 +1109,11 @@ int8_t WhichWay(int a,int b)
 void BFS()
 {
 
-    int a = x;
-    int b = y;
+    uint8_t a = x;
+    uint8_t b = y;
     cost[a][b] = 1;//現在地のコストを1にする
 
-    while(1){
+    while((a != 50)&&(b != 50)){
 
         reach_time[a][b] = 1;//そのマスを訪問済みにする
         for(int n = 2; n <= 16; n *= 2){//そのマスの周りのマスのコストを＋１する
@@ -1116,8 +1124,8 @@ void BFS()
                         if((!reach_time[a][b-1])&&(kabe_zahyou[a][b-1] != 100)){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a][b-1] = cost[a][b] + 1;
                             //キューの末尾に入れる
-                            enqueue(a);
-                            enqueue(b-1);
+                            Q.push(a);
+                            Q.push(b-1);
                         }
                         break;
 
@@ -1125,8 +1133,8 @@ void BFS()
                         if((!reach_time[a][b+1])&&(kabe_zahyou[a][b+1] != 100)){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a][b+1] = cost[a][b] + 1;
                             //キューの末尾に入れる
-                            enqueue(a);
-                            enqueue(b+1);
+                            Q.push(a);
+                            Q.push(b+1);
                         }
                         break;
 
@@ -1134,8 +1142,8 @@ void BFS()
                         if((!reach_time[a-1][b])&&(kabe_zahyou[a-1][b] != 100)){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a-1][b] = cost[a][b] + 1;
                             //キューの末尾に入れる
-                            enqueue(a-1);
-                            enqueue(b);
+                            Q.push(a-1);
+                            Q.push(b);
                         }
                         break;
 
@@ -1143,8 +1151,8 @@ void BFS()
                         if((!reach_time[a+1][b])&&(kabe_zahyou[a+1][b] != 100)){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a+1][b] = cost[a][b] + 1;
                             //キューの末尾に入れる
-                            enqueue(a+1);
-                            enqueue(b);
+                            Q.push(a+1);
+                            Q.push(b);
                         }
                         break;
                 }
@@ -1154,40 +1162,40 @@ void BFS()
             }
         }
         //キューの先頭を取り出す
-        a = dequeue();
-        b = dequeue();
+        a = Q.front();
+        b = Q.front();
 
         if((a == -1)||(b == -1)){//error
             break;
         }
 
-        if((a == 50)&&(b == 50)){
+        /*if((a == 50)&&(b == 50)){
             break;
-        }
+        }*/
     }
     //スタックを使って逆探索
     a = 50;
     b = 50;
-    push(4);//停止用
-    while(1){
+    //push(4);//停止用
+    while((a != x)&&(b != y)){
 
         switch(Direction){
             case East:
                 switch(WhichWay(a,b)){//前後左右のどこが最短になるか１：右折、２：左折、３：直進
 
                     case North://北マスからきたとき（ここのシグナルは探索時の曲がる→進むとは逆で、進む→曲がるじゃないとかも。pushの順番は曲がる、進む(これpop?)）
-                        push(2);
-                        push(3);
+                        S.push(2);
+                        S.push(3);
                         b += -1;
                         Direction = South;
 
                     case West://西マスからきたとき
-                        push(3);
+                        S.push(3);
                         a += -1;
 
                     case South://南マスからきたとき
-                        push(1);
-                        push(3);
+                        S.push(1);
+                        S.push(3);
                         b += 1;
                         Direction = North;
 
@@ -1196,19 +1204,19 @@ void BFS()
             case North:
                 switch(WhichWay(a,b)){//前後左右のどこが最短になるか
                     case East:
-                        push(1);
-                        push(3);
+                        S.push(1);
+                        S.push(3);
                         a += 1;
                         Direction = West;
 
                     case West:
-                        push(2);
-                        push(3);
+                        S.push(2);
+                        S.push(3);
                         a += -1;
                         Direction = East;
 
                     case South:
-                        push(3);
+                        S.push(3);
                         b += -1;
 
                 }
@@ -1216,18 +1224,18 @@ void BFS()
             case West:
                 switch(WhichWay(a,b)){//前後左右のどこが最短になるか
                     case East:
-                        push(3);
+                        S.push(3);
                         a += 1;
 
                     case North:
-                        push(1);
-                        push(3);
+                        S.push(1);
+                        S.push(3);
                         b += -1;
                         Direction = South;
 
                     case South:
-                        push(2);
-                        push(3);
+                        S.push(2);
+                        S.push(3);
                         Direction = North;
 
                 }
@@ -1235,26 +1243,26 @@ void BFS()
             case South:
                 switch(WhichWay(a,b)){//前後左右のどこが最短になるか
                     case East:
-                        push(2);
-                        push(3);
+                        S.push(2);
+                        S.push(3);
                         a += 1;
                         Direction = West;
 
                     case North:
-                        push(3);
+                        S.push(3);
                         b += -1;
 
                     case West:
-                        push(1);
-                        push(3);
+                        S.push(1);
+                        S.push(3);
                         a += -1;
                         Direction = East;
 
                 }
         }
-        if((a == x)&&(b == y)){
+        /*if((a == x)&&(b == y)){
             break;
-        }
+        }*/
     }
     
     
@@ -1344,9 +1352,11 @@ void WriteDownWall()
 /*******************************************************************************************/
 void GoHome()
 {
+
         //ここ以下を「相手(モーター)から動き終わったという信号が送られたら」とかにしないとバババッて送られちゃうかも
     while(1){
-        switch(pop()){
+        
+        switch(S.top()){
             case 1:
                 //TurnRight
                 migi();
@@ -1365,7 +1375,10 @@ void GoHome()
                 //Stop
                 delay(20000);
                 break;
+            default:
+                hidari();//デバッグ用
         }
+        S.pop();
     }
     
 }
@@ -1436,10 +1449,10 @@ void setup(){
   Serial.println("test");
 
 
-  /*スタック・キューのセットアップ***********************************************************************************************************/
+  /*スタック・キューのセットアップ***********************************************************************************************************
   init();
   st_init();
-
+*/
 
 
   /*アルゴリズムのセットアップ***********************************************************************************************************/
@@ -1528,6 +1541,11 @@ void loop(){
             Status = 2;//帰還開始
             start_Gohome = true;
         }
+        Homecount += 1;
+        if(Homecount >= 8){
+            Status = 2;//帰還開始
+            start_Gohome = true;
+        }
         break;
     
     case 2://帰還(このとき探索に戻らないよう入れ子構造にする or ここだけは関数内に直接migi()とかを入れてwhile文)   
@@ -1563,4 +1581,5 @@ void loop(){
         TileStatus();
         break;
     }
+    
 }
