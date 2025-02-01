@@ -601,6 +601,8 @@ void susumu_heitan() {
         char receivedChar = Serial3.read(); // データを読み取る
         // 必要に応じて受信データを処理する
     }
+    tiziki();
+    delay(300);
   /*..............変数初期化.................................*/
   count2 =0;
   bump_giveup_count =0;
@@ -1592,29 +1594,33 @@ void loop(){
 
     case 3://直進
         susumu_heitan();
+        delay(200);
         TileStatus();
         break;
 
     case 4://右折
         migi();
-        delay(300);
+        delay(500);
         susumu_heitan();
+        delay(200);
         TileStatus();
         break;
 
     case 5://左折
         hidari();
-        delay(300);
+        delay(500);
         susumu_heitan();
+        delay(200);
         TileStatus();
         break;
 
     case 6://後進
         migi();
-        delay(300);
+        delay(500);
         migi();
-        delay(300);
+        delay(500);
         susumu_heitan();
+        delay(200);
         TileStatus();
         break;
     }
