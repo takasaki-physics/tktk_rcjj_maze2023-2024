@@ -17,8 +17,8 @@
 #include <queue>
 #include <stack>
 
-std::stack <int> S;
-std::queue<int> Q;
+std::stack <uint8_t> S;
+std::queue<uint8_t> Q;
 MPU6050 mpu;
 SMS_STS sms_sts;
 SoftwareSerial softSerial(36,37);
@@ -44,6 +44,7 @@ uint8_t Status = 0;
 
 uint8_t CheckX = 0;
 uint8_t CheckY = 0;
+uint8_t CheckD = 0;
 
 /*MPU変数*/
 // MPU control/status vars
@@ -521,6 +522,7 @@ void serialEvent1() {
         //現在の座標をチェックポイントの座標として代入する
         CheckX = x;
         CheckY = y;
+        CheckD = Direction;
 
   }else{
     Serial.println("No sensors");
@@ -1105,24 +1107,27 @@ int8_t WhichWay(int a,int b)
 /*
 /*
 /*更新者：吉ノ薗2025/01/22
+/*　　　　吉ノ薗 2025/02/01　変更点：スタックとキューをライブラリにして座標の計算をビット演算に変更
 /*
 /*******************************************************************************************/
 void BFS()
 {
+    //hidari();//デバッグ用
+
 
     uint8_t a = x;
     uint8_t b = y;
     cost[a][b] = 1;//現在地のコストを1にする
 
-    while((a != 50)&&(b != 50)){
+    while(!(a == 50 && b == 50)){
 
         reach_time[a][b] = 1;//そのマスを訪問済みにする
         for(int n = 2; n <= 16; n *= 2){//そのマスの周りのマスのコストを＋１する
             //int result = static_cast<int>(pow(2, n));
-            if(kabe_zahyou[a][b] % n == 0){//kabe_zahyou[][]は0000 の4ビットに絶対方向の東8西4南2北1をそれぞれ割り当てる
+            if(!(kabe_zahyou[a][b] & n)) {//kabe_zahyou[][]は0000 の4ビットに絶対方向の東8西4南2北1をそれぞれ割り当てる
                 switch(n){
                     case 2://北の壁がない
-                        if((!reach_time[a][b-1])&&(kabe_zahyou[a][b-1] != 100)){//その先のマスが訪問済みでない&その先のマスが探索済み
+                        if(!reach_time[a][b-1] && kabe_zahyou[a][b-1] != 100){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a][b-1] = cost[a][b] + 1;
                             //キューの末尾に入れる
                             Q.push(a);
@@ -1131,7 +1136,7 @@ void BFS()
                         break;
 
                     case 4://南の壁がない
-                        if((!reach_time[a][b+1])&&(kabe_zahyou[a][b+1] != 100)){//その先のマスが訪問済みでない&その先のマスが探索済み
+                        if(!reach_time[a][b+1] && kabe_zahyou[a][b+1] != 100){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a][b+1] = cost[a][b] + 1;
                             //キューの末尾に入れる
                             Q.push(a);
@@ -1140,7 +1145,7 @@ void BFS()
                         break;
 
                     case 8://西の壁がない
-                        if((!reach_time[a-1][b])&&(kabe_zahyou[a-1][b] != 100)){//その先のマスが訪問済みでない&その先のマスが探索済み
+                        if(!reach_time[a-1][b] && kabe_zahyou[a-1][b] != 100){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a-1][b] = cost[a][b] + 1;
                             //キューの末尾に入れる
                             Q.push(a-1);
@@ -1149,7 +1154,7 @@ void BFS()
                         break;
 
                     case 16://東の壁がない
-                        if((!reach_time[a+1][b])&&(kabe_zahyou[a+1][b] != 100)){//その先のマスが訪問済みでない&その先のマスが探索済み
+                        if( !reach_time[a+1][b] && kabe_zahyou[a+1][b] != 100) {//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a+1][b] = cost[a][b] + 1;
                             //キューの末尾に入れる
                             Q.push(a+1);
@@ -1159,49 +1164,56 @@ void BFS()
                 }
 
             }else{//その方向に壁があるとき
-                kabe_zahyou[a][b] = kabe_zahyou[a][b] - (n/2);
+                kabe_zahyou[a][b] &= ~n;  // n のビットを 0 にする（壁を削除）
             }
         }
         //キューの先頭を取り出す
-        a = Q.front();
-        Q.pop();
-        
-        b = Q.front();
-        Q.pop();
+        if (Q.size() < 2) break;  // キューの要素が足りない場合は終了
 
-        if((a == -1)||(b == -1)){//error
-            break;
-        }
+        a = Q.front(); Q.pop();
+        b = Q.front(); Q.pop();
+
+        //if (Q.empty()) break;
 
         /*if((a == 50)&&(b == 50)){
             break;
         }*/
     }
+
+
+    //hidari();//デバッグ用
+
+
+
+
     //スタックを使って逆探索
     a = 50;
     b = 50;
     //push(4);//停止用
-    while((a != x)&&(b != y)){
+    while(!(a == x&&b == y)){
 
         switch(Direction){
             case East:
                 switch(WhichWay(a,b)){//前後左右のどこが最短になるか１：右折、２：左折、３：直進
 
-                    case North://北マスからきたとき（ここのシグナルは探索時の曲がる→進むとは逆で、進む→曲がるじゃないとかも。pushの順番は曲がる、進む(これpop?)）
+                    case North://北マスからきたとき（ここのシグナルは探索時の曲がる→進むとは逆で、進む→曲がるじゃないとかも。）
                         S.push(2);
                         S.push(3);
                         b += -1;
                         Direction = South;
+                        break;
 
                     case West://西マスからきたとき
                         S.push(3);
                         a += -1;
+                        break;
 
                     case South://南マスからきたとき
                         S.push(1);
                         S.push(3);
                         b += 1;
                         Direction = North;
+                        break;
 
                 }
 
@@ -1212,16 +1224,19 @@ void BFS()
                         S.push(3);
                         a += 1;
                         Direction = West;
+                        break;
 
                     case West:
                         S.push(2);
                         S.push(3);
                         a += -1;
                         Direction = East;
+                        break;
 
                     case South:
                         S.push(3);
                         b += -1;
+                        break;
 
                 }
 
@@ -1230,17 +1245,20 @@ void BFS()
                     case East:
                         S.push(3);
                         a += 1;
+                        break;
 
                     case North:
                         S.push(1);
                         S.push(3);
                         b += -1;
                         Direction = South;
+                        break;
 
                     case South:
                         S.push(2);
                         S.push(3);
                         Direction = North;
+                        break;
 
                 }
 
@@ -1251,16 +1269,19 @@ void BFS()
                         S.push(3);
                         a += 1;
                         Direction = West;
+                        break;
 
                     case North:
                         S.push(3);
                         b += -1;
+                        break;
 
                     case West:
                         S.push(1);
                         S.push(3);
                         a += -1;
                         Direction = East;
+                        break;
 
                 }
         }
@@ -1268,8 +1289,15 @@ void BFS()
             break;
         }*/
     }
+
+
+
+
+    //hidari();//デバッグ用
     
-    
+
+
+
 }
 
 
@@ -1487,6 +1515,7 @@ void setup(){
 /*更新者：吉ノ薗2025/01/22
 /*　　　　清田侑希 2025/1/28　変更点：動きの最適化のためにdelayを追加|スタートスイッチの導入
 /*　　　　吉ノ薗 2025/01/31　変更点：途中で進行停止になった場合座標をチェックポイントの場所に戻すようにした。
+/*　　　　吉ノ薗 2025/02/01　変更点：チェックポイントの方位を追加
 /*        
 /*******************************************************************************************/
 void loop(){
@@ -1521,6 +1550,7 @@ void loop(){
             //チェックポイントとして保存した座標を現在の座標として代入する
             x = CheckX;
             y = CheckY;
+            Direction = CheckD;
         }
     }
     /*.................................................................*/
@@ -1549,7 +1579,7 @@ void loop(){
 
         /*デバッグ用*/
         Homecount += 1;
-        if(Homecount >= 8){
+        if(Homecount >= 10){
             Status = 2;//帰還開始
             start_Gohome = true;
         }
