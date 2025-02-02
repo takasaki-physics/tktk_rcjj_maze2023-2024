@@ -541,12 +541,12 @@ void serialEvent1() {
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     delay(420);
     delay(500);
-    Position[0] = 1023; //右に回転
-    Position[1] = 1023;
-    Position[2] = 1023;
-    Position[3] = 1023;
+    Position[0] = 1534; //右に回転
+    Position[1] = 1534;
+    Position[2] = 1534;
+    Position[3] = 1534;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(314);
+    delay(471);
     delay(500);
     count2= count2-4;
     bump_giveup_count++;
@@ -566,12 +566,12 @@ void serialEvent1() {
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     delay(420);
     delay(500);
-    Position[0] = -1023; //左に回転
-    Position[1] = -1023;
-    Position[2] = -1023;
-    Position[3] = -1023;
+    Position[0] = -1534; //左に回転
+    Position[1] = -1534;
+    Position[2] = -1534;
+    Position[3] = -1534;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(314);
+    delay(471);
     delay(500);
     count2= count2-4;
     bump_giveup_count++;
@@ -627,9 +627,9 @@ void susumu_heitan() {
     /*...........坂があるかどうか..............*/
     tiziki_2(); //get_roll_data
     delay(50);
-    if (katamuki_true <-21){
+    if (katamuki_true <-8){
         Serial.println("Slope_Ue");
-        while(katamuki_true <-21){
+        while(katamuki_true <-8){
             Serial.println("Climbing...");
             Position[0] = 400; //前に進む
             Position[1] = -400;
@@ -641,8 +641,14 @@ void susumu_heitan() {
             delay(100);
             Slope = true;
         }
-    }else if (katamuki_true >21){
-        while(katamuki_true > 21){
+        Position[0] = 8190; //前に進む
+        Position[1] = -8190;
+        Position[2] = -8190;
+        Position[3] = 8190;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(2500);
+    }else if (katamuki_true >8){
+        while(katamuki_true > 8){
             Serial.println("Down Hill...");
             Position[0] = 400; //前に進む
             Position[1] = -400;
@@ -654,6 +660,12 @@ void susumu_heitan() {
             delay(100);
             Slope = true;
         }
+        Position[0] = 8190; //前に進む
+        Position[1] = -8190;
+        Position[2] = -8190;
+        Position[3] = 8190;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(2500);
     }
     while (Serial3.available() > 0) {
         char receivedChar = Serial3.read(); // データを読み取る
