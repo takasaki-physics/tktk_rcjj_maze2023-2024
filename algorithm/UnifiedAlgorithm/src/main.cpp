@@ -1079,7 +1079,7 @@ long firstseconds;
 /*更新者：吉ノ薗2025/01/22
 /*
 /*******************************************************************************************/
-int8_t WhichWay(int a,int b)
+int WhichWay(uint8_t a,uint8_t b)
 {
     if(cost[a][b] - cost[a+1][b] == 1){
         return East;
@@ -1118,16 +1118,29 @@ void BFS()
     uint8_t a = x;
     uint8_t b = y;
     cost[a][b] = 1;//現在地のコストを1にする
+    Serial.print("/n GotoHome:");
 
     while(!(a == 50 && b == 50)){
 
         reach_time[a][b] = 1;//そのマスを訪問済みにする
-        for(int n = 2; n <= 16; n *= 2){//そのマスの周りのマスのコストを＋１する
+        for(int n = 1; n <= 8; n *= 2){//そのマスの周りのマスのコストを＋１する
             //int result = static_cast<int>(pow(2, n));
+            Serial.print("/n n =");
+            Serial.print(n);
+
+            Serial.print("/n kabe_zahyou[a][b] ==");
+            Serial.print(kabe_zahyou[a][b]);
+
+            Serial.print("/n cost[a][b] == ");
+            Serial.print(cost[a][b]);
+
+            delay(300);
+
             if(!(kabe_zahyou[a][b] & n)) {//kabe_zahyou[][]は0000 の4ビットに絶対方向の東8西4南2北1をそれぞれ割り当てる
+
                 switch(n){
-                    case 2://北の壁がない
-                        if(!reach_time[a][b-1] && kabe_zahyou[a][b-1] != 100){//その先のマスが訪問済みでない&その先のマスが探索済み
+                    case 1://北の壁がない
+                        if((!reach_time[a][b-1]) && !(kabe_zahyou[a][b-1] & 16)){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a][b-1] = cost[a][b] + 1;
                             //キューの末尾に入れる
                             Q.push(a);
@@ -1135,8 +1148,8 @@ void BFS()
                         }
                         break;
 
-                    case 4://南の壁がない
-                        if(!reach_time[a][b+1] && kabe_zahyou[a][b+1] != 100){//その先のマスが訪問済みでない&その先のマスが探索済み
+                    case 2://南の壁がない
+                        if((!reach_time[a][b+1]) && !(kabe_zahyou[a][b+1] & 16)){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a][b+1] = cost[a][b] + 1;
                             //キューの末尾に入れる
                             Q.push(a);
@@ -1144,8 +1157,8 @@ void BFS()
                         }
                         break;
 
-                    case 8://西の壁がない
-                        if(!reach_time[a-1][b] && kabe_zahyou[a-1][b] != 100){//その先のマスが訪問済みでない&その先のマスが探索済み
+                    case 4://西の壁がない
+                        if((!reach_time[a-1][b]) && !(kabe_zahyou[a-1][b] & 16)){//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a-1][b] = cost[a][b] + 1;
                             //キューの末尾に入れる
                             Q.push(a-1);
@@ -1153,8 +1166,8 @@ void BFS()
                         }
                         break;
 
-                    case 16://東の壁がない
-                        if( !reach_time[a+1][b] && kabe_zahyou[a+1][b] != 100) {//その先のマスが訪問済みでない&その先のマスが探索済み
+                    case 8://東の壁がない
+                        if((!reach_time[a+1][b]) && !(kabe_zahyou[a+1][b] & 16)) {//その先のマスが訪問済みでない&その先のマスが探索済み
                             cost[a+1][b] = cost[a][b] + 1;
                             //キューの末尾に入れる
                             Q.push(a+1);
@@ -1164,14 +1177,21 @@ void BFS()
                 }
 
             }else{//その方向に壁があるとき
-                kabe_zahyou[a][b] &= ~n;  // n のビットを 0 にする（壁を削除）
+                kabe_zahyou[a][b] &= ~n;  // n のビットを 0 にする（壁を削除）これビットだしいらない気がする
             }
         }
         //キューの先頭を取り出す
         if (Q.size() < 2) break;  // キューの要素が足りない場合は終了
 
-        a = Q.front(); Q.pop();
-        b = Q.front(); Q.pop();
+        a = Q.front(); 
+        Serial.print("/n QueX =");
+        Serial.print(a);
+        Q.pop();
+
+        b = Q.front(); 
+        Serial.print("/n QueY =");
+        Serial.print(b);
+        Q.pop();
 
         //if (Q.empty()) break;
 
@@ -1181,23 +1201,25 @@ void BFS()
     }
 
 
-    //hidari();//デバッグ用
-
-
-
 
     //スタックを使って逆探索
     a = 50;
     b = 50;
+
+    /*デバッグ用*/
+    /*if(WhichWay(a,b) == 0){
+        migi();
+    }*/
+
     //push(4);//停止用
-    while(!(a == x&&b == y)){
+    while(!((a == x) && (b == y))){
 
         switch(Direction){
             case East:
-                switch(WhichWay(a,b)){//前後左右のどこが最短になるか１：右折、２：左折、３：直進
+                switch(WhichWay(a,b)){//前後左右のどこが最短になるか
 
-                    case North://北マスからきたとき（ここのシグナルは探索時の曲がる→進むとは逆で、進む→曲がるじゃないとかも。）
-                        S.push(2);
+                    case North://北マスからきたとき（ここのシグナルは探索時の曲がる→進むとは逆で、進む→曲がるじゃないと。）
+                        S.push(2);//１：右折、２：左折、３：直進
                         S.push(3);
                         b += -1;
                         Direction = South;
@@ -1216,6 +1238,7 @@ void BFS()
                         break;
 
                 }
+                break;
 
             case North:
                 switch(WhichWay(a,b)){//前後左右のどこが最短になるか
@@ -1239,6 +1262,7 @@ void BFS()
                         break;
 
                 }
+                break;
 
             case West:
                 switch(WhichWay(a,b)){//前後左右のどこが最短になるか
@@ -1261,6 +1285,7 @@ void BFS()
                         break;
 
                 }
+                break;
 
             case South:
                 switch(WhichWay(a,b)){//前後左右のどこが最短になるか
@@ -1284,20 +1309,16 @@ void BFS()
                         break;
 
                 }
+                break;
+
+            /*デバッグ用*/
+            default:
+                hidari();
         }
         /*if((a == x)&&(b == y)){
             break;
         }*/
     }
-
-
-
-
-    //hidari();//デバッグ用
-    
-
-
-
 }
 
 
@@ -1314,60 +1335,60 @@ void BFS()
 void WriteDownWall()
 {
     //壁情報の記入(ここは帰還アルゴリズム用の関数)
-    if(kabe_zahyou[x][y] == 100){//記録されていない場合（そうしないと延々と加算されちゃう）
+    if(kabe_zahyou[x][y] & 16){//記録されていない場合（そうしないと延々と加算されちゃう）
         switch (Direction){
             case East:
                 if(right_wall){
-                    kabe_zahyou[x][y] += 2;
+                    kabe_zahyou[x][y] |= 2;
                 }
                 if(front_wall){
-                    kabe_zahyou[x][y] += 8;
+                    kabe_zahyou[x][y] |= 8;
                 }
                 if(left_wall){
-                    kabe_zahyou[x][y] += 1;
+                    kabe_zahyou[x][y] |= 1;
                 }
                 break;
             
             case North:
                 if(right_wall){
-                    kabe_zahyou[x][y] += 8;
+                    kabe_zahyou[x][y] |= 8;
                 }
                 if(front_wall){
-                    kabe_zahyou[x][y] += 1;
+                    kabe_zahyou[x][y] |= 1;
                 }
                 if(left_wall){
-                    kabe_zahyou[x][y] += 4;
+                    kabe_zahyou[x][y] |= 4;
                 }
                 break;
 
             case West:
                 if(right_wall){
-                    kabe_zahyou[x][y] += 1;
+                    kabe_zahyou[x][y] |= 1;
                 }
                 if(front_wall){
-                    kabe_zahyou[x][y] += 4;
+                    kabe_zahyou[x][y] |= 4;
                 }
                 if(left_wall){
-                    kabe_zahyou[x][y] += 2;
+                    kabe_zahyou[x][y] |= 2;
                 }
                 break;
 
             case South:
                 if(right_wall){
-                    kabe_zahyou[x][y] += 4;
+                    kabe_zahyou[x][y] |= 4;
                 }
                 if(front_wall){
-                    kabe_zahyou[x][y] += 2;
+                    kabe_zahyou[x][y] |= 2;
                 }
                 if(left_wall){
-                    kabe_zahyou[x][y] += 8;
+                    kabe_zahyou[x][y] |= 8;
                 }
                 break;
             }
             //対応
             //e n w s
             //8 4 2 1
-        kabe_zahyou[x][y] += -100;//4ビットの情報のみが残る
+        kabe_zahyou[x][y] &= ~16;//4ビットの情報のみが残る
     }
 }
 
@@ -1392,16 +1413,19 @@ void GoHome()
             case 1:
                 //TurnRight
                 migi();
+                delay(300);
                 break;
 
             case 2:
                 //TurnLeft
                 hidari();
+                delay(300);
                 break;
 
             case 3:
                 //GoStraight
                 susumu_heitan();
+                delay(300);
                 break;
             case 4:
                 //Stop
@@ -1490,7 +1514,7 @@ void setup(){
   /*アルゴリズムのセットアップ***********************************************************************************************************/
   for (int t = 0; t < 90; t++) {
     for (int j = 0; j < 90; j++) {
-        kabe_zahyou[t][j] = 100;
+        kabe_zahyou[t][j] |= 16;
         reach_time[t][j] = 0;
         cost[t][j] = 0;
         toutatu_zahyou[t][j] = 0; 
@@ -1563,8 +1587,7 @@ void loop(){
 
     case 1://座標更新と探索
         WriteDownWall();//帰還用の記録
-        MoveTo(judge());//拡張右手法で行く方法を決める,実際に移動して座標を変更+到達回数を加算
-
+        
         // 現在の時刻を取得
         time_t NowTime;
         time(&NowTime);  // 現在の時刻を取得して NowTime に格納
@@ -1583,6 +1606,9 @@ void loop(){
             Status = 2;//帰還開始
             start_Gohome = true;
         }
+
+        MoveTo(judge());//拡張右手法で行く方法を決める,実際に移動して座標を変更+到達回数を加算
+
         break;
     
     case 2://帰還(このとき探索に戻らないよう入れ子構造にする or ここだけは関数内に直接migi()とかを入れてwhile文)   
