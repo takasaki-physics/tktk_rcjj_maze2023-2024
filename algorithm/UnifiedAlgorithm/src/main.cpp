@@ -792,6 +792,13 @@ int16_t LeftWeight = 0;
 
 bool start_Gohome = false; //SSD1306に帰還アルゴリズムに入っているかどうかを送信するかの変数
 
+/*帰還用変数*/
+int8_t kabe_zahyou[90][90];//0000 の4ビットに絶対方向の東8西4南2北1をそれぞれ割り当てるみたいな
+int8_t cost[90][90];//マス目のコスト
+bool reach_time[90][90];//到達の有無（帰還用）
+long now_seconds;
+long firstseconds;
+
 /*******************************************************************************************/
 /* 座標などのデータ送信                                                                             
 /*処理：Serial1を用いて帰還しているかどうか、右、前、左の重み、X,Y座標、方向のデータをSSD1306に送信する
@@ -833,6 +840,48 @@ void send_display(){
 
 
   delay(200); // 必要に応じて調整
+}
+
+/*******************************************************************************************/
+/*行き止まりの検索                                                                              
+/*処理：全てのマスについて、
+/*      前後左右の三か所以上が行き止まりor壁のときそのマスの到達回数を+100する（マスの到達回数が100未満のとき）
+/*
+/*更新者：吉ノ薗2025/02/02
+/*
+/*******************************************************************************************/
+void EffectiveDeadEnd(){
+
+    int NorthReached = 0;
+    int EastReached = 0;
+    int WestReached = 0;
+    int SouthReached = 0;
+
+    for (int t = 0; t < 89; t++) {
+        for (int j = 0; j < 89; j++) {
+
+            uint8_t DeadEndCount = 0;
+
+            NorthReached = toutatu_zahyou[t][j-1];
+            EastReached  = toutatu_zahyou[t+1][j];
+            WestReached  = toutatu_zahyou[t-1][j];
+            SouthReached = toutatu_zahyou[t][j+1];
+            
+            if(toutatu_zahyou[t][j] < 100){
+
+                if((NorthReached >= 100) || (kabe_zahyou[t][j] & 1/*北に壁がある*/)){DeadEndCount += 1;}
+                if((SouthReached >= 100) || (kabe_zahyou[t][j] & 2/*南に壁がある*/)){DeadEndCount += 1;}
+                if((WestReached >= 100) || (kabe_zahyou[t][j] & 4/*西に壁がある*/)){DeadEndCount += 1;}
+                if((EastReached >= 100) || (kabe_zahyou[t][j] & 8/*東に壁がある*/)){DeadEndCount += 1;}
+
+                /*前後左右の三か所以上が行き止まりor壁のとき、そのマスの到達回数を+100する*/
+                if(DeadEndCount >= 3){
+                    toutatu_zahyou[t][j] += 100;
+                }
+
+            }
+        }
+    }
 }
 
 /*******************************************************************************************/
@@ -898,9 +947,13 @@ int8_t judge(){
 
     
 
-    if ((RightWeight > 100) && (FrontWeight > 100) && (LeftWeight > 100)){//if all wall
+    if ((RightWeight > 100) && (FrontWeight > 100) && (LeftWeight > 100)){//if all wall　or already reached
         GoTo = Back;
+        toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
     }
+
+    EffectiveDeadEnd();//より効率的な行き止まりの検索
+
     send_display();
     RightWeight = 0;//怖いから初期化
     FrontWeight = 0;
@@ -944,7 +997,6 @@ switch (Direction){
 
                 case Back:
                     Status = 6;
-                    toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     x += -1;
                     Direction = West;
                     break;
@@ -973,7 +1025,6 @@ switch (Direction){
 
                 case Back:
                     Status = 6;
-                    toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     y += -1;
                     Direction = South;
                     break;
@@ -1002,7 +1053,6 @@ switch (Direction){
                 
                 case Back:
                     Status = 6;
-                    toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     x += 1;
                     Direction = East;
                     
@@ -1032,7 +1082,6 @@ switch (Direction){
                 
                 case Back:
                     Status = 6;
-                    toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
                     y += -1;
                     Direction = North;
                     break;
@@ -1109,12 +1158,7 @@ void TileStatus()
 
 
 
-/*帰還用変数*/
-int8_t kabe_zahyou[90][90];//0000 の4ビットに絶対方向の東8西4南2北1をそれぞれ割り当てるみたいな
-int8_t cost[90][90];//マス目のコスト
-bool reach_time[90][90];//到達の有無（帰還用）
-long now_seconds;
-long firstseconds;
+
 
 
 
