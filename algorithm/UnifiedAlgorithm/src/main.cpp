@@ -1214,7 +1214,7 @@ void BFS()
         migi();
     }*/
 
-    //push(4);//停止用
+    S.push(4);//停止用
     while(!((a == x) && (b == y))){
 
         switch(Direction){
@@ -1434,8 +1434,8 @@ void GoHome()
                 //Stop
                 delay(20000);
                 break;
-            default:
-                hidari();//デバッグ用
+            /*default:
+                hidari();//デバッグ用*/
         }
         S.pop();//要素の削除
     }
