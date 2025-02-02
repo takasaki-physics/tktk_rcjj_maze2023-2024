@@ -857,10 +857,10 @@ void EffectiveDeadEnd(){
     int WestReached = 0;
     int SouthReached = 0;
 
-    for (int t = 0; t < 89; t++) {
-        for (int j = 0; j < 89; j++) {
+    for (int t = 1; t < 89; t++) {
+        for (int j = 1; j < 89; j++) {
 
-            uint8_t DeadEndCount = 0;
+            int DeadEndCount = 0;
 
             NorthReached = toutatu_zahyou[t][j-1];
             EastReached  = toutatu_zahyou[t+1][j];
@@ -869,10 +869,10 @@ void EffectiveDeadEnd(){
             
             if(toutatu_zahyou[t][j] < 100){
 
-                if((NorthReached >= 100) || (kabe_zahyou[t][j] & 1/*北に壁がある*/)){DeadEndCount += 1;}
-                if((SouthReached >= 100) || (kabe_zahyou[t][j] & 2/*南に壁がある*/)){DeadEndCount += 1;}
-                if((WestReached >= 100) || (kabe_zahyou[t][j] & 4/*西に壁がある*/)){DeadEndCount += 1;}
-                if((EastReached >= 100) || (kabe_zahyou[t][j] & 8/*東に壁がある*/)){DeadEndCount += 1;}
+                if((NorthReached >= 100) || (kabe_zahyou[t][j] & 1/*北に壁がある*/)){DeadEndCount++;}
+                if((SouthReached >= 100) || (kabe_zahyou[t][j] & 2/*南に壁がある*/)){DeadEndCount++;}
+                if((WestReached >= 100) || (kabe_zahyou[t][j] & 4/*西に壁がある*/)){DeadEndCount++;}
+                if((EastReached >= 100) || (kabe_zahyou[t][j] & 8/*東に壁がある*/)){DeadEndCount++;}
 
                 /*前後左右の三か所以上が行き止まりor壁のとき、そのマスの到達回数を+100する*/
                 if(DeadEndCount >= 3){
@@ -952,8 +952,6 @@ int8_t judge(){
         toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
     }
 
-    EffectiveDeadEnd();//より効率的な行き止まりの検索
-
     send_display();
     RightWeight = 0;//怖いから初期化
     FrontWeight = 0;
@@ -974,120 +972,122 @@ int8_t judge(){
 /*******************************************************************************************/
 void MoveTo(int8_t GoTo)
 {
-switch (Direction){
-        case East:
-            switch (GoTo){
-                case Right:
-                    Status = 4;
-                    y += 1;
-                    Direction = South;
-                    break;
-                
-                case Front:
-                    Status = 3;
-                    x += 1;
-                    Direction = East;
-                    break;
-                
-                case Left:
-                    Status = 5;
-                    y += -1;
-                    Direction = North;
-                    break;
-
-                case Back:
-                    Status = 6;
-                    x += -1;
-                    Direction = West;
-                    break;
-                }
-            break;
-        
-        case North:
-            switch (GoTo){
-                case Right:
-                    Status = 4;
-                    x += 1;
-                    Direction = East;
-                    break;
-                
-                case Front:
-                    Status = 3;
-                    y += -1;
-                    Direction = North;
-                    break;
-                
-                case Left:
-                    Status = 5;
-                    x += -1;
-                    Direction = West;
-                    break;
-
-                case Back:
-                    Status = 6;
-                    y += -1;
-                    Direction = South;
-                    break;
-                }
-            break;
-        
-        case West:
-            switch (GoTo){
-                case Right:
-                    Status = 4;
-                    y += -1;
-                    Direction = North;
-                    break;
-                
-                case Front:
-                    Status = 3;
-                    x += -1;
-                    Direction = West;
-                    break;
-                
-                case Left:
-                    Status = 5;
-                    y += 1;
-                    Direction = South;
-                    break;
-                
-                case Back:
-                    Status = 6;
-                    x += 1;
-                    Direction = East;
+    EffectiveDeadEnd();//より効率的な行き止まりの検索
+    
+    switch (Direction){
+            case East:
+                switch (GoTo){
+                    case Right:
+                        Status = 4;
+                        y += 1;
+                        Direction = South;
+                        break;
                     
-                    break;
-                }
-            break;
-        
-        case South:
-            switch (GoTo){
-                case Right:
-                    Status = 4;
-                    x += -1;
-                    Direction = West;
-                    break;
-                
-                case Front:
-                    Status = 3;
-                    y += 1;
-                    Direction = South;
-                    break;
-                
-                case Left:
-                    Status = 5;
-                    x += 1;
-                    Direction = East;
-                    break;
-                
-                case Back:
-                    Status = 6;
-                    y += -1;
-                    Direction = North;
-                    break;
-                }
-            break;
-    }
+                    case Front:
+                        Status = 3;
+                        x += 1;
+                        Direction = East;
+                        break;
+                    
+                    case Left:
+                        Status = 5;
+                        y += -1;
+                        Direction = North;
+                        break;
+
+                    case Back:
+                        Status = 6;
+                        x += -1;
+                        Direction = West;
+                        break;
+                    }
+                break;
+            
+            case North:
+                switch (GoTo){
+                    case Right:
+                        Status = 4;
+                        x += 1;
+                        Direction = East;
+                        break;
+                    
+                    case Front:
+                        Status = 3;
+                        y += -1;
+                        Direction = North;
+                        break;
+                    
+                    case Left:
+                        Status = 5;
+                        x += -1;
+                        Direction = West;
+                        break;
+
+                    case Back:
+                        Status = 6;
+                        y += -1;
+                        Direction = South;
+                        break;
+                    }
+                break;
+            
+            case West:
+                switch (GoTo){
+                    case Right:
+                        Status = 4;
+                        y += -1;
+                        Direction = North;
+                        break;
+                    
+                    case Front:
+                        Status = 3;
+                        x += -1;
+                        Direction = West;
+                        break;
+                    
+                    case Left:
+                        Status = 5;
+                        y += 1;
+                        Direction = South;
+                        break;
+                    
+                    case Back:
+                        Status = 6;
+                        x += 1;
+                        Direction = East;
+                        
+                        break;
+                    }
+                break;
+            
+            case South:
+                switch (GoTo){
+                    case Right:
+                        Status = 4;
+                        x += -1;
+                        Direction = West;
+                        break;
+                    
+                    case Front:
+                        Status = 3;
+                        y += 1;
+                        Direction = South;
+                        break;
+                    
+                    case Left:
+                        Status = 5;
+                        x += 1;
+                        Direction = East;
+                        break;
+                    
+                    case Back:
+                        Status = 6;
+                        y += -1;
+                        Direction = North;
+                        break;
+                    }
+                break;
+        }
     toutatu_zahyou[x][y] += 1;//移動先のマスの到達回数をプラスしている
     
 }
