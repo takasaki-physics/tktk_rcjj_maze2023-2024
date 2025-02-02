@@ -331,6 +331,64 @@ void get_tof_data() {
     }
 }
 
+
+/*******************************************************************************************/
+/* get_victim_data                                                                              
+/*処理：
+/*
+/*更新者：誰が作った
+/*
+/*******************************************************************************************/
+//右側のカメラ
+void discover_hisaisha() {//追加分
+  int count4 = 0; //待つ時間によって判定
+  while ((Serial7.available() == 0)&&(count4 <50)){
+    delay(200);
+    count4++;
+  Serial.println(count4);
+  }
+  Serial.println("count4");
+  if (Serial7.available() > 0) {
+   int receivedData = Serial7.read();
+   Serial.println(receivedData);
+   Serial.print("count");
+   Serial.println(count4);
+   delay(2000);
+   if (count4 < 25){
+    Serial.println("NONE");
+    count4 = 0;
+   }else if (count4 < 30){
+    Serial.println("red|| H");
+    //SCServo();
+    //SCServo();
+    count4 =0;
+   }else if(count4 < 35){
+    Serial.println("yellow||S");
+    //SCServo();
+    count4 = 0;
+   }else if(count4 < 50){
+    Serial.println("green||U");
+    count4 =0;
+   }else{
+    count4 =0;
+    
+   }
+  }else{
+    count4=0;
+  }
+  
+  
+}
+
+//get_victim_data_右
+void serialEvent7(){
+  if (Serial7.available() >0){
+    int receivedData7 = Serial7.read(); 
+    discover_hisaisha();
+    Serial7.flush();
+  }
+}
+
 /*******************************************************************************************/
 /* 右回転                                                                              
 /*処理：MPU6050で取得したデータをもとに90度右回転するまでモーターを回し続ける
@@ -355,7 +413,7 @@ void migi(){
   sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
   delay(100);
   tiziki_kaitenn();
-  //serialEvent7();
+  serialEvent7();
   //serialEvent8();
   if (chousei ==1){
     if (kakudo_true2 <=90){
@@ -400,7 +458,7 @@ void hidari(){
   sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
   delay(100);
   tiziki_kaitenn();
-  //serialEvent7();
+  serialEvent7();
   //serialEvent8();
   if (chousei ==1){
     if (kakudo_true2 >= 270){
@@ -631,62 +689,7 @@ void serialEvent1(){
 
 
 
-/*******************************************************************************************/
-/* get_victim_data                                                                              
-/*処理：
-/*
-/*更新者：誰が作った
-/*
-/*******************************************************************************************/
-//右側のカメラ
-void discover_hisaisha() {//追加分
-  int count4 = 0; //待つ時間によって判定
-  while ((Serial7.available() == 0)&&(count4 <50)){
-    delay(200);
-    count4++;
-  Serial.println(count4);
-  }
-  Serial.println("count4");
-  if (Serial7.available() > 0) {
-   int receivedData = Serial7.read();
-   Serial.println(receivedData);
-   Serial.print("count");
-   Serial.println(count4);
-   delay(2000);
-   if (count4 < 25){
-    Serial.println("NONE");
-    count4 = 0;
-   }else if (count4 < 30){
-    Serial.println("red|| H");
-    //SCServo();
-    //SCServo();
-    count4 =0;
-   }else if(count4 < 35){
-    Serial.println("yellow||S");
-    //SCServo();
-    count4 = 0;
-   }else if(count4 < 50){
-    Serial.println("green||U");
-    count4 =0;
-   }else{
-    count4 =0;
-    
-   }
-  }else{
-    count4=0;
-  }
-  
-  
-}
 
-//get_victim_data_右
-void serialEvent7(){
-  if (Serial7.available() >0){
-    int receivedData7 = Serial7.read(); 
-    discover_hisaisha();
-    Serial7.flush();
-  }
-}
 
 
 /*スタック・キュー用変数
@@ -1354,9 +1357,9 @@ void BFS()
                 }
                 break;
 
-            /*デバッグ用
+            /*デバッグ用*/
             default:
-                hidari();*/
+                hidari();
         }
         /*if((a == x)&&(b == y)){
             break;
@@ -1631,7 +1634,7 @@ void loop(){
     case 1://座標更新と探索
         WriteDownWall();//帰還用の記録
         
-        /*// 現在の時刻を取得
+        // 現在の時刻を取得
         time_t NowTime;
         time(&NowTime);  // 現在の時刻を取得して NowTime に格納
         now_seconds = static_cast<long>(NowTime); 
@@ -1640,15 +1643,15 @@ void loop(){
         if(now_seconds - firstseconds >= 330){
             Status = 2;//帰還開始
             start_Gohome = true;
-        }*/
+        }
 
 
-        /*デバッグ用
+        /*デバッグ用*/
         Homecount += 1;
         if(Homecount >= 10){
             Status = 2;//帰還開始
             start_Gohome = true;
-        }*/
+        }
 
         MoveTo(judge());//拡張右手法で行く方法を決める,実際に移動して座標を変更+到達回数を加算
 
