@@ -786,9 +786,9 @@ int dequeue() {
 
 /*アルゴリズム用変数*/
 int8_t toutatu_zahyou[90][90];//そのマスの到達回数
-int16_t RightWeight = 0;
-int16_t FrontWeight = 0;
-int16_t LeftWeight = 0;
+int RightWeight = 0;
+int FrontWeight = 0;
+int LeftWeight = 0;
 
 bool start_Gohome = false; //SSD1306に帰還アルゴリズムに入っているかどうかを送信するかの変数
 
@@ -847,10 +847,10 @@ void send_display(){
 /*処理：全てのマスについて、
 /*      前後左右の三か所以上が行き止まりor壁のときそのマスの到達回数を+100する（マスの到達回数が100未満のとき）
 /*
-/*更新者：吉ノ薗2025/02/02
+/*更新者：吉ノ薗2025/02/02いったん凍結
 /*
 /*******************************************************************************************/
-void EffectiveDeadEnd(){
+/*void EffectiveDeadEnd(){
 
     int NorthReached = 0;
     int EastReached = 0;
@@ -869,12 +869,12 @@ void EffectiveDeadEnd(){
             
             if(toutatu_zahyou[t][j] < 100){
 
-                if((NorthReached >= 100) || (kabe_zahyou[t][j] & 1/*北に壁がある*/)){DeadEndCount++;}
-                if((SouthReached >= 100) || (kabe_zahyou[t][j] & 2/*南に壁がある*/)){DeadEndCount++;}
-                if((WestReached >= 100) || (kabe_zahyou[t][j] & 4/*西に壁がある*/)){DeadEndCount++;}
-                if((EastReached >= 100) || (kabe_zahyou[t][j] & 8/*東に壁がある*/)){DeadEndCount++;}
+                if((NorthReached >= 100) || (kabe_zahyou[t][j] & 1)){DeadEndCount++;}//北に壁がある
+                if((SouthReached >= 100) || (kabe_zahyou[t][j] & 2)){DeadEndCount++;}//南に壁がある
+                if((WestReached >= 100) || (kabe_zahyou[t][j] & 4)){DeadEndCount++;}//西に壁がある
+                if((EastReached >= 100) || (kabe_zahyou[t][j] & 8)){DeadEndCount++;}//東に壁がある
 
-                /*前後左右の三か所以上が行き止まりor壁のとき、そのマスの到達回数を+100する*/
+                //前後左右の三か所以上が行き止まりor壁のとき、そのマスの到達回数を+100する
                 if(DeadEndCount >= 3){
                     toutatu_zahyou[t][j] += 100;
                 }
@@ -882,7 +882,7 @@ void EffectiveDeadEnd(){
             }
         }
     }
-}
+}*/
 
 /*******************************************************************************************/
 /* ジャッジ                                                                            
@@ -922,15 +922,15 @@ int8_t judge(){
 
     }
 
-    //壁がある場合更にプラスする
+    //壁がある場合１０００にする
     if (right_wall){
-        RightWeight += 100;
+        RightWeight = 1000;
     }
     if (front_wall){
-        FrontWeight += 100;
+        FrontWeight = 1000;
     }
     if (left_wall){
-        LeftWeight += 100;
+        LeftWeight = 1000;
     }
 
     int8_t GoTo = 0;
@@ -945,11 +945,11 @@ int8_t judge(){
         GoTo = Left;
     }
 
-    
+    if(toutatu_zahyou[x][y] > 100){toutatu_zahyou[x][y] = 100;}//捕捉：走行中に右の重みが94っていう出るはずのない値がでたためオーバーフローを疑いこの関数を導入。対処療法であるため根本的な解決には至っていない
 
-    if ((RightWeight > 100) && (FrontWeight > 100) && (LeftWeight > 100)){//if all wall　or already reached
+    if ((RightWeight == 1000) && (FrontWeight == 1000) && (LeftWeight == 1000)){//if all wall
         GoTo = Back;
-        toutatu_zahyou[x][y] += 100;//行き止まりだから効率化のため二度と行かないようにする
+        toutatu_zahyou[x][y] = 50;//行き止まりだから効率化のため二度と行かないようにする
     }
 
     send_display();
@@ -958,8 +958,6 @@ int8_t judge(){
     LeftWeight = 0;
     return GoTo;
 }
-
-
 
 
 /*******************************************************************************************/
@@ -972,8 +970,8 @@ int8_t judge(){
 /*******************************************************************************************/
 void MoveTo(int8_t GoTo)
 {
-    EffectiveDeadEnd();//より効率的な行き止まりの検索
-    
+    //EffectiveDeadEnd();//より効率的な行き止まりの検索
+
     switch (Direction){
             case East:
                 switch (GoTo){
