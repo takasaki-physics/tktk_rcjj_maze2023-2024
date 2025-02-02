@@ -638,15 +638,55 @@ void serialEvent1(){
 /*更新者：誰が作った
 /*
 /*******************************************************************************************/
-/* 
-void serialEvent2(){
-    if (Serial8.available() >0){
-    int receivedData = Serial8.read();
-    Serial8.flush();
-    discover_hisaisha2();
+//右側のカメラ
+void discover_hisaisha() {//追加分
+  int count4 = 0; //待つ時間によって判定
+  while ((Serial7.available() == 0)&&(count4 <50)){
+    delay(200);
+    count4++;
+  Serial.println(count4);
+  }
+  Serial.println("count4");
+  if (Serial7.available() > 0) {
+   int receivedData = Serial7.read();
+   Serial.println(receivedData);
+   Serial.print("count");
+   Serial.println(count4);
+   delay(2000);
+   if (count4 < 25){
+    Serial.println("NONE");
+    count4 = 0;
+   }else if (count4 < 30){
+    Serial.println("red|| H");
+    //SCServo();
+    //SCServo();
+    count4 =0;
+   }else if(count4 < 35){
+    Serial.println("yellow||S");
+    //SCServo();
+    count4 = 0;
+   }else if(count4 < 50){
+    Serial.println("green||U");
+    count4 =0;
+   }else{
+    count4 =0;
+    
+   }
+  }else{
+    count4=0;
+  }
+  
+  
+}
+
+//get_victim_data_右
+void serialEvent7(){
+  if (Serial7.available() >0){
+    int receivedData7 = Serial7.read(); 
+    discover_hisaisha();
+    Serial7.flush();
   }
 }
-*/
 
 
 /*スタック・キュー用変数
