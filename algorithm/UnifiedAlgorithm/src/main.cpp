@@ -1631,7 +1631,7 @@ void loop(){
     case 1://座標更新と探索
         WriteDownWall();//帰還用の記録
         
-        // 現在の時刻を取得
+        /*// 現在の時刻を取得
         time_t NowTime;
         time(&NowTime);  // 現在の時刻を取得して NowTime に格納
         now_seconds = static_cast<long>(NowTime); 
@@ -1640,15 +1640,15 @@ void loop(){
         if(now_seconds - firstseconds >= 330){
             Status = 2;//帰還開始
             start_Gohome = true;
-        }
+        }*/
 
 
-        /*デバッグ用*/
+        /*デバッグ用
         Homecount += 1;
         if(Homecount >= 10){
             Status = 2;//帰還開始
             start_Gohome = true;
-        }
+        }*/
 
         MoveTo(judge());//拡張右手法で行く方法を決める,実際に移動して座標を変更+到達回数を加算
 
