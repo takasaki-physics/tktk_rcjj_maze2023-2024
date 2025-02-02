@@ -1314,9 +1314,9 @@ void BFS()
                 }
                 break;
 
-            /*デバッグ用*/
+            /*デバッグ用
             default:
-                hidari();
+                hidari();*/
         }
         /*if((a == x)&&(b == y)){
             break;
