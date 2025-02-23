@@ -334,9 +334,9 @@ void get_tof_data() {
 
 /*******************************************************************************************/
 /* get_victim_data                                                                              
-/*処理：
+/*処理：OpenMVによって被災者の発見
 /*
-/*更新者：誰が作った
+/*更新者：清田侑希 2025/2/23
 /*
 /*******************************************************************************************/
 //右側のカメラ
@@ -381,11 +381,68 @@ void discover_hisaisha() {//追加分
 }
 
 //get_victim_data_右
-void serialEvent7(){
+void Cam1_serial(){
   if (Serial7.available() >0){
     int receivedData7 = Serial7.read(); 
     discover_hisaisha();
     Serial7.flush();
+  }
+}
+
+/*******************************************************************************************/
+/* get_victim_data2                                                                              
+/*処理：OpenMVによって被災者を発見する
+/*
+/*更新者：清田侑希　2025/2/23
+/*
+/*******************************************************************************************/
+//左側のカメラ
+void discover_hisaisha2() {//追加分
+  int count4 = 0; //待つ時間によって判定
+  while ((Serial8.available() == 0)&&(count4 <50)){
+    delay(200);
+    count4++;
+  Serial.println(count4);
+  }
+  Serial.println("count4");
+  if (Serial8.available() > 0) {
+   int receivedData = Serial8.read();
+   Serial.println(receivedData);
+   Serial.print("count");
+   Serial.println(count4);
+   delay(2000);
+   if (count4 < 25){
+    Serial.println("NONE");
+    count4 = 0;
+   }else if (count4 < 30){
+    Serial.println("red|| H");
+    //SCServo();
+    //SCServo();
+    count4 =0;
+   }else if(count4 < 35){
+    Serial.println("yellow||S");
+    //SCServo();
+    count4 = 0;
+   }else if(count4 < 50){
+    Serial.println("green||U");
+    count4 =0;
+   }else{
+    count4 =0;
+    
+   }
+  }else{
+    count4=0;
+  }
+  
+  
+}
+
+//get_victim_data_左
+void Cam2_serial(){
+  if (Serial8.available() >0){
+    int receivedData7 = Serial8.read(); 
+    discover_hisaisha2();
+    Serial8.flush();
   }
 }
 
@@ -413,8 +470,8 @@ void migi(){
   sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
   delay(100);
   tiziki_kaitenn();
-  serialEvent7();
-  //serialEvent8();
+  Cam1_serial();
+  //Cam2_serial();
   if (chousei ==1){
     if (kakudo_true2 <=90){
       kakudo_true2 =kakudo_true2 +360;
@@ -458,8 +515,8 @@ void hidari(){
   sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
   delay(100);
   tiziki_kaitenn();
-  serialEvent7();
-  //serialEvent8();
+  Cam1_serial();
+  //Cam2_serial();
   if (chousei ==1){
     if (kakudo_true2 >= 270){
       kakudo_true2 =kakudo_true2 - 360;
@@ -481,7 +538,7 @@ void hidari(){
 /*更新者：清田侑希　2025/1/26
 /*
 /*******************************************************************************************/
-void serialEvent1() {
+void get_color_bump() {
   if (Serial1.available()>0){
   int receivedData2 = Serial1.read();
   Serial.println(receivedData2);
@@ -503,7 +560,7 @@ void serialEvent1() {
     Serial.println("blue_tile");
     delay(50);
     blue_count = true;
-  }else if(receivedData2 == 5 || bump_giveup_count > 1){
+  }else if(receivedData2 == 5 || bump_giveup_count > 0){
     if (bump_giveup_count == 2){
         receivedIndex = 0; //tofデータを取得するためにバイト数を初期化する
         while (receivedIndex != 6){
@@ -611,9 +668,9 @@ void susumu_heitan() {
     Position[3] = 303;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     delay(90);
-    serialEvent1(); //color_load
-    serialEvent7();//_victim_camera1
-    serialEvent8();//_victim_camera2
+    get_color_bump(); //color_load
+    Cam1_serial();//_victim_camera1
+    Cam2_serial();//_victim_camera2
     count2++;
   }
 
@@ -682,22 +739,7 @@ void susumu_heitan() {
 
 
 
-/*******************************************************************************************/
-/* get_victim_data                                                                              
-/*処理：
-/*
-/*更新者：誰が作った
-/*
-/*******************************************************************************************/
-/*
-void serialEvent1(){
-  if (Serial7.available() >0){
-    int receivedData = Serial7.read();
-    Serial7.flush();
-    discover_hisaisha();
-  }
-}
-*/
+
 
 
 
