@@ -126,7 +126,7 @@ int mawasu; //どこまで機体を回すかの変数
 bool chousei =0; //MPUが0度と360度になったときの分岐
 double katamuki; //tiziki2()でのrollの代入
 int katamuki_true; //tiziki2()でrollを整数化したあとの変数
-int count2 = 0;//進んだ回数＿10回でわかれている
+int count2 = 0;//進んだ回数＿40回でわかれている
 int bump_giveup_count = 0; //障害物に当たった時あきらめる変数
 
 bool right_wall = false;//ここもセンサーの値を取得するファイルとして分けたい
@@ -278,7 +278,7 @@ void tiziki_2(){
 /*処理： ヘッダーが来たら6バイト距離のデータを取得するこれによって各壁の検知を行う
 /*
 /*更新者：清田侑希　2025/1/26
-/*
+/*清田侑希　2025/2/23 変更点：壁の有無を各方向の2つのセンサーがともに壁を検知したときのみ壁とみなす
 /*******************************************************************************************/
 void get_tof_data() {
     while (Serial3.available() > 0) {
@@ -300,28 +300,31 @@ void get_tof_data() {
             Serial.print(i);
             Serial.print(": ");
             Serial.println(receivedData[i], BIN); // 受信データを2進数で表示
-            //壁の有無を変数に代入
-            if ((i == 0 || i == 3) && receivedData[i] == 1) {
-                front_wall = true;
-                Serial.println("front_wall");
-            } else if (i == 0 || i == 3) {
-                front_wall = false;
-            }
-            
-            if ((i == 1 || i == 2) && receivedData[i] == 1) {
-                left_wall = true;
-                Serial.println("left_wall");
-            } else if (i == 1 || i == 2) {
-                left_wall = false;
-            }
-            
-            if ((i == 4 || i == 5) && receivedData[i] == 1) {
-                right_wall = true;
-                Serial.println("right_wall");
-            } else if (i == 4 || i == 5) {
-                right_wall = false;
-            }
+
         }
+
+        //壁の有無を変数に代入
+        if (receivedData[0] == 1 && receivedData[3] == 1) {
+            front_wall = true;
+            Serial.println("front_wall");
+        } else {
+            front_wall = false;
+        }
+        
+        if (receivedData[1] == 1 && receivedData[2] == 1) {
+            left_wall = true;
+            Serial.println("left_wall");
+        } else {
+            left_wall = false;
+        }
+        
+        if (receivedData[4] == 1 && receivedData[5] == 1) {
+            right_wall = true;
+            Serial.println("right_wall");
+        } else {
+            right_wall = false;
+        }
+
         Serial.println("All data received");
         //座標更新のフェーズに移行
         Status = 1;
@@ -536,7 +539,7 @@ void hidari(){
 /*処理：Serial1にデータが来たら1バイト読み込んで青、黒、ロードセルを検知する
 /*Data 1:黒タイル　2：青タイル　3：左の障害物　4：右の障害物　5：前の壁　6：銀のタイル
 /*更新者：清田侑希　2025/1/26
-/*
+/*清田侑希　2025/2/23 変更点：障害物を検知して最初の動作の時に壁との距離を測るようにした
 /*******************************************************************************************/
 void get_color_bump() {
   if (Serial1.available()>0){
@@ -560,14 +563,30 @@ void get_color_bump() {
     Serial.println("blue_tile");
     delay(50);
     blue_count = true;
-  }else if(receivedData2 == 5 || bump_giveup_count > 0){
-    if (bump_giveup_count == 2){
+  }else if (bump_giveup_count == 0){
         receivedIndex = 0; //tofデータを取得するためにバイト数を初期化する
+        front_wall = false; //怖いので初期化
         while (receivedIndex != 6){
             get_tof_data();
-        }       
-    }
-    if(receivedData2== 5 ||front_wall == true || bump_giveup_count > 3){
+        }
+        if (front_wall == true){
+            Position[0] = -2025; //後ろに下がる
+            Position[1] = 2025;
+            Position[2] = 2025;
+            Position[3] = -2025;
+            sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+            Serial.println("Backing...");
+            delay(1000);
+            if (count2 < 20 ){
+                //座標の変更をもとに戻す
+                Gap = true;
+            }
+            count2 = 40;            
+        }
+        bump_giveup_count++;     
+    
+  }else if(receivedData2 == 5 || bump_giveup_count > 3){
+    if(receivedData2== 5 || bump_giveup_count > 3){
         Position[0] = -2025; //後ろに下がる
         Position[1] = 2025;
         Position[2] = 2025;
