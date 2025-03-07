@@ -454,7 +454,7 @@ void Cam2_serial(){
 /*処理：MPU6050で取得したデータをもとに90度右回転するまでモーターを回し続ける
 /*変更点：ギア搭載による回転方向の反転と適切なdelayの実装
 /*更新者：清田侑希　2025/1/25
-/*
+/*       清田侑希　2025/3/7 変更点：回転方法の変更
 /*******************************************************************************************/
 void migi(){
   tiziki_kaitenn();
@@ -465,7 +465,22 @@ void migi(){
   }else if (kakudo_true2 <= 360){
     mawasu = kakudo_true2-80;
   }
-  while (kakudo_true2 > mawasu || chousei ==1){
+/*
+  //90度回転させる
+  Position[0] = 8190;
+  Position[1] = 8190;
+  Position[2] = 8190;
+  Position[3] = 8190;
+  delay(1884);
+  delay(200);
+  //現在の角度を取得する
+  tiziki_kaitenn(); 
+  if (kakudo_true2 - mawasu >= 300){
+    mawasu = 360;
+  }
+    */
+  //仮にバンプなどで90度回らなかったら90度回るまで補正し続ける
+  while (kakudo_true2 > mawasu){
   Position[0] = 440; //右に回転
   Position[1] = 440;
   Position[2] = 440;
