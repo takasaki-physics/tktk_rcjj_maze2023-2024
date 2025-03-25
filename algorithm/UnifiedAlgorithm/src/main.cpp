@@ -117,6 +117,9 @@ int receivedIndex = 0; // データ格納位置
 #define BRIGHTNESS 100   // LEDの明るさを設定 (0～255)
 
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800); //8個のNeoPixelがSeeedのデジタルピン27に接続され、GRB順の800kHzのデータ伝送速度で動作
+/*..................レスキューキット排出用のサーボモーターの変数の定義............*/
+const int SERVO_PIN = 10; //servo2 36
+const int SERVO_PIN2 = 36;
 /*..........................................................*/
 /*センサー類変数*/
 unsigned int SERVO_POS = 0; //変数SERVO_POS=0とする
@@ -396,7 +399,52 @@ void get_tof_data() {
       }
     }
 }
+/*******************************************************************************************/
+/* Servo_rescue                                                                              
+/*処理：サーボモーターによるレスキューキットの排出
+/*
+/*更新者：清田侑希 2025/3/26
+/*
+/*******************************************************************************************/
+void motor_servo(int motor_speed, int seconds) {
+  int pulse_width = 1500-motor_speed*8;
+  int starttime = millis();
+  while(true) {
+    if (millis()-starttime > seconds) break;
+      digitalWrite(SERVO_PIN, HIGH);
+      delayMicroseconds(pulse_width);
+      digitalWrite(SERVO_PIN, LOW);
+      delay(20);    
+  } 
+}
 
+void motor_servo2(int motor_speed, int seconds) {
+  int pulse_width = 1500-motor_speed*8;
+  int starttime = millis();
+  while(true) {
+    if (millis()-starttime > seconds) break;
+      digitalWrite(SERVO_PIN2, HIGH);
+      delayMicroseconds(pulse_width);
+      digitalWrite(SERVO_PIN2, LOW);
+      delay(20);    
+  } 
+}
+
+void servo_res(){
+  motor_servo(100,100);
+  motor_servo(0,1000);
+  motor_servo(-100,100);
+  motor_servo(0,1000);
+  delay(500);
+}
+
+void servo_res2(){
+  motor_servo2(100,100);
+  motor_servo2(0,1000);
+  motor_servo2(-100,100);
+  motor_servo2(0,1000);
+  delay(500);
+}
 
 /*******************************************************************************************/
 /* get_victim_data                                                                              
@@ -1742,6 +1790,8 @@ void setup(){
   Serial8.begin(19200);//using_cam2
   Wire.begin();
   pinMode(6, INPUT); //スタート用スイッチのpin設定
+  pinMode(SERVO_PIN, OUTPUT);//レスキューキット用のサーボモーターのpin設定
+  pinMode(SERVO_PIN2, OUTPUT);//上に同じ
   delay(2000);
   /*MPUのセットアップ***********************************************************************************************************/
   Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
