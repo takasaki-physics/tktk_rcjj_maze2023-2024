@@ -181,7 +181,7 @@ void tiziki()
   kakudo_true = int(kakudo);
   Serial.println(kakudo_true);
   if (kakudo_true >= 0 && kakudo_true < 45) {
-    for (int i =0; i < kakudo_true ;i++){
+    for (int i =0; i < kakudo_true -mawasu ;i++){
         Position[0] = 60; //右に回転
         Position[1] = 60;
         Position[2] = 60;
@@ -191,7 +191,7 @@ void tiziki()
       
     }
   }else if (kakudo_true >= 45 && kakudo_true < 90) {
-    for (int i =0; i < 90-kakudo_true ;i++){
+    for (int i =0; i < mawasu-kakudo_true ;i++){
         Position[0] = -60; //左に回転
         Position[1] = -60;
         Position[2] = -60;
@@ -201,7 +201,7 @@ void tiziki()
       
     }
   }else if (kakudo_true >= 90 && kakudo_true < 135) {
-    for (int i =0; i < kakudo_true-90 ;i++){
+    for (int i =0; i < kakudo_true-mawasu ;i++){
         Position[0] = 60; //右に回転
         Position[1] = 60;
         Position[2] = 60;
@@ -211,7 +211,7 @@ void tiziki()
       
     }
   }else if (kakudo_true >= 135 && kakudo_true < 180) {
-    for (int i =0; i < 180-kakudo_true ;i++){
+    for (int i =0; i < mawasu-kakudo_true ;i++){
         Position[0] = -60; //左に回転
         Position[1] = -60;
         Position[2] = -60;
@@ -221,7 +221,7 @@ void tiziki()
       
     }
   }else if (kakudo_true >= 180 && kakudo_true < 225) {
-    for (int i =0; i < kakudo_true-180 ;i++){
+    for (int i =0; i < kakudo_true-mawasu ;i++){
         Position[0] = 60; //右に回転
         Position[1] = 60;
         Position[2] = 60;
@@ -231,7 +231,7 @@ void tiziki()
       
     }
   }else if (kakudo_true >= 225 && kakudo_true < 270) {
-    for (int i =0; i < 270-kakudo_true ;i++){
+    for (int i =0; i < mawasu-kakudo_true ;i++){
         Position[0] = -60; //左に回転
         Position[1] = -60;
         Position[2] = -60;
@@ -241,7 +241,7 @@ void tiziki()
       
     }
   }else if (kakudo_true >= 270 && kakudo_true < 315) {
-    for (int i =0; i < kakudo_true-270 ;i++){
+    for (int i =0; i < kakudo_true-mawasu ;i++){
         Position[0] = 60; //右に回転
         Position[1] = 60;
         Position[2] = 60;
@@ -251,7 +251,7 @@ void tiziki()
       
     }
   }else if (kakudo_true >= 315 && kakudo_true <= 360) {
-    for (int i =0; i < 360-kakudo_true ;i++){
+    for (int i =0; i < mawasu-kakudo_true ;i++){
         Position[0] = -60; //左に回転
         Position[1] = -60;
         Position[2] = -60;
@@ -591,7 +591,6 @@ void migi(){
     }
     delay(50);
   }
-  mawasu =0;
   delay(200);
   tiziki(); //角度補正            
 }
@@ -617,6 +616,7 @@ void hidari(){
   }else if (kakudo_true2 >= 0){
     mawasu = kakudo_true2 + 80;
   }
+  /*
     Position[0] = -8190;
     Position[1] = -8190;
     Position[2] = -8190;
@@ -628,7 +628,7 @@ void hidari(){
     if(kakudo_true2 <= -300){
         mawasu = 0;
     }
-    
+    */
     //90度回転しなかったときに角度の補正を行う
   while (kakudo_true2 < mawasu){
   Position[0] = -440; //左に回転
@@ -871,8 +871,7 @@ void susumu_heitan() {
         char receivedChar = Serial3.read(); // データを読み取る
         // 必要に応じて受信データを処理する
     }
-    tiziki();
-    delay(300);
+    delay(150);
   /*..............変数初期化.................................*/
   count2 =0;
   bump_giveup_count =0;
