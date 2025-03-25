@@ -1019,15 +1019,15 @@ int8_t judge(){
 
     }
 
-    //壁がある場合１０００にする
+    //壁がある場合１００にする
     if (right_wall){
-        RightWeight = 1000;
+        RightWeight = 100;
     }
     if (front_wall){
-        FrontWeight = 1000;
+        FrontWeight = 100;
     }
     if (left_wall){
-        LeftWeight = 1000;
+        LeftWeight = 100;
     }
 
     int8_t GoTo = 0;
@@ -1044,7 +1044,11 @@ int8_t judge(){
 
     if(toutatu_zahyou[x][y] > 100){toutatu_zahyou[x][y] = 100;}//捕捉：走行中に右の重みが94っていう出るはずのない値がでたためオーバーフローを疑いこの関数を導入。対処療法であるため根本的な解決には至っていない
 
-    if ((RightWeight == 1000) && (FrontWeight == 1000) && (LeftWeight == 1000)){//if all wall
+    if(front_weight > 100){front_weight = 100;}//前・左・右の重みが100を越えていたら100にする
+    if(right_weight > 100){right_weight = 100;}
+    if(left_weight > 100){left_weight = 100;}
+
+    if ((RightWeight == 100) && (FrontWeight == 100) && (LeftWeight == 100)){//if all wall
         GoTo = Back;
         toutatu_zahyou[x][y] = 50;//行き止まりだから効率化のため二度と行かないようにする
     }
