@@ -14,6 +14,7 @@
 #include <SCServo.h> //SCServoを使うと宣言]
 #include <SoftwareSerial.h> //SoftwareSerial(複数機器とシリアル通信)を使うと宣言
 #include "MPU6050_6Axis_MotionApps20.h"
+#include <Adafruit_NeoPixel.h>
 #include <queue>
 #include <stack>
 
@@ -109,6 +110,17 @@ const byte HEADER = 255;  // ヘッダー (送信側と一致すること)
 bool headerDetected = false;
 byte receivedData[6];  // 受信データ格納用
 int receivedIndex = 0; // データ格納位置
+
+/*.........NeoPixelの変数の定義........................*/
+#define PIN        9    // データ信号用のピン
+#define NUMPIXELS  8     // LEDの数
+#define BRIGHTNESS 100   // LEDの明るさを設定 (0～255)
+
+Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800); //8個のNeoPixelがSeeedのデジタルピン27に接続され、GRB順の800kHzのデータ伝送速度で動作
+/*..................レスキューキット排出用のサーボモーターの変数の定義............*/
+const int SERVO_PIN = 10; //servo2 36
+const int SERVO_PIN2 = 36;
+/*..........................................................*/
 /*センサー類変数*/
 unsigned int SERVO_POS = 0; //変数SERVO_POS=0とする
 byte ID[4]; //IDはそれぞれのモーターのID
@@ -172,7 +184,7 @@ void tiziki()
   kakudo_true = int(kakudo);
   Serial.println(kakudo_true);
   if (kakudo_true >= 0 && kakudo_true < 45) {
-    for (int i =0; i < kakudo_true ;i++){
+    for (int i =0; i < kakudo_true -mawasu ;i++){
         Position[0] = 60; //右に回転
         Position[1] = 60;
         Position[2] = 60;
@@ -182,7 +194,7 @@ void tiziki()
       
     }
   }else if (kakudo_true >= 45 && kakudo_true < 90) {
-    for (int i =0; i < 90-kakudo_true ;i++){
+    for (int i =0; i < mawasu-kakudo_true ;i++){
         Position[0] = -60; //左に回転
         Position[1] = -60;
         Position[2] = -60;
@@ -192,7 +204,7 @@ void tiziki()
       
     }
   }else if (kakudo_true >= 90 && kakudo_true < 135) {
-    for (int i =0; i < kakudo_true-90 ;i++){
+    for (int i =0; i < kakudo_true-mawasu ;i++){
         Position[0] = 60; //右に回転
         Position[1] = 60;
         Position[2] = 60;
@@ -202,7 +214,7 @@ void tiziki()
       
     }
   }else if (kakudo_true >= 135 && kakudo_true < 180) {
-    for (int i =0; i < 180-kakudo_true ;i++){
+    for (int i =0; i < mawasu-kakudo_true ;i++){
         Position[0] = -60; //左に回転
         Position[1] = -60;
         Position[2] = -60;
@@ -212,7 +224,7 @@ void tiziki()
       
     }
   }else if (kakudo_true >= 180 && kakudo_true < 225) {
-    for (int i =0; i < kakudo_true-180 ;i++){
+    for (int i =0; i < kakudo_true-mawasu ;i++){
         Position[0] = 60; //右に回転
         Position[1] = 60;
         Position[2] = 60;
@@ -222,7 +234,7 @@ void tiziki()
       
     }
   }else if (kakudo_true >= 225 && kakudo_true < 270) {
-    for (int i =0; i < 270-kakudo_true ;i++){
+    for (int i =0; i < mawasu-kakudo_true ;i++){
         Position[0] = -60; //左に回転
         Position[1] = -60;
         Position[2] = -60;
@@ -232,7 +244,7 @@ void tiziki()
       
     }
   }else if (kakudo_true >= 270 && kakudo_true < 315) {
-    for (int i =0; i < kakudo_true-270 ;i++){
+    for (int i =0; i < kakudo_true-mawasu ;i++){
         Position[0] = 60; //右に回転
         Position[1] = 60;
         Position[2] = 60;
@@ -242,7 +254,7 @@ void tiziki()
       
     }
   }else if (kakudo_true >= 315 && kakudo_true <= 360) {
-    for (int i =0; i < 360-kakudo_true ;i++){
+    for (int i =0; i < mawasu-kakudo_true ;i++){
         Position[0] = -60; //左に回転
         Position[1] = -60;
         Position[2] = -60;
@@ -272,6 +284,60 @@ void tiziki_2(){
   Serial.println(katamuki_true); 
   
 }
+
+/*******************************************************************************************/
+/* NeoPixelのいろいろな動作関数                                                                            
+/*処理：Neopixelを前後左右、赤黄緑に光らせる
+/*更新者：清田侑希 2025/3/25
+/*
+/*******************************************************************************************/
+
+void NeoPixel_Front_ON() {
+  pixels.setPixelColor(0, pixels.Color(255, 0, 0)); // 0番目のLEDを(R,G,B)=(255,0,0)⇔赤に点灯
+  pixels.setPixelColor(1, pixels.Color(255, 0, 0)); // 1番目のLEDを(R,G,B)=(255,0,0)⇔赤に点灯
+  pixels.show(); // LEDに反映
+}
+void NeoPixel_Front_OFF() {
+  pixels.setPixelColor(0, pixels.Color(0, 0, 0)); // 0番目のLEDを消灯
+  pixels.setPixelColor(1, pixels.Color(0, 0, 0)); // 1番目のLEDを消灯
+  pixels.show(); // LEDに反映
+}
+void NeoPixel_Right_ON() {
+  pixels.setPixelColor(2, pixels.Color(255, 0, 0)); // 2番目のLEDを(R,G,B)=(255,0,0)⇔赤に点灯
+  pixels.setPixelColor(3, pixels.Color(255, 0, 0)); // 3番目のLEDを(R,G,B)=(255,0,0)⇔赤に点灯
+  pixels.show(); // LEDに反映
+}
+void NeoPixel_Right_OFF() {
+  pixels.setPixelColor(2, pixels.Color(0, 0, 0)); // 2番目のLEDを消灯
+  pixels.setPixelColor(3, pixels.Color(0, 0, 0)); // 3番目のLEDを消灯
+  pixels.show(); // LEDに反映
+}
+void NeoPixel_Rear_ON() {
+  pixels.setPixelColor(4, pixels.Color(255, 0, 0)); // 4番目のLEDを(R,G,B)=(255,0,0)⇔赤に点灯
+  pixels.setPixelColor(5, pixels.Color(255, 0, 0)); // 5番目のLEDを(R,G,B)=(255,0,0)⇔赤に点灯
+  pixels.show(); // LEDに反映
+}
+void NeoPixel_Rear_OFF() {
+  pixels.setPixelColor(4, pixels.Color(0, 0, 0)); // 4番目のLEDを消灯
+  pixels.setPixelColor(5, pixels.Color(0, 0, 0)); // 5番目のLEDを消灯
+  pixels.show(); // LEDに反映
+}
+void NeoPixel_Left_ON() {
+  pixels.setPixelColor(6, pixels.Color(255, 0, 0)); // 6番目のLEDを(R,G,B)=(255,0,0)⇔赤に点灯
+  pixels.setPixelColor(7, pixels.Color(255, 0, 0)); // 7番目のLEDを(R,G,B)=(255,0,0)⇔赤に点灯
+  pixels.show(); // LEDに反映
+}
+void NeoPixel_Left_OFF() {
+  pixels.setPixelColor(6, pixels.Color(0, 0, 0)); // 6番目のLEDを消灯
+  pixels.setPixelColor(7, pixels.Color(0, 0, 0)); // 7番目のLEDを消灯
+  pixels.show(); // LEDに反映
+}
+void NeoPixel_Color(uint8_t r, uint8_t g, uint8_t b) {
+  pixels.clear();
+  pixels.fill(pixels.Color(r, g, b));
+  pixels.show();
+}
+
 
 /*******************************************************************************************/
 /* collect_tof_data                                                                              
@@ -333,7 +399,52 @@ void get_tof_data() {
       }
     }
 }
+/*******************************************************************************************/
+/* Servo_rescue                                                                              
+/*処理：サーボモーターによるレスキューキットの排出
+/*
+/*更新者：清田侑希 2025/3/26
+/*
+/*******************************************************************************************/
+void motor_servo(int motor_speed, int seconds) {
+  int pulse_width = 1500-motor_speed*8;
+  int starttime = millis();
+  while(true) {
+    if (millis()-starttime > seconds) break;
+      digitalWrite(SERVO_PIN, HIGH);
+      delayMicroseconds(pulse_width);
+      digitalWrite(SERVO_PIN, LOW);
+      delay(20);    
+  } 
+}
 
+void motor_servo2(int motor_speed, int seconds) {
+  int pulse_width = 1500-motor_speed*8;
+  int starttime = millis();
+  while(true) {
+    if (millis()-starttime > seconds) break;
+      digitalWrite(SERVO_PIN2, HIGH);
+      delayMicroseconds(pulse_width);
+      digitalWrite(SERVO_PIN2, LOW);
+      delay(20);    
+  } 
+}
+
+void servo_res(){
+  motor_servo(100,100);
+  motor_servo(0,1000);
+  motor_servo(-100,100);
+  motor_servo(0,1000);
+  delay(500);
+}
+
+void servo_res2(){
+  motor_servo2(100,100);
+  motor_servo2(0,1000);
+  motor_servo2(-100,100);
+  motor_servo2(0,1000);
+  delay(500);
+}
 
 /*******************************************************************************************/
 /* get_victim_data                                                                              
@@ -343,53 +454,66 @@ void get_tof_data() {
 /*
 /*******************************************************************************************/
 //右側のカメラ
-void discover_hisaisha() {//追加分
-  int count4 = 0; //待つ時間によって判定
-  while ((Serial7.available() == 0)&&(count4 <50)){
-    delay(200);
-    count4++;
-  Serial.println(count4);
-  }
-  Serial.println("count4");
-  if (Serial7.available() > 0) {
-   int receivedData = Serial7.read();
-   Serial.println(receivedData);
-   Serial.print("count");
-   Serial.println(count4);
-   delay(2000);
-   if (count4 < 25){
-    Serial.println("NONE");
-    count4 = 0;
-   }else if (count4 < 30){
-    Serial.println("red|| H");
-    //SCServo();
-    //SCServo();
-    count4 =0;
-   }else if(count4 < 35){
-    Serial.println("yellow||S");
-    //SCServo();
-    count4 = 0;
-   }else if(count4 < 50){
-    Serial.println("green||U");
-    count4 =0;
-   }else{
-    count4 =0;
-    
-   }
-  }else{
-    count4=0;
-  }
-  
-  
-}
+void serialEvent7(){
+  if (Serial7.available()>0){
+    int recivedData7 = Serial7.read();
+    if (recivedData7 == 1){
+      Serial.println("H_victim");
+      for ( int i =0;i < 5 ;i++){
+        NeoPixel_Color(255,0,0);
+        delay(500);
+        pixels.clear();
+        pixels.show();
+        delay(500);
+      }
+    }else if (recivedData7 == 2){
+        Serial.println("S_victim");
+        for ( int i =0;i < 5 ;i++){
+          NeoPixel_Color(255,200,0);
+          delay(500);
+          pixels.clear();
+          pixels.show();
+          delay(500);
+        }
+      }else if(recivedData7 == 3){
+        Serial.println("U_victim");
+        for ( int i =0;i < 5 ;i++){
+          NeoPixel_Color(0,255,0);
+          delay(500);
+          pixels.clear();
+          pixels.show();
+          delay(500);
+        }
+      }else if (recivedData7 == 4){
+        Serial.println("red_victim");
+        for ( int i =0;i < 3 ;i++){
+          NeoPixel_Color(255,0,0);
+          delay(1000);
+          pixels.clear();
+          pixels.show();
+          delay(1000);
+        }
+      }else if(recivedData7 == 5){
+        Serial.println("yellow_victim");
+        for ( int i =0;i < 3 ;i++){
+          NeoPixel_Color(255,200,0);
+          delay(1000);
+          pixels.clear();
+          pixels.show();
+          delay(1000);
+        }
+      }else if(recivedData7 == 6){
+        Serial.println("green_victim");
+        for ( int i =0;i < 3 ;i++){
+          NeoPixel_Color(0,255,0);
+          delay(1000);
+          pixels.clear();
+          pixels.show();
+          delay(1000);
 
-//get_victim_data_右
-void Cam1_serial(){
-  if (Serial7.available() >0){
-    int receivedData7 = Serial7.read(); 
-    discover_hisaisha();
-    Serial7.flush();
-  }
+        }
+      }
+    }
 }
 
 /*******************************************************************************************/
@@ -400,53 +524,67 @@ void Cam1_serial(){
 /*
 /*******************************************************************************************/
 //左側のカメラ
-void discover_hisaisha2() {//追加分
-  int count4 = 0; //待つ時間によって判定
-  while ((Serial8.available() == 0)&&(count4 <50)){
-    delay(200);
-    count4++;
-  Serial.println(count4);
-  }
-  Serial.println("count4");
-  if (Serial8.available() > 0) {
-   int receivedData = Serial8.read();
-   Serial.println(receivedData);
-   Serial.print("count");
-   Serial.println(count4);
-   delay(2000);
-   if (count4 < 25){
-    Serial.println("NONE");
-    count4 = 0;
-   }else if (count4 < 30){
-    Serial.println("red|| H");
-    //SCServo();
-    //SCServo();
-    count4 =0;
-   }else if(count4 < 35){
-    Serial.println("yellow||S");
-    //SCServo();
-    count4 = 0;
-   }else if(count4 < 50){
-    Serial.println("green||U");
-    count4 =0;
-   }else{
-    count4 =0;
-    
-   }
-  }else{
-    count4=0;
-  }
-  
-  
-}
 
-//get_victim_data_左
-void Cam2_serial(){
-  if (Serial8.available() >0){
-    int receivedData7 = Serial8.read(); 
-    discover_hisaisha2();
-    Serial8.flush();
-  }
+void serialEvent8(){
+  if (Serial8.available()>0){
+    int recivedData = Serial8.read();
+    if (recivedData == 1){
+      Serial.println("H_victim");
+      for ( int i =0;i < 5 ;i++){
+        NeoPixel_Color(255,0,0);
+        delay(500);
+        pixels.clear();
+        pixels.show();
+        delay(500);
+      }
+    }else if (recivedData == 2){
+        Serial.println("S_victim");
+        for ( int i =0;i < 5 ;i++){
+          NeoPixel_Color(255,200,0);
+          delay(500);
+          pixels.clear();
+          pixels.show();
+          delay(500);
+        }
+      }else if(recivedData == 3){
+        Serial.println("U_victim");
+        for ( int i =0;i < 5 ;i++){
+          NeoPixel_Color(0,255,0);
+          delay(500);
+          pixels.clear();
+          pixels.show();
+          delay(500);
+        }
+      }else if (recivedData == 4){
+        Serial.println("red_victim");
+        for ( int i =0;i < 3 ;i++){
+          NeoPixel_Color(255,0,0);
+          delay(1000);
+          pixels.clear();
+          pixels.show();
+          delay(1000);
+        }
+      }else if(recivedData == 5){
+        Serial.println("yellow_victim");
+        for ( int i =0;i < 3 ;i++){
+          NeoPixel_Color(255,200,0);
+          delay(1000);
+          pixels.clear();
+          pixels.show();
+          delay(1000);
+        }
+      }else if(recivedData == 6){
+        Serial.println("green_victim");
+        for ( int i =0;i < 3 ;i++){
+          NeoPixel_Color(0,255,0);
+          delay(1000);
+          pixels.clear();
+          pixels.show();
+          delay(1000);
+
+        }
+      }
+    }
 }
 
 /*******************************************************************************************/
@@ -458,6 +596,7 @@ void Cam2_serial(){
 /*******************************************************************************************/
 void migi(){
   tiziki_kaitenn();
+  delay(50);
   if (kakudo_true2 <=90){
     mawasu = kakudo_true2 +280;
     kakudo_true2 =kakudo_true2 +360;
@@ -475,6 +614,7 @@ void migi(){
   delay(200);
   //現在の角度を取得する
   tiziki_kaitenn(); 
+  delay(50);
   if (kakudo_true2 - mawasu >= 300){
     mawasu = 360;
   }
@@ -488,8 +628,8 @@ void migi(){
   sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
   delay(100);
   tiziki_kaitenn();
-  Cam1_serial();
-  //Cam2_serial();
+  serialEvent7();
+  serialEvent8();
   if (chousei ==1){
     if (kakudo_true2 <=90){
       kakudo_true2 =kakudo_true2 +360;
@@ -499,7 +639,6 @@ void migi(){
     }
     delay(50);
   }
-  mawasu =0;
   delay(200);
   tiziki(); //角度補正            
 }
@@ -517,6 +656,7 @@ void migi(){
 void hidari(){
   //どこまで回すかの数値を処理
   tiziki_kaitenn();
+  delay(50);
   if (kakudo_true2 >= 270){
     mawasu = kakudo_true2 - 280; 
     kakudo_true2 = kakudo_true2 - 360;
@@ -524,17 +664,21 @@ void hidari(){
   }else if (kakudo_true2 >= 0){
     mawasu = kakudo_true2 + 80;
   }
-/*
+  /*
     Position[0] = -8190;
     Position[1] = -8190;
     Position[2] = -8190;
     Position[3] = -8190;
+    delay(1884);
+    delay(200);
+    tiziki_kaitenn();
+    delay(50);
     if(kakudo_true2 <= -300){
         mawasu = 0;
     }
     */
     //90度回転しなかったときに角度の補正を行う
-  while (kakudo_true2 < mawasu || chousei ==1){
+  while (kakudo_true2 < mawasu){
   Position[0] = -440; //左に回転
   Position[1] = -440;
   Position[2] = -440;
@@ -542,8 +686,8 @@ void hidari(){
   sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
   delay(100);
   tiziki_kaitenn();
-  Cam1_serial();
-  //Cam2_serial();
+  serialEvent7();
+  serialEvent8();
   if (chousei ==1){
     if (kakudo_true2 >= 270){
       kakudo_true2 =kakudo_true2 - 360;
@@ -565,7 +709,7 @@ void hidari(){
 /*更新者：清田侑希　2025/1/26
 /*清田侑希　2025/2/23 変更点：障害物を検知して最初の動作の時に壁との距離を測るようにした
 /*******************************************************************************************/
-void get_color_bump() {
+void serialEvent1() {
   if (Serial1.available()>0){
   int receivedData2 = Serial1.read();
   Serial.println(receivedData2);
@@ -587,7 +731,9 @@ void get_color_bump() {
     Serial.println("blue_tile");
     delay(50);
     blue_count = true;
-  }else if (bump_giveup_count == 0){
+  }
+  /*
+  else if (bump_giveup_count == 0){
         receivedIndex = 0; //tofデータを取得するためにバイト数を初期化する
         front_wall = false; //怖いので初期化
         while (receivedIndex != 6){
@@ -609,7 +755,9 @@ void get_color_bump() {
         }
         bump_giveup_count++;     
     
-  }else if(receivedData2 == 5 || bump_giveup_count > 3){
+  }
+  */
+  else if(receivedData2 == 5 || bump_giveup_count > 3){
     if(receivedData2== 5 || bump_giveup_count > 3){
         Position[0] = -2025; //後ろに下がる
         Position[1] = 2025;
@@ -711,9 +859,9 @@ void susumu_heitan() {
     Position[3] = 303;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     delay(90);
-    get_color_bump(); //color_load
-    Cam1_serial();//_victim_camera1
-    Cam2_serial();//_victim_camera2
+    serialEvent1(); //color_load
+    serialEvent7();//_victim_camera1
+    serialEvent8();//_victim_camera2
     count2++;
   }
 
@@ -727,9 +875,9 @@ void susumu_heitan() {
     /*...........坂があるかどうか..............*/
     tiziki_2(); //get_roll_data
     delay(50);
-    if (katamuki_true <-8){
+    if (katamuki_true <-18){
         Serial.println("Slope_Ue");
-        while(katamuki_true <-8){
+        while(katamuki_true <-18){
             Serial.println("Climbing...");
             Position[0] = 400; //前に進む
             Position[1] = -400;
@@ -747,8 +895,8 @@ void susumu_heitan() {
         Position[3] = 8190;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
         delay(2500);
-    }else if (katamuki_true >8){
-        while(katamuki_true > 8){
+    }else if (katamuki_true >18){
+        while(katamuki_true > 18){
             Serial.println("Down Hill...");
             Position[0] = 400; //前に進む
             Position[1] = -400;
@@ -771,8 +919,7 @@ void susumu_heitan() {
         char receivedChar = Serial3.read(); // データを読み取る
         // 必要に応じて受信データを処理する
     }
-    tiziki();
-    delay(300);
+    delay(150);
   /*..............変数初期化.................................*/
   count2 =0;
   bump_giveup_count =0;
@@ -907,8 +1054,6 @@ long firstseconds;
 
 void send_display(){
   // 各センサーの距離を取得し壁の有無を判定
-
-
   byte data_for_send[7];
   data_for_send[0] = (start_Gohome) ? 0x01 : 0x00;
   data_for_send[1] = (RightWeight);
@@ -1649,6 +1794,8 @@ void setup(){
   Serial8.begin(19200);//using_cam2
   Wire.begin();
   pinMode(6, INPUT); //スタート用スイッチのpin設定
+  pinMode(SERVO_PIN, OUTPUT);//レスキューキット用のサーボモーターのpin設定
+  pinMode(SERVO_PIN2, OUTPUT);//上に同じ
   delay(2000);
   /*MPUのセットアップ***********************************************************************************************************/
   Wire.setClock(400000); // 400kHz I2C clock. Comment this line if having compilation difficulties
@@ -1692,6 +1839,10 @@ void setup(){
   ACC[2] = 50;
   ACC[3] = 50;
   Serial.println("test");
+
+    /*...........NeoPixelのセットアップ.......*/
+    pixels.begin(); // NeoPixelの初期化
+    pixels.setBrightness(BRIGHTNESS); // 明るさを設定
 
 
   /*スタック・キューのセットアップ***********************************************************************************************************
@@ -1760,10 +1911,16 @@ void loop(){
             } else {
                 Serial.print("DMP Initialization failed.");
             }
+            while (Serial3.available() > 0) {
+            char receivedChar = Serial3.read(); // データを読み取る
+            // 必要に応じて受信データを処理する
+            }
             //チェックポイントとして保存した座標を現在の座標として代入する
             x = CheckX;
             y = CheckY;
             Direction = CheckD;
+            Status = 0;
+            break;
         }
     }
     /*.................................................................*/
