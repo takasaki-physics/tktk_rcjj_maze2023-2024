@@ -43,9 +43,9 @@ uint8_t y = 50;
 uint8_t Direction = North;
 uint8_t Status = 0;
 
-uint8_t CheckX = 0;
-uint8_t CheckY = 0;
-uint8_t CheckD = 0;
+uint8_t CheckX = 50;
+uint8_t CheckY = 50;
+uint8_t CheckD = North;
 
 /*MPU変数*/
 // MPU control/status vars
@@ -347,7 +347,7 @@ void NeoPixel_Color(uint8_t r, uint8_t g, uint8_t b) {
 /*清田侑希　2025/2/23 変更点：壁の有無を各方向の2つのセンサーがともに壁を検知したときのみ壁とみなす
 /*******************************************************************************************/
 void get_tof_data() {
-    while (Serial3.available() > 0) {
+    if (Serial3.available() > 0) {
       byte incomingByte = Serial3.read(); // Serial3から1バイト読み取り
       if (!headerDetected) {
         if (incomingByte == HEADER) {
@@ -1189,9 +1189,9 @@ int8_t judge(){
 
     if(toutatu_zahyou[x][y] > 100){toutatu_zahyou[x][y] = 100;}//捕捉：走行中に右の重みが94っていう出るはずのない値がでたためオーバーフローを疑いこの関数を導入。対処療法であるため根本的な解決には至っていない
 
-    if(front_weight > 100){front_weight = 100;}//前・左・右の重みが100を越えていたら100にする
-    if(right_weight > 100){right_weight = 100;}
-    if(left_weight > 100){left_weight = 100;}
+    if(FrontWeight > 100){FrontWeight = 100;}//前・左・右の重みが100を越えていたら100にする
+    if(RightWeight > 100){RightWeight = 100;}
+    if(LeftWeight > 100){LeftWeight = 100;}
 
     if ((RightWeight == 100) && (FrontWeight == 100) && (LeftWeight == 100)){//if all wall
         GoTo = Back;
@@ -1333,7 +1333,6 @@ void MoveTo(int8_t GoTo)
                 break;
         }
     toutatu_zahyou[x][y] += 1;//移動先のマスの到達回数をプラスしている
-    
 }
 
 
