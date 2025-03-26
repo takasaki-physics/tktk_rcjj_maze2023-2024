@@ -347,7 +347,7 @@ void NeoPixel_Color(uint8_t r, uint8_t g, uint8_t b) {
 /*清田侑希　2025/2/23 変更点：壁の有無を各方向の2つのセンサーがともに壁を検知したときのみ壁とみなす
 /*******************************************************************************************/
 void get_tof_data() {
-    if (Serial3.available() > 0) {
+    /*if (Serial3.available() > 0) {
       byte incomingByte = Serial3.read(); // Serial3から1バイト読み取り
       if (!headerDetected) {
         if (incomingByte == HEADER) {
@@ -367,24 +367,47 @@ void get_tof_data() {
             Serial.print(": ");
             Serial.println(receivedData[i], BIN); // 受信データを2進数で表示
 
+        }*/
+        if (!headerDetected) {
+          if (incomingByte == 255) {  // ヘッダー（255）を検出
+            headerDetected = true;  // ヘッダー検出
+            receivedIndex = 0;      // データ格納位置をリセット
+            Serial.println("Header detected!"); // デバッグ用
+          }
+        } else {
+          receivedData[receivedIndex++] = incomingByte; // データを格納
+    
+          // 6つのセンサー分データを受信した場合
+          if (receivedIndex == 6) {
+            // 受信したデータを表示
+            Serial.println("Received data:");
+            for (int i = 0; i < receivedIndex; i++) {
+              Serial.print("Sensor ");
+              Serial.print(i + 1); // センサー番号（1から6）
+              Serial.print(": ");
+              Serial.println(receivedData[i], DEC); // 受信データを10進数で表示
+            }
+            Serial.println("All data received");
+            Status = 2;
+            headerDetected = false; // ヘッダーをリセット
+          }
         }
-
         //壁の有無を変数に代入
-        if (receivedData[0] == 1 && receivedData[3] == 1) {
+        if (receivedData[0] =< 170 && receivedData[3] =< 170) {
             front_wall = true;
             Serial.println("front_wall");
         } else {
             front_wall = false;
         }
         
-        if (receivedData[1] == 1 && receivedData[2] == 1) {
+        if (receivedData[1] =< 170 && receivedData[2] =< 170) {
             left_wall = true;
             Serial.println("left_wall");
         } else {
             left_wall = false;
         }
         
-        if (receivedData[4] == 1 && receivedData[5] == 1) {
+        if (receivedData[4] =< 170 && receivedData[5] =< 170) {
             right_wall = true;
             Serial.println("right_wall");
         } else {
