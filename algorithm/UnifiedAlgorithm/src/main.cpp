@@ -1440,7 +1440,8 @@ int WhichWay(uint8_t a,uint8_t b)
 /*
 /*
 /*更新者：吉ノ薗2025/01/22
-/*　　　　吉ノ薗 2025/02/01　変更点：スタックとキューをライブラリにして座標の計算をビット演算に変更
+/*　　　　吉ノ薗2025/02/01　変更点：スタックとキューをライブラリにして座標の計算をビット演算に変更
+/*       吉ノ薗2025/03/26 delay(300)を削除。遅かったのお前が原因だろ
 /*
 /*******************************************************************************************/
 void BFS()
@@ -1451,23 +1452,26 @@ void BFS()
     uint8_t a = x;
     uint8_t b = y;
     cost[a][b] = 1;//現在地のコストを1にする
-    Serial.print("/n GotoHome:");
+    Serial.print("%d GotoHome:");
 
     while(!(a == 50 && b == 50)){
 
         reach_time[a][b] = 1;//そのマスを訪問済みにする
+        Serial.print("%d a =");
+        Serial.print(a);
+        Serial.print("%d b =");
+        Serial.print(b)
+
+        Serial.print("%d kabe_zahyou[a][b] ==");
+        Serial.print(kabe_zahyou[a][b]);
+
+        Serial.print("%d cost[a][b] == ");
+        Serial.print(cost[a][b]);
+        
         for(int n = 1; n <= 8; n *= 2){//そのマスの周りのマスのコストを＋１する
             //int result = static_cast<int>(pow(2, n));
-            Serial.print("/n n =");
+            Serial.print("%d n =");
             Serial.print(n);
-
-            Serial.print("/n kabe_zahyou[a][b] ==");
-            Serial.print(kabe_zahyou[a][b]);
-
-            Serial.print("/n cost[a][b] == ");
-            Serial.print(cost[a][b]);
-
-            delay(300);
 
             if(!(kabe_zahyou[a][b] & n)) {//kabe_zahyou[][]は0000 の4ビットに絶対方向の東8西4南2北1をそれぞれ割り当てる
 
@@ -1517,15 +1521,8 @@ void BFS()
         //キューの先頭を取り出す
         if (Q.size() < 2) break;  // キューの要素が足りない場合は終了
 
-        a = Q.front(); 
-        Serial.print("/n QueX =");
-        Serial.print(a);
-        Q.pop();
-
-        b = Q.front(); 
-        Serial.print("/n QueY =");
-        Serial.print(b);
-        Q.pop();
+        a = Q.front(); Q.pop();
+        b = Q.front();Q.pop();
 
         //if (Q.empty()) break;
 
@@ -1539,6 +1536,7 @@ void BFS()
     //スタックを使って逆探索
     a = 50;
     b = 50;
+    Direction = North;
 
     /*デバッグ用*/
     /*if(WhichWay(a,b) == 0){
@@ -1647,7 +1645,8 @@ void BFS()
 
             /*デバッグ用*/
             default:
-                hidari();
+                Serial.println("Error");
+                break;
         }
         /*if((a == x)&&(b == y)){
             break;
@@ -1735,14 +1734,13 @@ void WriteDownWall()
 /*
 /*更新者：吉ノ薗2025/01/22
 /*　　　　吉ノ薗2025/01/29：20秒停止するようにした
+/*       吉ノ薗2025/03/26 whileの条件を「スタックが空でなかった場合」に変更
 /*
 /*******************************************************************************************/
 void GoHome()
 {
-
         //ここ以下を「相手(モーター)から動き終わったという信号が送られたら」とかにしないとバババッて送られちゃうかも
-    while(1){
-        
+    while(!S.empty()){
         switch(S.top()){
             case 1:
                 //TurnRight
@@ -1765,8 +1763,6 @@ void GoHome()
                 //Stop
                 delay(20000);
                 break;
-            /*default:
-                hidari();//デバッグ用*/
         }
         S.pop();//要素の削除
     }
