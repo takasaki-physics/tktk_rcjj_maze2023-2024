@@ -812,7 +812,7 @@ void serialEvent1() {
       while (receivedIndex != 6){
           get_tof_data();
       }
-      if (front_wall == true && receivedData[0] - receivedData[3] < 30 && receivedData[0] - receivedData[3] > -30){
+      if (receivedData[0] <= 90 && receivedData[3] <= 90&& receivedData[0] - receivedData[3] < 30 && receivedData[0] - receivedData[3] > -30){
             Position[0] = -1000; //後ろに下がる
             Position[1] = 1000;
             Position[2] = 1000;
@@ -862,7 +862,7 @@ void serialEvent1() {
     while (receivedIndex != 6){
         get_tof_data();
     }
-    if (front_wall == true && receivedData[0] - receivedData[3] < 30 && receivedData[0] - receivedData[3] > -30){
+    if (receivedData[0] <= 90 && receivedData[3] <= 90 && receivedData[0] - receivedData[3] < 30 && receivedData[0] - receivedData[3] > -30){
           Position[0] = -1000; //後ろに下がる
           Position[1] = 1000;
           Position[2] = 1000;
@@ -958,13 +958,6 @@ void susumu_heitan() {
     serialEvent8();//_victim_camera2
     count2++;
   }
-
-  /*............青タイルがある場合の待機............*/
-
-  if (blue_count == true){
-    Serial.println("Waiting...");
-    delay(5500);
-  }
     
     /*...........坂があるかどうか..............*/
     tiziki_2(); //get_roll_data
@@ -989,6 +982,7 @@ void susumu_heitan() {
         Position[3] = 8190;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
         delay(2500);
+        serialEvent1();
     }else if (katamuki_true >18){
         while(katamuki_true > 18){
             Serial.println("Down Hill...");
@@ -1008,7 +1002,16 @@ void susumu_heitan() {
         Position[3] = 8190;
         sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
         delay(2500);
+        serialEvent1();
     }
+
+      /*............青タイルがある場合の待機............*/
+
+  if (blue_count == true){
+    Serial.println("Waiting...");
+    delay(5500);
+  }
+
     while (Serial3.available() > 0) {
         char receivedChar = Serial3.read(); // データを読み取る
         // 必要に応じて受信データを処理する
@@ -1018,6 +1021,7 @@ void susumu_heitan() {
   count2 =0;
   bump_giveup_count =0;
   Status = 0;
+  blue_count = false;
 }
 
 
