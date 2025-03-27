@@ -1549,6 +1549,7 @@ void BFS(uint8_t x,uint8_t y)
     while(!(a == GoalX && b == GoalY)){
 
         reach_time[a][b] = 1;//そのマスを訪問済みにする
+
         Serial.print("a =");
         Serial.println(a);
         Serial.print("b =");
@@ -1823,7 +1824,7 @@ void BFS(uint8_t x,uint8_t y)
     delay(300);
     pixels.clear();
     pixels.show();
-    NeoPixel_Color(255,0,0);
+    NeoPixel_Color(255,255,0);
 }
 
 
