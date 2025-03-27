@@ -18,6 +18,8 @@
 #include <queue>
 #include <stack>
 
+using namespace std;
+
 std::stack<uint8_t> S;
 std::queue<uint8_t> Q;
 MPU6050 mpu;
