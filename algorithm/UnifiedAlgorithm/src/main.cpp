@@ -1605,23 +1605,13 @@ void BFS(uint8_t x,uint8_t y)
                         }
                         break;
                 }
-
             }
-            /*else{//その方向に壁があるとき
-                kabe_zahyou[a][b] &= ~n;  // n のビットを 0 にする（壁を削除）これビットだしいらない気がする
-            }*/
         }
         //キューの先頭を取り出す
         if (Q.size() < 2) break;  // キューの要素が足りない場合は終了
 
         a = Q.front(); Q.pop();
         b = Q.front(); Q.pop();
-
-        //if (Q.empty()) break;
-
-        /*if((a == 50)&&(b == 50)){
-            break;
-        }*/
     }
 
 
@@ -1641,8 +1631,11 @@ void BFS(uint8_t x,uint8_t y)
     }*/
 
     S.push(4);//停止用
+
     int TheWay = 0;
+
     while(!((a == x) && (b == y))){
+
         if(cost[a][b] - cost[a+1][b] == 1){
             TheWay = East;
         }
@@ -1810,60 +1803,60 @@ void BFS(uint8_t x,uint8_t y)
 void WriteDownWall()
 {
     //壁情報の記入(ここは帰還アルゴリズム用の関数)
-    if(kabe_zahyou[x][y] & 16){//記録されていない場合（そうしないと延々と加算されちゃう）
+    if(kabe_zahyou[x][y] == 16){//記録されていない場合（そうしないと延々と加算されちゃう）
         switch (Direction){
             case East:
                 if(right_wall){
-                    kabe_zahyou[x][y] |= 2;
+                    kabe_zahyou[x][y] += 2;
                 }
                 if(front_wall){
-                    kabe_zahyou[x][y] |= 8;
+                    kabe_zahyou[x][y] += 8;
                 }
                 if(left_wall){
-                    kabe_zahyou[x][y] |= 1;
+                    kabe_zahyou[x][y] += 1;
                 }
                 break;
             
             case North:
                 if(right_wall){
-                    kabe_zahyou[x][y] |= 8;
+                    kabe_zahyou[x][y] += 8;
                 }
                 if(front_wall){
-                    kabe_zahyou[x][y] |= 1;
+                    kabe_zahyou[x][y] += 1;
                 }
                 if(left_wall){
-                    kabe_zahyou[x][y] |= 4;
+                    kabe_zahyou[x][y] += 4;
                 }
                 break;
 
             case West:
                 if(right_wall){
-                    kabe_zahyou[x][y] |= 1;
+                    kabe_zahyou[x][y] += 1;
                 }
                 if(front_wall){
-                    kabe_zahyou[x][y] |= 4;
+                    kabe_zahyou[x][y] += 4;
                 }
                 if(left_wall){
-                    kabe_zahyou[x][y] |= 2;
+                    kabe_zahyou[x][y] += 2;
                 }
                 break;
 
             case South:
                 if(right_wall){
-                    kabe_zahyou[x][y] |= 4;
+                    kabe_zahyou[x][y] += 4;
                 }
                 if(front_wall){
-                    kabe_zahyou[x][y] |= 2;
+                    kabe_zahyou[x][y] += 2;
                 }
                 if(left_wall){
-                    kabe_zahyou[x][y] |= 8;
+                    kabe_zahyou[x][y] += 8;
                 }
                 break;
             }
             //対応
-            //e n w s
+            //東西南北
             //8 4 2 1
-        kabe_zahyou[x][y] &= ~16;//4ビットの情報のみが残る
+        kabe_zahyou[x][y] += -16;//4ビットの情報のみが残る
     }
 }
 
@@ -2065,16 +2058,7 @@ void loop(){
         }
     }
     /*.................................................................*/
-    // 現在の時刻を取得
-    time_t NowTime;
-    time(&NowTime);  // 現在の時刻を取得して NowTime に格納
-    now_seconds = static_cast<long>(NowTime); 
-
-    //330秒（＝5分半）経ったら幅優先探索を始める
-    if(now_seconds - firstseconds >= /*330*/ 120){
-        Status = 2;//帰還開始
-        start_Gohome = true;
-    }
+    
     
     switch (Status)
     {
@@ -2091,8 +2075,18 @@ void loop(){
             Status = 2;//帰還開始
             start_Gohome = true;
         }*/
+       // 現在の時刻を取得
+        time_t NowTime;
+        time(&NowTime);  // 現在の時刻を取得して NowTime に格納
+        now_seconds = static_cast<long>(NowTime); 
 
-        MoveTo(judge());//拡張右手法で行く方法を決める,実際に移動して座標を変更+到達回数を加算
+        //330秒（＝5分半）経ったら幅優先探索を始める
+        if(now_seconds - firstseconds >= /*330*/ 120){
+            Status = 2;//帰還開始
+            start_Gohome = true;
+        }
+        
+        if(!(Status == 2)){MoveTo(judge())};//拡張右手法で行く方法を決める,実際に移動して座標を変更+到達回数を加算
 
         break;
     
