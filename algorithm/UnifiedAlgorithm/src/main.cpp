@@ -18,7 +18,7 @@
 #include <queue>
 #include <stack>
 
-std::stack <uint8_t> S;
+std::stack<uint8_t> S;
 std::queue<uint8_t> Q;
 MPU6050 mpu;
 SMS_STS sms_sts;
@@ -1129,8 +1129,8 @@ int LeftWeight = 0;
 bool start_Gohome = false; //SSD1306に帰還アルゴリズムに入っているかどうかを送信するかの変数
 
 /*帰還用変数*/
-int8_t kabe_zahyou[90][90];//0000 の4ビットに絶対方向の東8西4南2北1をそれぞれ割り当てるみたいな
-int8_t cost[90][90];//マス目のコスト
+int kabe_zahyou[90][90];//0000 の4ビットに絶対方向の東8西4南2北1をそれぞれ割り当てるみたいな
+int cost[90][90];//マス目のコスト
 bool reach_time[90][90];//到達の有無（帰還用）
 long now_seconds;
 long firstseconds;
