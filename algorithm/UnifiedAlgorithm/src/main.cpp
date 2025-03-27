@@ -1687,12 +1687,14 @@ void BFS(uint8_t x,uint8_t y)
                         Direction = North;
                         break;
                     case East:
-                        Serial.println("Error");
                         pixels.clear();
                         pixels.show();
                         delay(300);
                         NeoPixel_Color(255,0,0);
-                        Direction =North;
+                        S.push(2);
+                        S.push(2);
+                        S.push(3);
+                        //Direction =North;
                         break;
 
                 }
@@ -1719,12 +1721,14 @@ void BFS(uint8_t x,uint8_t y)
                         b += -1;
                         break;
                     case North:
-                        Serial.println("Error");
                         pixels.clear();
                         pixels.show();
                         delay(300);
                         NeoPixel_Color(255,0,0);
-                        Direction = East;
+                        S.push(2);
+                        S.push(2);
+                        S.push(3);
+                        //Direction = East;
                         break;
 
                 }
@@ -1750,12 +1754,14 @@ void BFS(uint8_t x,uint8_t y)
                         Direction = North;
                         break;
                     case West:
-                        Serial.println("Error");
                         pixels.clear();
                         pixels.show();
                         delay(300);
                         NeoPixel_Color(255,0,0);
-                        Direction =North;
+                        S.push(2);
+                        S.push(2);
+                        S.push(3);
+                        //Direction =North;
                         break;
 
                 }
@@ -1782,12 +1788,14 @@ void BFS(uint8_t x,uint8_t y)
                         Direction = East;
                         break;
                     case South:
-                        Serial.println("Error");
                         pixels.clear();
                         pixels.show();
                         delay(300);
                         NeoPixel_Color(255,0,0);
-                        Direction =North;
+                        S.push(2);
+                        S.push(2);
+                        S.push(3);
+                        //Direction =North;
                         break;
 
                 }
