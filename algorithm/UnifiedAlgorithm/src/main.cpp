@@ -1760,6 +1760,7 @@ void GoHome()
                 break;
             case 4:
                 //Stop
+                /*ここに壁情報が合ってないとうろうろさせるコード入れる*/
                 delay(20000);
                 break;
         }
@@ -1929,7 +1930,7 @@ void loop(){
     case 1://座標更新と探索
         WriteDownWall();//帰還用の記録
         
-        /*// 現在の時刻を取得
+        // 現在の時刻を取得
         time_t NowTime;
         time(&NowTime);  // 現在の時刻を取得して NowTime に格納
         now_seconds = static_cast<long>(NowTime); 
@@ -1938,7 +1939,7 @@ void loop(){
         if(now_seconds - firstseconds >= 330){
             Status = 2;//帰還開始
             start_Gohome = true;
-        }*/
+        }
 
 
         /*デバッグ用
