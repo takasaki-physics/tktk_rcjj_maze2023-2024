@@ -18,7 +18,6 @@
 #include <queue>
 #include <stack>
 
-using namespace std;
 
 std::stack<uint8_t> S;
 std::queue<uint8_t> Q;
@@ -1625,12 +1624,16 @@ void BFS()
     }
 
 
-
     //スタックを使って逆探索
     a = GoalX;
     b = GoalY;
     Direction = North;
 
+    delay(300);
+    pixels.clear();
+    pixels.show();
+    NeoPixel_Color(0,255,0);
+    
     /*デバッグ用*/
     /*if(WhichWay(a,b) == 0){
         migi();
@@ -1744,6 +1747,11 @@ void BFS()
             break;
         }*/
     }
+    
+    delay(300);
+    pixels.clear();
+    pixels.show();
+    NeoPixel_Color(255,0,0);
 }
 
 
@@ -2021,7 +2029,7 @@ void loop(){
     now_seconds = static_cast<long>(NowTime); 
 
     //330秒（＝5分半）経ったら幅優先探索を始める
-    if(now_seconds - firstseconds >= /*330*/ 60){
+    if(now_seconds - firstseconds >= /*330*/ 120){
         Status = 2;//帰還開始
         start_Gohome = true;
     }
