@@ -37,6 +37,7 @@ SoftwareSerial softSerial(36,37);
 
 /*デバッグ用*/
 uint8_t Homecount = 0;
+bool BFScount = false;
 
 
 uint8_t x = 50;
@@ -1150,13 +1151,19 @@ long firstseconds;
 void send_display(){
   // 各センサーの距離を取得し壁の有無を判定
   byte data_for_send[7];
-  data_for_send[0] = (start_Gohome) ? 0x01 : 0x00;
+  /*data_for_send[0] = (start_Gohome) ? 0x01 : 0x00;
   data_for_send[1] = (RightWeight);
   data_for_send[2] = (LeftWeight);
   data_for_send[3] = (FrontWeight);
   data_for_send[4] = (x);
   data_for_send[5] = (y);
-  data_for_send[6] = (Direction);
+  data_for_send[6] = (Direction);*/
+
+  data_for_send[0] = (start_Gohome) ? 0x01 : 0x00;
+  data_for_send[1] = (kabe_zahyou[x][y]);
+  data_for_send[2] = (x);
+  data_for_send[3] = (y);
+  data_for_send[4] = (Direction);
 
   Serial3.write(255);
   Serial.println("Sent header: 255");
@@ -1293,7 +1300,7 @@ int8_t judge(){
         toutatu_zahyou[x][y] = 50;//行き止まりだから効率化のため二度と行かないようにする
     }
 
-    send_display();
+    //send_display();
     RightWeight = 0;//怖いから初期化
     FrontWeight = 0;
     LeftWeight = 0;
@@ -1679,12 +1686,13 @@ void BFS(uint8_t x,uint8_t y)
                         b += 1;
                         Direction = North;
                         break;
-                    default:
+                    case East:
                         Serial.println("Error");
                         pixels.clear();
                         pixels.show();
                         delay(300);
                         NeoPixel_Color(255,0,0);
+                        Direction =North;
                         break;
 
                 }
@@ -1710,12 +1718,13 @@ void BFS(uint8_t x,uint8_t y)
                         S.push(3);
                         b += -1;
                         break;
-                    default:
+                    case North:
                         Serial.println("Error");
                         pixels.clear();
                         pixels.show();
                         delay(300);
                         NeoPixel_Color(255,0,0);
+                        Direction = East;
                         break;
 
                 }
@@ -1740,12 +1749,13 @@ void BFS(uint8_t x,uint8_t y)
                         S.push(3);
                         Direction = North;
                         break;
-                    default:
+                    case West:
                         Serial.println("Error");
                         pixels.clear();
                         pixels.show();
                         delay(300);
                         NeoPixel_Color(255,0,0);
+                        Direction =North;
                         break;
 
                 }
@@ -1771,12 +1781,13 @@ void BFS(uint8_t x,uint8_t y)
                         a += -1;
                         Direction = East;
                         break;
-                    default:
+                    case South:
                         Serial.println("Error");
                         pixels.clear();
                         pixels.show();
                         delay(300);
                         NeoPixel_Color(255,0,0);
+                        Direction =North;
                         break;
 
                 }
@@ -2079,6 +2090,12 @@ void loop(){
 
     case 1://座標更新と探索
         WriteDownWall(x,y,Direction);//帰還用の記録
+        send_display();/*デバッグ用*/
+
+        /*デバッグ用*/
+        /*if(BFScount){BFS(x,y);}
+        else{BFScount = true;}*/
+
         /*デバッグ用
         Homecount += 1;
         if(Homecount >= 10){
