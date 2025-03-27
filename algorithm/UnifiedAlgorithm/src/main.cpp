@@ -103,7 +103,12 @@ void getYawPitchRoll() {
     
   }
 }
-
+/*.........角度補正用の変数の定義.........*/
+float body_len = 115; //機体の前のセンサーと後ろのセンサーの距離
+float rag = 0; //前と後ろのtofの値の差
+float tan_value = 0; //rag/body_lenからくるtanθの値
+float theta_rad = 0; //θ・弧度法
+float theta_deg = 0; //θ・度数法
 /*.....tof受信用の変数.......................................*/
 
 const byte HEADER = 255;  // ヘッダー (送信側と一致すること)
@@ -349,56 +354,54 @@ void NeoPixel_Color(uint8_t r, uint8_t g, uint8_t b) {
 void get_tof_data() {
     if (Serial3.available() > 0) {
       byte incomingByte = Serial3.read(); // Serial3から1バイト読み取り
-      if (!headerDetected) {
-        if (incomingByte == HEADER) {
-          headerDetected = true;  // ヘッダー検出
-          receivedIndex = 0;      // データ格納位置をリセット
-          Serial.println("Header detected!"); // デバッグ用
-        }
-      } else {
-        receivedData[receivedIndex++] = incomingByte; // データを格納
-        if (receivedIndex == 6) {
-          // 6バイト受信完了
-          headerDetected = false;
-          // 受信したデータを表示
-        for (int i = 0; i < receivedIndex; i++) {
-            Serial.print("Sensor ");
-            Serial.print(i);
-            Serial.print(": ");
-            Serial.println(receivedData[i], BIN); // 受信データを2進数で表示
-
-        }
-
-        //壁の有無を変数に代入
-        if (receivedData[0] == 1 && receivedData[3] == 1) {
-            front_wall = true;
-            Serial.println("front_wall");
+        if (!headerDetected) {
+          if (incomingByte == 255) {  // ヘッダー（255）を検出
+            headerDetected = true;  // ヘッダー検出
+            receivedIndex = 0;      // データ格納位置をリセット
+            Serial.println("Header detected!"); // デバッグ用
+          }
         } else {
-            front_wall = false;
+          receivedData[receivedIndex++] = incomingByte; // データを格納
+    
+          // 6つのセンサー分データを受信した場合
+          if (receivedIndex == 6) {
+            // 受信したデータを表示
+            Serial.println("Received data:");
+            for (int i = 0; i < receivedIndex; i++) {
+              Serial.print("Sensor ");
+              Serial.print(i + 1); // センサー番号（1から6）
+              Serial.print(": ");
+              Serial.println(receivedData[i], DEC); // 受信データを10進数で表示
+            }
+              //壁の有無を変数に代入
+            if (receivedData[0] <= 170 && receivedData[3] <= 170) {
+                front_wall = true;
+                Serial.println("front_wall");
+            } else {
+                front_wall = false;
+            }
+            
+            if (receivedData[1] <= 170 && receivedData[2] <= 170) {
+                left_wall = true;
+                Serial.println("left_wall");
+            } else {
+                left_wall = false;
+            }
+            
+            if (receivedData[4] <= 170 && receivedData[5] <= 170) {
+                right_wall = true;
+                Serial.println("right_wall");
+            } else {
+                right_wall = false;
+            }
+            Serial.println("All data received");
+            Status = 1;
+            headerDetected = false; // ヘッダーをリセット
+          }
         }
-        
-        if (receivedData[1] == 1 && receivedData[2] == 1) {
-            left_wall = true;
-            Serial.println("left_wall");
-        } else {
-            left_wall = false;
-        }
-        
-        if (receivedData[4] == 1 && receivedData[5] == 1) {
-            right_wall = true;
-            Serial.println("right_wall");
-        } else {
-            right_wall = false;
-        }
-
-        Serial.println("All data received");
-        //座標更新のフェーズに移行
-        Status = 1;
    
         }
       }
-    }
-}
 /*******************************************************************************************/
 /* Servo_rescue                                                                              
 /*処理：サーボモーターによるレスキューキットの排出
@@ -431,19 +434,19 @@ void motor_servo2(int motor_speed, int seconds) {
 }
 
 void servo_res(){
-  motor_servo(100,100);
+  motor_servo(100,200);
   motor_servo(0,1000);
-  motor_servo(-100,100);
+  motor_servo(-100,200);
   motor_servo(0,1000);
-  delay(500);
+  delay(150);
 }
 
 void servo_res2(){
-  motor_servo2(100,100);
+  motor_servo2(100,200);
   motor_servo2(0,1000);
-  motor_servo2(-100,100);
+  motor_servo2(-100,200);
   motor_servo2(0,1000);
-  delay(500);
+  delay(150);
 }
 
 /*******************************************************************************************/
@@ -604,13 +607,13 @@ void migi(){
   }else if (kakudo_true2 <= 360){
     mawasu = kakudo_true2-80;
   }
-/*
   //90度回転させる
-  Position[0] = 8190;
-  Position[1] = 8190;
-  Position[2] = 8190;
-  Position[3] = 8190;
-  delay(1884);
+  Position[0] = 7450; //右に回転
+  Position[1] = 7450;
+  Position[2] = 7450;
+  Position[3] = 7450;
+  sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+  delay(1700);
   delay(200);
   //現在の角度を取得する
   tiziki_kaitenn(); 
@@ -618,7 +621,7 @@ void migi(){
   if (kakudo_true2 - mawasu >= 300){
     mawasu = 360;
   }
-    */
+  
   //仮にバンプなどで90度回らなかったら90度回るまで補正し続ける
   while (kakudo_true2 > mawasu){
   Position[0] = 440; //右に回転
@@ -639,8 +642,9 @@ void migi(){
     }
     delay(50);
   }
+  
   delay(200);
-  tiziki(); //角度補正            
+  //tiziki(); //角度補正            
 }
 
 
@@ -664,19 +668,19 @@ void hidari(){
   }else if (kakudo_true2 >= 0){
     mawasu = kakudo_true2 + 80;
   }
-  /*
-    Position[0] = -8190;
-    Position[1] = -8190;
-    Position[2] = -8190;
-    Position[3] = -8190;
-    delay(1884);
-    delay(200);
-    tiziki_kaitenn();
-    delay(50);
-    if(kakudo_true2 <= -300){
-        mawasu = 0;
-    }
-    */
+  Position[0] = -7450; //左に回転
+  Position[1] = -7450;
+  Position[2] = -7450;
+  Position[3] = -7450;
+  sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+  delay(1700);
+  delay(200);
+  tiziki_kaitenn();
+  delay(50);
+  if(kakudo_true2 <= -300){
+      mawasu = 0;
+  }
+    
     //90度回転しなかったときに角度の補正を行う
   while (kakudo_true2 < mawasu){
   Position[0] = -440; //左に回転
@@ -699,7 +703,7 @@ void hidari(){
   delay(50);
   }
   delay(200);
-  tiziki(); //角度補正         
+  //tiziki(); //角度補正         
 }
 
 /*******************************************************************************************/
@@ -796,6 +800,31 @@ void serialEvent1() {
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     delay(471);
     delay(500);
+    if (bump_giveup_count == 0){
+      while (Serial3.available() > 0) {
+        char receivedChar = Serial3.read(); // データを読み取る
+        // 必要に応じて受信データを処理する
+      }
+      receivedIndex = 0; //tofデータを取得するためにバイト数を初期化する
+      front_wall = false; //怖いので初期化
+      while (receivedIndex != 6){
+          get_tof_data();
+      }
+      if (front_wall == true && receivedData[0] - receivedData[3] < 30 && receivedData[0] - receivedData[3] > -30){
+            Position[0] = -1000; //後ろに下がる
+            Position[1] = 1000;
+            Position[2] = 1000;
+            Position[3] = -1000;
+            sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+            Serial.println("Backing...");
+            delay(500);           
+            if (count2 < 20 ){
+                //座標の変更をもとに戻す
+                Gap = true;
+            }
+            count2 = 40;  
+      }
+    }
     count2= count2-4;
     bump_giveup_count++;
   }else if(receivedData2 == 4){
@@ -821,6 +850,31 @@ void serialEvent1() {
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     delay(471);
     delay(500);
+    if (bump_giveup_count == 0){
+    while (Serial3.available() > 0) {
+      char receivedChar = Serial3.read(); // データを読み取る
+      // 必要に応じて受信データを処理する
+    }
+    receivedIndex = 0; //tofデータを取得するためにバイト数を初期化する
+    front_wall = false; //怖いので初期化
+    while (receivedIndex != 6){
+        get_tof_data();
+    }
+    if (front_wall == true && receivedData[0] - receivedData[3] < 30 && receivedData[0] - receivedData[3] > -30){
+          Position[0] = -1000; //後ろに下がる
+          Position[1] = 1000;
+          Position[2] = 1000;
+          Position[3] = -1000;
+          sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+          Serial.println("Backing...");
+          delay(500);             
+          if (count2 < 20 ){
+              //座標の変更をもとに戻す
+              Gap = true;
+          }
+          count2 = 40;  
+    }
+  }
     count2= count2-4;
     bump_giveup_count++;
   }else if(receivedData2 == 6){
@@ -847,6 +901,44 @@ void serialEvent1() {
 /*
 /*******************************************************************************************/
 void susumu_heitan() {
+  if (right_wall == true && bump_giveup_count == 0 &&(receivedData[4] - receivedData[5] >= 10 || receivedData[4] - receivedData[5] <=-10)){
+    if (receivedData[4] - receivedData[5] < 0){
+        rag = receivedData[5] - receivedData[4];
+        tan_value = rag / body_len;
+        theta_rad = atan(tan_value);
+        theta_deg = theta_rad * 180.0 / PI;  // 度数法に変換
+        Serial.print("rag_deg:");
+        Serial.println(theta_deg);
+        for (int i; i < theta_deg; i++){
+          Position[0] = -82; //左に回転
+          Position[1] = -82;
+          Position[2] = -82;
+          Position[3] = -82;
+          sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+          delay(20);
+        }
+    } else if (receivedData[4] - receivedData[5] > 0){
+        rag = receivedData[4] - receivedData[5];
+        tan_value = rag / body_len;
+        theta_rad = atan(tan_value);
+        theta_deg = theta_rad * 180.0 / PI;  // 度数法に変換
+        Serial.print("rag_deg:");
+        Serial.println(theta_deg);
+        for (int i; i < theta_deg; i++){
+          Position[0] = 82; //右に回転
+          Position[1] = 82;
+          Position[2] = 82;
+          Position[3] = 82;
+          sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+          delay(20);
+        }
+    }
+    delay(300);
+  }else if (Status != 3) {
+    delay(100);
+    tiziki();
+
+  }
     while (Serial1.available() > 0) {
       char receivedChar = Serial1.read(); // データを読み取る
       // 必要に応じて受信データを処理する
@@ -1459,7 +1551,7 @@ void BFS()
         Serial.print("%d a =");
         Serial.print(a);
         Serial.print("%d b =");
-        Serial.print(b)
+        Serial.print(b);
 
         Serial.print("%d kabe_zahyou[a][b] ==");
         Serial.print(kabe_zahyou[a][b]);
@@ -1555,7 +1647,6 @@ void BFS()
                         b += -1;
                         Direction = South;
                         break;
-
                     case West://西マスからきたとき
                         S.push(3);
                         a += -1;
