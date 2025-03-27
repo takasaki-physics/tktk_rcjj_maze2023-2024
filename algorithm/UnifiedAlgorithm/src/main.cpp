@@ -2086,7 +2086,7 @@ void loop(){
             start_Gohome = true;
         }
         
-        if(!(Status == 2)){MoveTo(judge())};//拡張右手法で行く方法を決める,実際に移動して座標を変更+到達回数を加算
+        if(!(Status == 2)){MoveTo(judge());};//拡張右手法で行く方法を決める,実際に移動して座標を変更+到達回数を加算
 
         break;
     
