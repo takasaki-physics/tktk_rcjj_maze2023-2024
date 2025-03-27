@@ -1809,7 +1809,7 @@ void BFS(uint8_t x,uint8_t y)
 /*更新者：吉ノ薗2025/01/22
 /*
 /*******************************************************************************************/
-void WriteDownWall()
+void WriteDownWall(uint8_t x,uint8_t y,uint8_t Direction)
 {
     //壁情報の記入(ここは帰還アルゴリズム用の関数)
     if(kabe_zahyou[x][y] == 16){//記録されていない場合（そうしないと延々と加算されちゃう）
@@ -2077,7 +2077,7 @@ void loop(){
         break;
 
     case 1://座標更新と探索
-        WriteDownWall();//帰還用の記録
+        WriteDownWall(x,y,Direction);//帰還用の記録
         /*デバッグ用
         Homecount += 1;
         if(Homecount >= 10){
