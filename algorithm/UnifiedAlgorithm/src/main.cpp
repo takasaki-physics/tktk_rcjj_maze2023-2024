@@ -18,8 +18,6 @@
 #include <queue>
 #include <stack>
 
-using namespace std;
-
 std::stack<uint8_t> S;
 std::queue<uint8_t> Q;
 MPU6050 mpu;
@@ -1128,8 +1126,6 @@ int RightWeight = 0;
 int FrontWeight = 0;
 int LeftWeight = 0;
 
-uint8_t GoalX = 50;
-uint8_t GoalY = 50;
 bool start_Gohome = false; //SSD1306に帰還アルゴリズムに入っているかどうかを送信するかの変数
 
 /*帰還用変数*/
@@ -1545,25 +1541,25 @@ void BFS()
     uint8_t a = x;
     uint8_t b = y;
     cost[a][b] = 1;//現在地のコストを1にする
-    Serial.println("GotoHome:");
+    Serial.print("%d GotoHome:");
 
-    while(!(a == GoalX && b == GoalY)){
+    while(!(a == 50 && b == 50)){
 
         reach_time[a][b] = 1;//そのマスを訪問済みにする
-        Serial.print("a =");
-        Serial.println(a);
-        Serial.print("b =");
-        Serial.println(b);
+        Serial.print("%d a =");
+        Serial.print(a);
+        Serial.print("%d b =");
+        Serial.print(b);
 
-        Serial.print("kabe_zahyou[a][b] ==");
-        Serial.println(kabe_zahyou[a][b]);
+        Serial.print("%d kabe_zahyou[a][b] ==");
+        Serial.print(kabe_zahyou[a][b]);
 
-        Serial.print("cost[a][b] == ");
-        Serial.println(cost[a][b]);
+        Serial.print("%d cost[a][b] == ");
+        Serial.print(cost[a][b]);
         
         for(int n = 1; n <= 8; n *= 2){//そのマスの周りのマスのコストを＋１する
             //int result = static_cast<int>(pow(2, n));
-            Serial.print("n =");
+            Serial.print("%d n =");
             Serial.print(n);
 
             if(!(kabe_zahyou[a][b] & n)) {//kabe_zahyou[][]は0000 の4ビットに絶対方向の東8西4南2北1をそれぞれ割り当てる
@@ -1627,8 +1623,8 @@ void BFS()
 
 
     //スタックを使って逆探索
-    a = GoalX;
-    b = GoalY;
+    a = 50;
+    b = 50;
     Direction = North;
 
     /*デバッグ用*/
@@ -1837,19 +1833,19 @@ void GoHome()
             case 1:
                 //TurnRight
                 migi();
-                delay(500);
+                delay(300);
                 break;
 
             case 2:
                 //TurnLeft
                 hidari();
-                delay(500);
+                delay(300);
                 break;
 
             case 3:
                 //GoStraight
                 susumu_heitan();
-                delay(200);
+                delay(300);
                 break;
             case 4:
                 //Stop
@@ -1950,8 +1946,7 @@ void setup(){
         toutatu_zahyou[t][j] = 0; 
         }
     }
-    toutatu_zahyou[GoalX][GoalY] = 1;
-    kabe_zahyou[GoalX][GoalY] = 0;
+    toutatu_zahyou[50][50] = 1;
     // 現在の時刻を取得します
     time_t FirstTime;
     time(&FirstTime);  // 現在の時刻を取得して FirstTime に格納
@@ -2035,6 +2030,10 @@ void loop(){
 
     case 1://座標更新と探索
         WriteDownWall();//帰還用の記録
+        
+        
+
+
         /*デバッグ用
         Homecount += 1;
         if(Homecount >= 10){
