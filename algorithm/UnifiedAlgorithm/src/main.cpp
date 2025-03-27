@@ -2012,6 +2012,17 @@ void loop(){
         }
     }
     /*.................................................................*/
+    // 現在の時刻を取得
+    time_t NowTime;
+    time(&NowTime);  // 現在の時刻を取得して NowTime に格納
+    now_seconds = static_cast<long>(NowTime); 
+
+    //330秒（＝5分半）経ったら幅優先探索を始める
+    if(now_seconds - firstseconds >= /*330*/ 60){
+        Status = 2;//帰還開始
+        start_Gohome = true;
+    }
+    
     switch (Status)
     {
     case 0://壁情報取得
@@ -2022,16 +2033,7 @@ void loop(){
     case 1://座標更新と探索
         WriteDownWall();//帰還用の記録
         
-        // 現在の時刻を取得
-        time_t NowTime;
-        time(&NowTime);  // 現在の時刻を取得して NowTime に格納
-        now_seconds = static_cast<long>(NowTime); 
-
-        //330秒（＝5分半）経ったら幅優先探索を始める
-        if(now_seconds - firstseconds >= /*330*/ 60){
-            Status = 2;//帰還開始
-            start_Gohome = true;
-        }
+        
 
 
         /*デバッグ用
