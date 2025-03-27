@@ -885,6 +885,9 @@ void serialEvent1() {
         CheckX = x;
         CheckY = y;
         CheckD = Direction;
+        NeoPixel_Rear_ON(); //デバッグ用
+        delay(200);
+        NeoPixel_Rear_OFF();
 
   }else{
     Serial.println("No sensors");
