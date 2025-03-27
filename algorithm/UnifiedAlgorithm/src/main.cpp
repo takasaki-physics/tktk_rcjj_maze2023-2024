@@ -1151,19 +1151,19 @@ long firstseconds;
 void send_display(){
   // 各センサーの距離を取得し壁の有無を判定
   byte data_for_send[7];
-  /*data_for_send[0] = (start_Gohome) ? 0x01 : 0x00;
+  data_for_send[0] = (start_Gohome) ? 0x01 : 0x00;
   data_for_send[1] = (RightWeight);
   data_for_send[2] = (LeftWeight);
   data_for_send[3] = (FrontWeight);
   data_for_send[4] = (x);
   data_for_send[5] = (y);
-  data_for_send[6] = (Direction);*/
+  data_for_send[6] = (Direction);
 
-  data_for_send[0] = (start_Gohome) ? 0x01 : 0x00;
+  /*data_for_send[0] = (start_Gohome) ? 0x01 : 0x00;
   data_for_send[1] = (kabe_zahyou[x][y]);
   data_for_send[2] = (x);
   data_for_send[3] = (y);
-  data_for_send[4] = (Direction);
+  data_for_send[4] = (Direction);*/
 
   Serial3.write(255);
   Serial.println("Sent header: 255");
@@ -1300,7 +1300,7 @@ int8_t judge(){
         toutatu_zahyou[x][y] = 50;//行き止まりだから効率化のため二度と行かないようにする
     }
 
-    //send_display();
+    send_display();
     RightWeight = 0;//怖いから初期化
     FrontWeight = 0;
     LeftWeight = 0;
@@ -1511,9 +1511,10 @@ void TileStatus()
 /* 最短経路の方位                                                                              
 /*処理：現在のマスのコストの、-1のコストのマスを探す
 /*更新者：吉ノ薗2025/01/22
+/*       吉ノ薗2025/03/28　BFS()内に入れたため廃止
 /*
 /*******************************************************************************************/
-int WhichWay(uint8_t a,uint8_t b)
+/*int WhichWay(uint8_t a,uint8_t b)
 {
     if(cost[a][b] - cost[a+1][b] == 1){
         return East;
@@ -1528,7 +1529,7 @@ int WhichWay(uint8_t a,uint8_t b)
         return South;
     }
     return 0;
-}
+}*/
 
 
 
@@ -1545,7 +1546,7 @@ int WhichWay(uint8_t a,uint8_t b)
 /*       吉ノ薗2025/03/26 delay(300)を削除。遅かったのお前が原因だろ
 /*
 /*******************************************************************************************/
-void BFS(uint8_t x,uint8_t y)
+void BFS()
 {
     //hidari();//デバッグ用
     uint8_t a = x;
@@ -1627,11 +1628,7 @@ void BFS(uint8_t x,uint8_t y)
     b = GoalY;
     Direction = North;
 
-    pixels.clear();
-    pixels.show();
-    delay(500);
     NeoPixel_Color(0,255,0);
-    delay(500);
     
     /*デバッグ用*/
     /*if(WhichWay(a,b) == 0){
@@ -1640,7 +1637,7 @@ void BFS(uint8_t x,uint8_t y)
 
     S.push(4);//停止用
 
-    int TheWay = 0;
+    uint8_t TheWay = 0;
 
     while(!((a == x) && (b == y))){
 
@@ -1689,12 +1686,9 @@ void BFS(uint8_t x,uint8_t y)
                     case East:
                         pixels.clear();
                         pixels.show();
-                        delay(300);
                         NeoPixel_Color(255,0,0);
-                        S.push(2);
-                        S.push(2);
-                        S.push(3);
-                        //Direction =North;
+                        delay(300);
+                        Direction =North;
                         break;
 
                 }
@@ -1723,11 +1717,12 @@ void BFS(uint8_t x,uint8_t y)
                     case North:
                         pixels.clear();
                         pixels.show();
-                        delay(300);
                         NeoPixel_Color(255,0,0);
+                        delay(300);
                         S.push(2);
                         S.push(2);
                         S.push(3);
+                        Direction = South;
                         //Direction = East;
                         break;
 
@@ -1756,12 +1751,9 @@ void BFS(uint8_t x,uint8_t y)
                     case West:
                         pixels.clear();
                         pixels.show();
-                        delay(300);
                         NeoPixel_Color(255,0,0);
-                        S.push(2);
-                        S.push(2);
-                        S.push(3);
-                        //Direction =North;
+                        delay(300);
+                        Direction =North;
                         break;
 
                 }
@@ -1790,12 +1782,9 @@ void BFS(uint8_t x,uint8_t y)
                     case South:
                         pixels.clear();
                         pixels.show();
-                        delay(300);
                         NeoPixel_Color(255,0,0);
-                        S.push(2);
-                        S.push(2);
-                        S.push(3);
-                        //Direction =North;
+                        delay(300);
+                        Direction =North;
                         break;
 
                 }
@@ -1811,7 +1800,6 @@ void BFS(uint8_t x,uint8_t y)
         }*/
     }
     
-    delay(300);
     pixels.clear();
     pixels.show();
     NeoPixel_Color(255,255,0);
@@ -1828,57 +1816,57 @@ void BFS(uint8_t x,uint8_t y)
 /*更新者：吉ノ薗2025/01/22
 /*
 /*******************************************************************************************/
-void WriteDownWall(uint8_t x,uint8_t y,uint8_t Direction)
+void WriteDownWall()
 {
     //壁情報の記入(ここは帰還アルゴリズム用の関数)
-    if(kabe_zahyou[x][y] == 16){//記録されていない場合（そうしないと延々と加算されちゃう）
+    if(kabe_zahyou[x][y] & 16){//記録されていない場合（そうしないと延々と加算されちゃう）
         kabe_zahyou[x][y] = 0;//4ビットの情報のみが残る
         switch (Direction){
             case East:
                 if(right_wall){
-                    kabe_zahyou[x][y] += 2;
+                    kabe_zahyou[x][y] |= 2;
                 }
                 if(front_wall){
-                    kabe_zahyou[x][y] += 8;
+                    kabe_zahyou[x][y] |= 8;
                 }
                 if(left_wall){
-                    kabe_zahyou[x][y] += 1;
+                    kabe_zahyou[x][y] |= 1;
                 }
                 break;
             
             case North:
                 if(right_wall){
-                    kabe_zahyou[x][y] += 8;
+                    kabe_zahyou[x][y] |= 8;
                 }
                 if(front_wall){
-                    kabe_zahyou[x][y] += 1;
+                    kabe_zahyou[x][y] |= 1;
                 }
                 if(left_wall){
-                    kabe_zahyou[x][y] += 4;
+                    kabe_zahyou[x][y] |= 4;
                 }
                 break;
 
             case West:
                 if(right_wall){
-                    kabe_zahyou[x][y] += 1;
+                    kabe_zahyou[x][y] |= 1;
                 }
                 if(front_wall){
-                    kabe_zahyou[x][y] += 4;
+                    kabe_zahyou[x][y] |= 4;
                 }
                 if(left_wall){
-                    kabe_zahyou[x][y] += 2;
+                    kabe_zahyou[x][y] |= 2;
                 }
                 break;
 
             case South:
                 if(right_wall){
-                    kabe_zahyou[x][y] += 4;
+                    kabe_zahyou[x][y] |= 4;
                 }
                 if(front_wall){
-                    kabe_zahyou[x][y] += 2;
+                    kabe_zahyou[x][y] |= 2;
                 }
                 if(left_wall){
-                    kabe_zahyou[x][y] += 8;
+                    kabe_zahyou[x][y] |= 8;
                 }
                 break;
             }
@@ -2016,7 +2004,7 @@ void setup(){
   /*アルゴリズムのセットアップ***********************************************************************************************************/
   for (int t = 0; t < 90; t++) {
     for (int j = 0; j < 90; j++) {
-        kabe_zahyou[t][j] = 16;
+        kabe_zahyou[t][j] |= 16;
         reach_time[t][j] = 0;
         cost[t][j] = 0;
         toutatu_zahyou[t][j] = 0; 
@@ -2097,8 +2085,8 @@ void loop(){
         break;
 
     case 1://座標更新と探索
-        WriteDownWall(x,y,Direction);//帰還用の記録
-        send_display();/*デバッグ用*/
+        WriteDownWall();//帰還用の記録
+        //send_display();/*デバッグ用*/
 
         /*デバッグ用*/
         /*if(BFScount){BFS(x,y);}
@@ -2127,7 +2115,7 @@ void loop(){
     
     case 2://帰還(このとき探索に戻らないよう入れ子構造にする or ここだけは関数内に直接migi()とかを入れてwhile文)
         NeoPixel_Color(0,0,255);   
-        BFS(x,y);
+        BFS();
         pixels.clear();
         pixels.show();
         GoHome();
