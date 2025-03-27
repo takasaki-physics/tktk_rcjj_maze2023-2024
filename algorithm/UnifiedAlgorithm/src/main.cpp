@@ -2045,7 +2045,8 @@ void loop(){
 
         break;
     
-    case 2://帰還(このとき探索に戻らないよう入れ子構造にする or ここだけは関数内に直接migi()とかを入れてwhile文)   
+    case 2://帰還(このとき探索に戻らないよう入れ子構造にする or ここだけは関数内に直接migi()とかを入れてwhile文)
+        NeoPixel_Color(0,0,255);   
         BFS();
         GoHome();
         break;
