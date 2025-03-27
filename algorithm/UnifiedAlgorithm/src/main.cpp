@@ -1630,8 +1630,8 @@ void BFS(uint8_t x,uint8_t y)
     b = GoalY;
     Direction = North;
 
-    delay(300);
     pixels.clear();
+    delay(300);
     pixels.show();
     NeoPixel_Color(0,255,0);
     
@@ -1666,16 +1666,16 @@ void BFS(uint8_t x,uint8_t y)
                         break;
                     default:
                         Serial.println("Error");
-                        delay(300);
                         pixels.clear();
+                        delay(300);
                         pixels.show();
                         NeoPixel_Color(255,0,0);
-                        delay(300);
                         pixels.clear();
+                        delay(300);
                         pixels.show();
                         NeoPixel_Color(255,0,0);
-                        delay(300);
                         pixels.clear();
+                        delay(300);
                         pixels.show();
                         NeoPixel_Color(255,0,0);
                         break;
@@ -1705,16 +1705,16 @@ void BFS(uint8_t x,uint8_t y)
                         break;
                     default:
                         Serial.println("Error");
-                        delay(300);
                         pixels.clear();
+                        delay(300);
                         pixels.show();
                         NeoPixel_Color(255,0,0);
-                        delay(300);
                         pixels.clear();
+                        delay(300);
                         pixels.show();
                         NeoPixel_Color(255,0,0);
-                        delay(300);
                         pixels.clear();
+                        delay(300);
                         pixels.show();
                         NeoPixel_Color(255,0,0);
                         break;
@@ -1743,16 +1743,16 @@ void BFS(uint8_t x,uint8_t y)
                         break;
                     default:
                         Serial.println("Error");
-                        delay(300);
                         pixels.clear();
+                        delay(300);
                         pixels.show();
                         NeoPixel_Color(255,0,0);
-                        delay(300);
                         pixels.clear();
+                        delay(300);
                         pixels.show();
                         NeoPixel_Color(255,0,0);
-                        delay(300);
                         pixels.clear();
+                        delay(300);
                         pixels.show();
                         NeoPixel_Color(255,0,0);
                         break;
@@ -1782,16 +1782,16 @@ void BFS(uint8_t x,uint8_t y)
                         break;
                     default:
                         Serial.println("Error");
-                        delay(300);
                         pixels.clear();
+                        delay(300);
                         pixels.show();
                         NeoPixel_Color(255,0,0);
-                        delay(300);
                         pixels.clear();
+                        delay(300);
                         pixels.show();
                         NeoPixel_Color(255,0,0);
-                        delay(300);
                         pixels.clear();
+                        delay(300);
                         pixels.show();
                         NeoPixel_Color(255,0,0);
                         break;
@@ -1802,18 +1802,18 @@ void BFS(uint8_t x,uint8_t y)
             /*デバッグ用*/
             default:
                 Serial.println("Error");
-                delay(300);
                 pixels.clear();
-                pixels.show();
-                NeoPixel_Color(255,0,0);
                 delay(300);
-                pixels.clear();
                 pixels.show();
-                NeoPixel_Color(255,0,0);
+                NeoPixel_Color(255,0,255);
+                pixels.clear();
                 delay(300);
-                pixels.clear();
                 pixels.show();
-                NeoPixel_Color(255,0,0);
+                NeoPixel_Color(255,0,255);
+                pixels.clear();
+                delay(300);
+                pixels.show();
+                NeoPixel_Color(255,0,255);
                 break;
         }
         /*if((a == x)&&(b == y)){
