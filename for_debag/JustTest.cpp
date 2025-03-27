@@ -5,10 +5,11 @@
 #include <thread>
 #include <cstdint>
 
-using namespace std;
+using std::cout;
+using std::endl;
 
-std::stack<uint8_t> S;
-std::queue<uint8_t> Q;
+std::stack<int> S;
+std::queue<int> Q;
 
 #define East 1
 #define North 2
@@ -20,8 +21,8 @@ std::queue<uint8_t> Q;
 #define Left 3
 #define Back 4
 
-uint8_t x = 4;
-uint8_t y = 1;
+int x = 4;
+int y = 1;
 uint8_t Direction = South;
 
 const uint8_t Xfactor = 7; // 迷路の大きさ
@@ -43,7 +44,7 @@ void delay(int milliseconds) {
     std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
 
-int WhichWay(uint8_t a, uint8_t b) {
+int WhichWay(int a, int b) {
     if (cost[a][b] - cost[a + 1][b] == 1) {
         return East;
     }
@@ -60,8 +61,8 @@ int WhichWay(uint8_t a, uint8_t b) {
 }
 
 void BFS() {
-    uint8_t a = x;
-    uint8_t b = y;
+    int a = x;
+    int b = y;
     cost[a][b] = 1;
     cout << "GotoHome:" << endl;
 

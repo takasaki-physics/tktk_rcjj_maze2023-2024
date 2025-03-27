@@ -1538,7 +1538,7 @@ int WhichWay(uint8_t a,uint8_t b)
 /*       吉ノ薗2025/03/26 delay(300)を削除。遅かったのお前が原因だろ
 /*
 /*******************************************************************************************/
-void BFS()
+void BFS(uint8_t x,uint8_t y)
 {
     //hidari();//デバッグ用
     uint8_t a = x;
@@ -1663,6 +1663,21 @@ void BFS()
                         b += 1;
                         Direction = North;
                         break;
+                    default:
+                        Serial.println("Error");
+                        delay(300);
+                        pixels.clear();
+                        pixels.show();
+                        NeoPixel_Color(255,0,0);
+                        delay(300);
+                        pixels.clear();
+                        pixels.show();
+                        NeoPixel_Color(255,0,0);
+                        delay(300);
+                        pixels.clear();
+                        pixels.show();
+                        NeoPixel_Color(255,0,0);
+                        break;
 
                 }
                 break;
@@ -1687,6 +1702,21 @@ void BFS()
                         S.push(3);
                         b += -1;
                         break;
+                    default:
+                        Serial.println("Error");
+                        delay(300);
+                        pixels.clear();
+                        pixels.show();
+                        NeoPixel_Color(255,0,0);
+                        delay(300);
+                        pixels.clear();
+                        pixels.show();
+                        NeoPixel_Color(255,0,0);
+                        delay(300);
+                        pixels.clear();
+                        pixels.show();
+                        NeoPixel_Color(255,0,0);
+                        break;
 
                 }
                 break;
@@ -1709,6 +1739,21 @@ void BFS()
                         S.push(2);
                         S.push(3);
                         Direction = North;
+                        break;
+                    default:
+                        Serial.println("Error");
+                        delay(300);
+                        pixels.clear();
+                        pixels.show();
+                        NeoPixel_Color(255,0,0);
+                        delay(300);
+                        pixels.clear();
+                        pixels.show();
+                        NeoPixel_Color(255,0,0);
+                        delay(300);
+                        pixels.clear();
+                        pixels.show();
+                        NeoPixel_Color(255,0,0);
                         break;
 
                 }
@@ -1734,6 +1779,21 @@ void BFS()
                         a += -1;
                         Direction = East;
                         break;
+                    default:
+                        Serial.println("Error");
+                        delay(300);
+                        pixels.clear();
+                        pixels.show();
+                        NeoPixel_Color(255,0,0);
+                        delay(300);
+                        pixels.clear();
+                        pixels.show();
+                        NeoPixel_Color(255,0,0);
+                        delay(300);
+                        pixels.clear();
+                        pixels.show();
+                        NeoPixel_Color(255,0,0);
+                        break;
 
                 }
                 break;
@@ -1741,6 +1801,18 @@ void BFS()
             /*デバッグ用*/
             default:
                 Serial.println("Error");
+                delay(300);
+                pixels.clear();
+                pixels.show();
+                NeoPixel_Color(255,0,0);
+                delay(300);
+                pixels.clear();
+                pixels.show();
+                NeoPixel_Color(255,0,0);
+                delay(300);
+                pixels.clear();
+                pixels.show();
+                NeoPixel_Color(255,0,0);
                 break;
         }
         /*if((a == x)&&(b == y)){
@@ -1952,7 +2024,7 @@ void setup(){
   /*アルゴリズムのセットアップ***********************************************************************************************************/
   for (int t = 0; t < 90; t++) {
     for (int j = 0; j < 90; j++) {
-        kabe_zahyou[t][j] |= 16;
+        kabe_zahyou[t][j] = 16;
         reach_time[t][j] = 0;
         cost[t][j] = 0;
         toutatu_zahyou[t][j] = 0; 
@@ -2056,7 +2128,7 @@ void loop(){
     
     case 2://帰還(このとき探索に戻らないよう入れ子構造にする or ここだけは関数内に直接migi()とかを入れてwhile文)
         NeoPixel_Color(0,0,255);   
-        BFS();
+        BFS(x,y);
         pixels.clear();
         pixels.show();
         GoHome();
