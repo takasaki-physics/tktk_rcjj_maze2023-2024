@@ -1128,8 +1128,8 @@ int RightWeight = 0;
 int FrontWeight = 0;
 int LeftWeight = 0;
 
-uint8_t GoalX = 50;
-uint8_t GoalY = 50;
+const uint8_t GoalX = 50;
+const uint8_t GoalY = 50;
 bool start_Gohome = false; //SSD1306に帰還アルゴリズムに入っているかどうかを送信するかの変数
 
 /*帰還用変数*/
