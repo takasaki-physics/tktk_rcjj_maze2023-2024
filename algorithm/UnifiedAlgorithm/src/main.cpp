@@ -1538,8 +1538,6 @@ int WhichWay(uint8_t a,uint8_t b)
 void BFS()
 {
     //hidari();//デバッグ用
-
-
     uint8_t a = x;
     uint8_t b = y;
     cost[a][b] = 1;//現在地のコストを1にする
@@ -1613,7 +1611,7 @@ void BFS()
         if (Q.size() < 2) break;  // キューの要素が足りない場合は終了
 
         a = Q.front(); Q.pop();
-        b = Q.front();Q.pop();
+        b = Q.front(); Q.pop();
 
         //if (Q.empty()) break;
 
@@ -2050,6 +2048,8 @@ void loop(){
     case 2://帰還(このとき探索に戻らないよう入れ子構造にする or ここだけは関数内に直接migi()とかを入れてwhile文)
         NeoPixel_Color(0,0,255);   
         BFS();
+        pixels.clear();
+        pixels.show();
         GoHome();
         break;
 
