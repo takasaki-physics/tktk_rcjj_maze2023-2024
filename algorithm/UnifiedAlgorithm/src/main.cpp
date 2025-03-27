@@ -1837,19 +1837,19 @@ void GoHome()
             case 1:
                 //TurnRight
                 migi();
-                delay(300);
+                delay(500);
                 break;
 
             case 2:
                 //TurnLeft
                 hidari();
-                delay(300);
+                delay(500);
                 break;
 
             case 3:
                 //GoStraight
                 susumu_heitan();
-                delay(300);
+                delay(200);
                 break;
             case 4:
                 //Stop
