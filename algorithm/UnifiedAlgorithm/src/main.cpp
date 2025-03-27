@@ -1631,8 +1631,8 @@ void BFS(uint8_t x,uint8_t y)
     Direction = North;
 
     pixels.clear();
-    delay(300);
     pixels.show();
+    delay(300);
     NeoPixel_Color(0,255,0);
     
     /*デバッグ用*/
@@ -1641,11 +1641,24 @@ void BFS(uint8_t x,uint8_t y)
     }*/
 
     S.push(4);//停止用
+    int TheWay = 0;
     while(!((a == x) && (b == y))){
+        if(cost[a][b] - cost[a+1][b] == 1){
+            TheWay = East;
+        }
+        if(cost[a][b] - cost[a][b-1] == 1){
+            TheWay = North;
+        }
+        if(cost[a][b] - cost[a-1][b] == 1){
+            TheWay = West;
+        }
+        if(cost[a][b] - cost[a][b+1] == 1){
+            TheWay = South;
+        }
 
         switch(Direction){
             case East:
-                switch(WhichWay(a,b)){//前後左右のどこが最短になるか
+                switch(TheWay){//前後左右のどこが最短になるか
 
                     case North://北マスからきたとき（ここのシグナルは探索時の曲がる→進むとは逆で、進む→曲がるじゃないと。）
                         S.push(2);//１：右折、２：左折、３：直進
@@ -1667,16 +1680,8 @@ void BFS(uint8_t x,uint8_t y)
                     default:
                         Serial.println("Error");
                         pixels.clear();
-                        delay(300);
                         pixels.show();
-                        NeoPixel_Color(255,0,0);
-                        pixels.clear();
                         delay(300);
-                        pixels.show();
-                        NeoPixel_Color(255,0,0);
-                        pixels.clear();
-                        delay(300);
-                        pixels.show();
                         NeoPixel_Color(255,0,0);
                         break;
 
@@ -1684,7 +1689,7 @@ void BFS(uint8_t x,uint8_t y)
                 break;
 
             case North:
-                switch(WhichWay(a,b)){//前後左右のどこが最短になるか
+                switch(TheWay){//前後左右のどこが最短になるか
                     case East:
                         S.push(1);
                         S.push(3);
@@ -1706,16 +1711,8 @@ void BFS(uint8_t x,uint8_t y)
                     default:
                         Serial.println("Error");
                         pixels.clear();
-                        delay(300);
                         pixels.show();
-                        NeoPixel_Color(255,0,0);
-                        pixels.clear();
                         delay(300);
-                        pixels.show();
-                        NeoPixel_Color(255,0,0);
-                        pixels.clear();
-                        delay(300);
-                        pixels.show();
                         NeoPixel_Color(255,0,0);
                         break;
 
@@ -1723,7 +1720,7 @@ void BFS(uint8_t x,uint8_t y)
                 break;
 
             case West:
-                switch(WhichWay(a,b)){//前後左右のどこが最短になるか
+                switch(TheWay){//前後左右のどこが最短になるか
                     case East:
                         S.push(3);
                         a += 1;
@@ -1744,16 +1741,8 @@ void BFS(uint8_t x,uint8_t y)
                     default:
                         Serial.println("Error");
                         pixels.clear();
-                        delay(300);
                         pixels.show();
-                        NeoPixel_Color(255,0,0);
-                        pixels.clear();
                         delay(300);
-                        pixels.show();
-                        NeoPixel_Color(255,0,0);
-                        pixels.clear();
-                        delay(300);
-                        pixels.show();
                         NeoPixel_Color(255,0,0);
                         break;
 
@@ -1761,7 +1750,7 @@ void BFS(uint8_t x,uint8_t y)
                 break;
 
             case South:
-                switch(WhichWay(a,b)){//前後左右のどこが最短になるか
+                switch(TheWay){//前後左右のどこが最短になるか
                     case East:
                         S.push(2);
                         S.push(3);
@@ -1783,16 +1772,8 @@ void BFS(uint8_t x,uint8_t y)
                     default:
                         Serial.println("Error");
                         pixels.clear();
-                        delay(300);
                         pixels.show();
-                        NeoPixel_Color(255,0,0);
-                        pixels.clear();
                         delay(300);
-                        pixels.show();
-                        NeoPixel_Color(255,0,0);
-                        pixels.clear();
-                        delay(300);
-                        pixels.show();
                         NeoPixel_Color(255,0,0);
                         break;
 
@@ -1802,18 +1783,6 @@ void BFS(uint8_t x,uint8_t y)
             /*デバッグ用*/
             default:
                 Serial.println("Error");
-                pixels.clear();
-                delay(300);
-                pixels.show();
-                NeoPixel_Color(255,0,255);
-                pixels.clear();
-                delay(300);
-                pixels.show();
-                NeoPixel_Color(255,0,255);
-                pixels.clear();
-                delay(300);
-                pixels.show();
-                NeoPixel_Color(255,0,255);
                 break;
         }
         /*if((a == x)&&(b == y)){
