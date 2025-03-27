@@ -1622,8 +1622,9 @@ void BFS(uint8_t x,uint8_t y)
 
     pixels.clear();
     pixels.show();
-    delay(300);
+    delay(500);
     NeoPixel_Color(0,255,0);
+    delay(500);
     
     /*デバッグ用*/
     /*if(WhichWay(a,b) == 0){
@@ -1639,14 +1640,22 @@ void BFS(uint8_t x,uint8_t y)
         if(cost[a][b] - cost[a+1][b] == 1){
             TheWay = East;
         }
-        if(cost[a][b] - cost[a][b-1] == 1){
+        else if(cost[a][b] - cost[a][b-1] == 1){
             TheWay = North;
         }
-        if(cost[a][b] - cost[a-1][b] == 1){
+        else if(cost[a][b] - cost[a-1][b] == 1){
             TheWay = West;
         }
-        if(cost[a][b] - cost[a][b+1] == 1){
+        else if(cost[a][b] - cost[a][b+1] == 1){
             TheWay = South;
+        }
+        else {
+          Serial.println("Error");
+          pixels.clear();
+          pixels.show();
+          delay(500);
+          NeoPixel_Color(0,0,255);
+          delay(500);
         }
 
         switch(Direction){
