@@ -1813,6 +1813,7 @@ void WriteDownWall(uint8_t x,uint8_t y,uint8_t Direction)
 {
     //壁情報の記入(ここは帰還アルゴリズム用の関数)
     if(kabe_zahyou[x][y] == 16){//記録されていない場合（そうしないと延々と加算されちゃう）
+        kabe_zahyou[x][y] = 0;//4ビットの情報のみが残る
         switch (Direction){
             case East:
                 if(right_wall){
@@ -1865,7 +1866,7 @@ void WriteDownWall(uint8_t x,uint8_t y,uint8_t Direction)
             //対応
             //東西南北
             //8 4 2 1
-        kabe_zahyou[x][y] += -16;//4ビットの情報のみが残る
+        
     }
 }
 
