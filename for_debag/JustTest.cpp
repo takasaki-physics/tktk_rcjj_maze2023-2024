@@ -116,7 +116,7 @@ void BFS() {
     //スタックを使って逆探索
     a = 1;
     b = 3;
-    Direction = North;
+    Direction = East;
 
     /*デバッグ用*/
     /*if(WhichWay(a,b) == 0){
@@ -136,7 +136,6 @@ void BFS() {
                         b += -1;
                         Direction = South;
                         break;
-
                     case West://西マスからきたとき
                         S.push(3);
                         a += -1;
@@ -147,6 +146,9 @@ void BFS() {
                         S.push(3);
                         b += 1;
                         Direction = North;
+                        break;
+                    case East:
+                        Direction =North;
                         break;
 
                 }
@@ -172,6 +174,13 @@ void BFS() {
                         S.push(3);
                         b += -1;
                         break;
+                    case North:
+                        S.push(2);
+                        S.push(2);
+                        S.push(3);
+                        Direction = South;
+                        //Direction = East;
+                        break;
 
                 }
                 break;
@@ -194,6 +203,9 @@ void BFS() {
                         S.push(2);
                         S.push(3);
                         Direction = North;
+                        break;
+                    case West:
+                        Direction =North;
                         break;
 
                 }
@@ -219,13 +231,17 @@ void BFS() {
                         a += -1;
                         Direction = East;
                         break;
+                    case South:
+                        Direction =North;
+                        break;
 
                 }
                 break;
 
             /*デバッグ用*/
             default:
-              cout << "no way" << endl;
+                //Serial.println("Error");
+                break;
         }
         /*if((a == x)&&(b == y)){
             break;
@@ -250,6 +266,7 @@ void GoHome() {
                 break;
             case 4:
                 cout << "Stop" << endl;
+                
                 delay(20000);
                 break;
         }

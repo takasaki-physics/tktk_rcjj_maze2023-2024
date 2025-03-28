@@ -1877,8 +1877,173 @@ void WriteDownWall()
     }
 }
 
+void ForBFSLeftGo(){
+    //WriteDownWall
+    int BFSWallZahyou = 0;
+    //壁情報の記入(ここは帰還アルゴリズム用の関数)
+    switch (Direction){
+    case East:
+      if(right_wall){
+        BFSWallZahyou |= 2;
+      }
+      if(front_wall){
+        BFSWallZahyou |= 8;
+      }
+      if(left_wall){
+        BFSWallZahyou |= 1;
+      }
+      break;
+            
+    case North:
+      if(right_wall){
+        BFSWallZahyou |= 8;
+      }
+      if(front_wall){
+        BFSWallZahyou |= 1;
+      }
+      if(left_wall){
+        BFSWallZahyou |= 4;
+      }
+      break;
 
+    case West:
+      if(right_wall){
+        BFSWallZahyou |= 1;
+      }
+      if(front_wall){
+        BFSWallZahyou |= 4;
+      }
+      if(left_wall){
+        BFSWallZahyou |= 2;
+      }
+      break;
 
+    case South:
+      if(right_wall){
+        BFSWallZahyou |= 4;
+      }
+      if(front_wall){
+        BFSWallZahyou |= 2;
+      }
+      if(left_wall){
+        BFSWallZahyou |= 8;
+      }
+      break;
+      }
+    //進行方向に対して背後の壁情報をなくす
+    switch (Direction)
+    {
+    case East:
+    kabe_zahyou[GoalX][GoalY] &= ~4;
+    break;
+
+    case North:
+    kabe_zahyou[GoalX][GoalY] &= ~2;
+    break;
+
+    case West:
+    kabe_zahyou[GoalX][GoalY] &= ~8;
+    break;
+
+    case South:
+    kabe_zahyou[GoalX][GoalY] &= ~1;
+    break;
+    }
+    if(BFSWallZahyou == kabe_zahyou[GoalX][GoalY]){delay(30000);}
+    //左手法
+    uint8_t GoTo = 0;
+    if     (right_wall){GoTo = Right;}
+    else if(front_wall){GoTo = Front;}
+    else if(left_wall) {GoTo = Left ;}
+    else               {GoTo = Back ;}
+
+    switch (GoTo)
+    {
+    case Right:
+    switch (Direction)
+    {
+    case North:
+      Direction = East;
+      break;
+
+    case East:
+      Direction = South;
+      break;
+
+    case South:
+      Direction = West;
+      break;
+
+    case West:
+      Direction = North;
+      break;
+    }
+    Status = 4;
+    break;
+
+    case Front:
+    /*switch (Direction)
+    {
+    case North:
+      break;
+
+    case East:
+      break;
+
+    case South:
+      break;
+
+    case West:
+      break;
+    }*/
+    Status = 2;
+    break;
+
+    case Left:
+    switch (Direction)
+    {
+    case North:
+      Direction = West;
+      break;
+
+    case East:
+      Direction = North;
+      break;
+
+    case South:
+      Direction = East;
+      break;
+
+    case West:
+      Direction = South;
+      break;
+    }
+    Status = 3;
+    break;
+
+    case Back:
+    switch (Direction)
+    {
+    case North:
+      Direction = South;
+      break;
+
+    case East:
+      Direction = West;
+      break;
+
+    case South:
+      Direction = North;
+      break;
+
+    case West:
+      Direction = East;
+      break;
+    }
+    Status = 5;
+    break;
+    }
+}
 /*******************************************************************************************/
 /* 帰還                                                                             
 /*処理：スタックから値をpopして順番に動いていく
@@ -1915,7 +2080,54 @@ void GoHome()
                 //Stop
                 /*ここに壁情報が合ってないとうろうろさせるコード入れる*/
                 /*壁情報取得　→　kabe_zahyou[50][50]と照合　→　会ってなかったら(x,y)=(51,50),(51,51),(50,51),(49,51),(49.50),(49,49),(50,49),(51,49)をそれぞれBFSで行って照合（いけなかったらどうするん）*/
-                delay(20000);
+                /*while(1)
+                {
+                  switch (Status)
+                  {
+                  case 0:
+                    get_tof_data();
+                    break;
+                  
+                  case 1:
+                    //WriteDownWall
+                    ForBFSLeftGo();
+                    break;
+
+                  case 2://直進
+                    susumu_heitan();
+                    delay(200);
+                    TileStatus();
+                    break;
+                  
+                  case 3://左折
+                    hidari();
+                    delay(500);
+                    susumu_heitan();
+                    delay(200);
+                    TileStatus();
+                    break;
+                  
+                  case 4://右折
+                    migi();
+                    delay(500);
+                    susumu_heitan();
+                    delay(200);
+                    TileStatus();
+                    break;
+                  
+                  case 5://後進
+                    migi();
+                    delay(500);
+                    migi();
+                    delay(500);
+                    susumu_heitan();
+                    delay(200);
+                    TileStatus();
+                    break;
+                  }
+
+                }*/
+                delay(30000):                
                 break;
         }
         S.pop();//要素の削除
