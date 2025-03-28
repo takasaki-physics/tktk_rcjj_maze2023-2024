@@ -2093,25 +2093,31 @@ void TileStatus()
 /* 最短経路の方位                                                                              
 /*処理：現在のマスのコストの、-1のコストのマスを探す
 /*更新者：吉ノ薗2025/01/22
-/*       吉ノ薗2025/03/28　BFS()内に入れたため廃止
+/*       吉ノ薗2025/03/28　差が１でも壁があれば行かないようにした
 /*
 /*******************************************************************************************/
-/*int WhichWay(uint8_t a,uint8_t b)
+int WhichWay(uint8_t a,uint8_t b)
 {
-    if(cost[a][b] - cost[a+1][b] == 1){
+    if ((cost[a][b] - cost[a + 1][b] == 1) && !(kabe_zahyou[a][b] & 8)) {
         return East;
-       }
-    if(cost[a][b] - cost[a][b-1] == 1){
+    }
+    if ((cost[a][b] - cost[a][b - 1] == 1) && !(kabe_zahyou[a][b] & 1)) {
         return North;
     }
-    if(cost[a][b] - cost[a-1][b] == 1){
+    if ((cost[a][b] - cost[a - 1][b] == 1) && !(kabe_zahyou[a][b] & 4)) {
         return West;
     }
-    if(cost[a][b] - cost[a][b+1] == 1){
+    if ((cost[a][b] - cost[a][b + 1] == 1) && !(kabe_zahyou[a][b] & 2)) {
         return South;
     }
+    Serial.println("Error");
+    pixels.clear();
+    pixels.show();
+    delay(500);
+    NeoPixel_Color(0,0,255);
+    delay(500);
     return 0;
-}*/
+}
 
 
 
@@ -2126,9 +2132,10 @@ void TileStatus()
 /*更新者：吉ノ薗2025/01/22
 /*　　　　吉ノ薗2025/02/01　変更点：スタックとキューをライブラリにして座標の計算をビット演算に変更
 /*       吉ノ薗2025/03/26 delay(300)を削除。遅かったのお前が原因だろ
+/*       吉ノ薗2025/03/28 座標記入漏れ・ミスを修正
 /*
 /*******************************************************************************************/
-void BFS(uint8_t x, uint8_t y)
+void BFS()
 {
     //hidari();//デバッグ用
     uint8_t a = x;
@@ -2219,11 +2226,11 @@ void BFS(uint8_t x, uint8_t y)
 
     S.push(4);//停止用
 
-    int TheWay = 0;
+    //int TheWay = 0;
 
     while(!((a == x) && (b == y))){
 
-        if(cost[a][b] - cost[a+1][b] == 1){
+        /*if(cost[a][b] - cost[a+1][b] == 1){
             TheWay = East;
         }
         if(cost[a][b] - cost[a][b-1] == 1){
@@ -2242,11 +2249,11 @@ void BFS(uint8_t x, uint8_t y)
           delay(500);
           NeoPixel_Color(0,0,255);
           delay(500);
-        }
+        }*/
 
         switch(Direction){
             case East:
-                switch(TheWay){//前後左右のどこが最短になるか
+                switch(WhichWay(a,b)){//前後左右のどこが最短になるか
 
                     case North://北マスからきたとき（ここのシグナルは探索時の曲がる→進むとは逆で、進む→曲がるじゃないと。）
                         S.push(2);//１：右折、２：左折、３：直進
@@ -2277,7 +2284,7 @@ void BFS(uint8_t x, uint8_t y)
                 break;
 
             case North:
-                switch(TheWay){//前後左右のどこが最短になるか
+                switch(WhichWay(a,b)){//前後左右のどこが最短になるか
                     case East:
                         S.push(1);
                         S.push(3);
@@ -2294,8 +2301,9 @@ void BFS(uint8_t x, uint8_t y)
 
                     case South:
                         S.push(3);
-                        b += -1;
+                        b += 1;
                         break;
+
                     case North:
                         pixels.clear();
                         pixels.show();
@@ -2312,7 +2320,7 @@ void BFS(uint8_t x, uint8_t y)
                 break;
 
             case West:
-                switch(TheWay){//前後左右のどこが最短になるか
+                switch(WhichWay(a,b)){//前後左右のどこが最短になるか
                     case East:
                         S.push(3);
                         a += 1;
@@ -2328,8 +2336,10 @@ void BFS(uint8_t x, uint8_t y)
                     case South:
                         S.push(2);
                         S.push(3);
+                        b += 1;//ここが原因
                         Direction = North;
                         break;
+
                     case West:
                         pixels.clear();
                         pixels.show();
@@ -2342,7 +2352,7 @@ void BFS(uint8_t x, uint8_t y)
                 break;
 
             case South:
-                switch(TheWay){//前後左右のどこが最短になるか
+                switch(WhichWay(a,b)){//前後左右のどこが最短になるか
                     case East:
                         S.push(2);
                         S.push(3);
@@ -2361,12 +2371,13 @@ void BFS(uint8_t x, uint8_t y)
                         a += -1;
                         Direction = East;
                         break;
+
                     case South:
                         pixels.clear();
                         pixels.show();
                         NeoPixel_Color(255,0,0);
                         delay(300);
-                        Direction =North;
+                        Direction = North;
                         break;
 
                 }
@@ -2917,7 +2928,7 @@ void loop(){
     
     case 2://帰還(このとき探索に戻らないよう入れ子構造にする or ここだけは関数内に直接migi()とかを入れてwhile文)
         NeoPixel_Color(0,0,255);   
-        BFS(x,y);
+        BFS();
         pixels.clear();
         pixels.show();
         GoHome();

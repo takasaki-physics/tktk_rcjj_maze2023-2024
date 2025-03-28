@@ -25,6 +25,9 @@ int x = 4;
 int y = 1;
 uint8_t Direction = South;
 
+const uint8_t GoalX = 3;
+const uint8_t GoalY = 1;
+
 const uint8_t Xfactor = 7; // 迷路の大きさ
 const uint8_t Yfactor = 5;
 
@@ -34,7 +37,7 @@ int kabe_zahyou[Xfactor][Yfactor] = {
     {16, 16, 16, 16, 16},
     {16, 5 , 14, 7 , 16},
     {16, 9 , 12, 2 , 16},
-    {16, 7 , 16, 2 , 16},
+    {16, 7 , 13, 2 , 16},
     {16, 9 , 4 , 2 , 16},
     {16, 13, 10, 11, 16},
     {16, 16, 16, 16, 16}
@@ -45,16 +48,16 @@ void delay(int milliseconds) {
 }
 
 int WhichWay(int a, int b) {
-    if (cost[a][b] - cost[a + 1][b] == 1) {
+    if ((cost[a][b] - cost[a + 1][b] == 1) && !(kabe_zahyou[a][b] & 8)) {
         return East;
     }
-    if (cost[a][b] - cost[a][b - 1] == 1) {
+    if ((cost[a][b] - cost[a][b - 1] == 1) && !(kabe_zahyou[a][b] & 1)) {
         return North;
     }
-    if (cost[a][b] - cost[a - 1][b] == 1) {
+    if ((cost[a][b] - cost[a - 1][b] == 1) && !(kabe_zahyou[a][b] & 4)) {
         return West;
     }
-    if (cost[a][b] - cost[a][b + 1] == 1) {
+    if ((cost[a][b] - cost[a][b + 1] == 1) && !(kabe_zahyou[a][b] & 2)) {
         return South;
     }
     return 0;
@@ -66,7 +69,7 @@ void BFS() {
     cost[a][b] = 1;
     cout << "GotoHome:" << endl;
 
-    while (!(a == 1 && b == 3)) {
+    while (!(a == GoalX && b == GoalY)) {
         reach_time[a][b] = 1;
         cout << "a = " << a << ", b = " << b << endl;
         cout << " kabe_zahyou[a][b] = " << kabe_zahyou[a][b] << ", cost[a][b] = " << cost[a][b] << endl;
@@ -113,10 +116,11 @@ void BFS() {
         a = Q.front(); Q.pop();
         b = Q.front(); Q.pop();
     }
+    cout << "WalkMappingFinish" << endl;
     //スタックを使って逆探索
-    a = 1;
-    b = 3;
-    Direction = East;
+    a = GoalX;
+    b = GoalY;
+    Direction = North;
 
     /*デバッグ用*/
     /*if(WhichWay(a,b) == 0){
@@ -125,7 +129,10 @@ void BFS() {
 
     S.push(4);//停止用
     while(!((a == x) && (b == y))){
-
+        delay(10);
+        //cout << "a = " << a << ",b = " << b << ",Direction = " << Direction << endl;
+        cout << "a = " << a << ",b = " << b << endl;
+        cout << "GoTo = " << WhichWay(a,b) << endl;
         switch(Direction){
             case East:
                 switch(WhichWay(a,b)){//前後左右のどこが最短になるか
@@ -172,7 +179,7 @@ void BFS() {
 
                     case South:
                         S.push(3);
-                        b += -1;
+                        b += 1;/*こここここここ*/
                         break;
                     case North:
                         S.push(2);
@@ -202,6 +209,7 @@ void BFS() {
                     case South:
                         S.push(2);
                         S.push(3);
+                        b += 1;
                         Direction = North;
                         break;
                     case West:
