@@ -21,11 +21,11 @@ std::queue<int> Q;
 #define Left 3
 #define Back 4
 
-int x = 4;
-int y = 1;
+int x = 5;
+int y = 3;
 uint8_t Direction = South;
 
-const uint8_t GoalX = 5;
+const uint8_t GoalX = 1;
 const uint8_t GoalY = 3;
 
 const uint8_t Xfactor = 7; // 迷路の大きさ
@@ -42,6 +42,16 @@ int kabe_zahyou[Xfactor][Yfactor] = {
     {16, 13, 10, 11, 16},
     {16, 16, 16, 16, 16}
 };
+
+/*int kabe_zahyou[Xfactor][Yfactor] = {
+    {16, 16, 16, 16, 16},
+    {16, 12, 12, 12, 16},
+    {16, 16, 16, 16, 16},
+    {16, 16, 16, 16, 16},
+    {16, 16, 16, 16, 16},
+    {16, 16, 10, 16, 16},
+    {16, 16, 16, 16, 16}
+};*/
 
 void delay(int milliseconds) {
     std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
@@ -120,6 +130,7 @@ void BFS() {
     //スタックを使って逆探索
     a = GoalX;
     b = GoalY;
+    uint8_t NowDirection = Direction;
     Direction = North;
 
     /*デバッグ用*/
@@ -254,6 +265,80 @@ void BFS() {
         /*if((a == x)&&(b == y)){
             break;
         }*/
+    }
+    switch (NowDirection)//1：右折、2：左折、3：直進
+    {
+    case North:
+        switch (Direction)
+        {
+        case East:
+            S.push(1);
+            break;
+
+        case South:
+            S.push(1);
+            S.push(1);
+            break;
+
+        case West:
+            S.push(2);
+            break;
+        }
+        break;
+    
+    case East:
+        switch (Direction)
+        {
+        case North:
+            S.push(2);
+            break;
+
+        case South:
+            S.push(1);
+            break;
+
+        case West:
+            S.push(1);
+            S.push(1);
+            break;
+        }
+        break;
+
+    case South:
+        switch (Direction)
+        {
+        case North:
+            S.push(1);
+            S.push(1);
+            break;
+        
+        case East:
+            S.push(2);
+            break;
+
+        case West:
+            S.push(1);
+            break;
+        }
+        break;
+
+    case West:
+        switch (Direction)
+        {
+        case North:
+            S.push(1);
+            break;
+        
+        case East:
+            S.push(1);
+            S.push(1);
+            break;
+
+        case South:
+            S.push(2);
+            break;
+        }
+        break;
     }
 }
 

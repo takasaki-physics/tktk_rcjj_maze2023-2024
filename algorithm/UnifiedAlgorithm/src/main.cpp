@@ -2134,6 +2134,7 @@ int WhichWay(uint8_t a,uint8_t b)
 /*　　　　吉ノ薗2025/02/01　変更点：スタックとキューをライブラリにして座標の計算をビット演算に変更
 /*       吉ノ薗2025/03/26 delay(300)を削除。遅かったのお前が原因だろ
 /*       吉ノ薗2025/03/28 座標記入漏れ・ミスを修正
+/*       吉ノ薗2025/03/28 逆探索終了時の向きと実際の向きを合わせるように修正
 /*
 /*******************************************************************************************/
 void BFS()
@@ -2216,42 +2217,15 @@ void BFS()
     //スタックを使って逆探索
     a = GoalX;
     b = GoalY;
+    uint8_t NowDirection = Direction;
     Direction = North;
 
     NeoPixel_Color(0,255,0);
-    
-    /*デバッグ用*/
-    /*if(WhichWay(a,b) == 0){
-        migi();
-    }*/
 
     S.push(4);//停止用
 
-    //int TheWay = 0;
 
     while(!((a == x) && (b == y))){
-
-        /*if(cost[a][b] - cost[a+1][b] == 1){
-            TheWay = East;
-        }
-        if(cost[a][b] - cost[a][b-1] == 1){
-            TheWay = North;
-        }
-        if(cost[a][b] - cost[a-1][b] == 1){
-            TheWay = West;
-        }
-        if(cost[a][b] - cost[a][b+1] == 1){
-            TheWay = South;
-        }
-        if(TheWay == 0){
-          Serial.println("Error");
-          pixels.clear();
-          pixels.show();
-          delay(500);
-          NeoPixel_Color(0,0,255);
-          delay(500);
-        }*/
-
         switch(Direction){
             case East:
                 switch(WhichWay(a,b)){//前後左右のどこが最短になるか
@@ -2308,10 +2282,10 @@ void BFS()
                     case North:
                         pixels.clear();
                         pixels.show();
-                        NeoPixel_Color(255,0,0);
+                        NeoPixel_Color(0,255,0);
                         delay(300);
-                        S.push(2);
-                        S.push(2);
+                        S.push(1);
+                        S.push(1);
                         S.push(3);
                         Direction = South;
                         //Direction = East;
@@ -2389,11 +2363,81 @@ void BFS()
                 Serial.println("Error");
                 break;
         }
-        /*if((a == x)&&(b == y)){
-            break;
-        }*/
     }
+    switch (NowDirection)//今の向きを逆探索終了時の向きに変更する
+    {
+    case North:
+        switch (Direction)
+        {
+        case East:
+            S.push(1);
+            break;
+
+        case South:
+            S.push(1);
+            S.push(1);
+            break;
+
+        case West:
+            S.push(2);
+            break;
+        }
+        break;
     
+    case East:
+        switch (Direction)
+        {
+        case North:
+            S.push(2);
+            break;
+
+        case South:
+            S.push(1);
+            break;
+
+        case West:
+            S.push(1);
+            S.push(1);
+            break;
+        }
+        break;
+
+    case South:
+        switch (Direction)
+        {
+        case North:
+            S.push(1);
+            S.push(1);
+            break;
+        
+        case East:
+            S.push(2);
+            break;
+
+        case West:
+            S.push(1);
+            break;
+        }
+        break;
+
+    case West:
+        switch (Direction)
+        {
+        case North:
+            S.push(1);
+            break;
+        
+        case East:
+            S.push(1);
+            S.push(1);
+            break;
+
+        case South:
+            S.push(2);
+            break;
+        }
+        break;
+    }
     pixels.clear();
     pixels.show();
     NeoPixel_Color(255,255,0);
