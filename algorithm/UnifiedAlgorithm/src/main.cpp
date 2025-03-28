@@ -150,6 +150,7 @@ int katamuki_true; //tiziki2()でrollを整数化したあとの変数
 int count2 = 0;//進んだ回数＿40回でわかれている
 int bump_giveup_count = 0; //障害物に当たった時あきらめる変数
 
+bool VictimisAlready[90][90];
 bool right_wall = false;//ここもセンサーの値を取得するファイルとして分けたい
 bool front_wall = false;
 bool left_wall = false;
@@ -464,7 +465,7 @@ void servo_res2(){
 /*******************************************************************************************/
 //右側のカメラ
 void serialEvent7(){
-  if (Serial7.available()>0){
+  if (Serial7.available()>0 && !VictimisAlready[x][y]){
     int recivedData7 = Serial7.read();
     if (recivedData7 == 1){
       Serial.println("H_victim");
@@ -809,6 +810,7 @@ void serialEvent7(){
 
         }
       }
+      VictimisAlready[x][y] = true;
     }
 }
 
@@ -822,7 +824,7 @@ void serialEvent7(){
 //左側のカメラ
 
 void serialEvent8(){
-  if (Serial8.available()>0){
+  if (Serial8.available()>0 && !VictimisAlready[x][y]){
     int recivedData = Serial8.read();
     if (recivedData == 1){
       Serial.println("H_victim");
@@ -1164,6 +1166,7 @@ void serialEvent8(){
 
         }
       }
+      VictimisAlready[x][y] = true;
     }
 }
 
@@ -1604,106 +1607,6 @@ void susumu_heitan() {
 
 
 
-
-
-
-
-
-
-
-
-/*スタック・キュー用変数
-const int MAX = 100; // キュー配列の最大サイズ
-*/
-
-/*******************************************************************************************/
-/* スタック・キュー用の関数                                                                             
-/*処理：インターネットに転がってるものを借用。ググってくれ！
-/*
-/*更新者：吉ノ薗2025/01/22「既存のライブラリだとリングバッファがないからつくった」
-/*　　　　吉ノ薗2025/02/01　ライブラリに移行
-/*
-/*******************************************************************************************/
-
-/*int st[MAX]; // スタックを表す配列
-int top = 0; // スタックの先頭を表すポインタ
-// スタックを初期化する
-void st_init() {
-    top = 0; // スタックポインタを初期位置に
-}
-
-// スタックが空かどうかを判定する
-bool st_isEmpty() {
-    return (top == 0); // スタックサイズが 0 かどうか
-}
-
-// スタックが満杯かどうかを判定する
-bool st_isFull() {
-    return (top == MAX); // スタックサイズが MAX かどうか
-}
-*/
-
-/*
-int qu[MAX]; // キューを表す配列
-int tail = 0, head = 0; // キューの要素区間を表す変数
-
-// キューを初期化する
-void init() {
-    head = tail = 0;
-}
-
-// キューが空かどうかを判定する
-bool isEmpty() {
-    return (head == tail);
-}
-
-// スタックが満杯かどうかを判定する
-bool isFull() {
-    return (head == (tail + 1) % MAX);
-}
-
-// push (top を進めて要素を格納)
-void push(int v) {
-    if (st_isFull()) {
-        //cout << "error: stack is full." << endl;
-        return;
-    }
-    st[top++] = v; // st[top] = v; と top++; をまとめてこのように表せます
-}
-
-// pop (top をデクリメントして、top の位置にある要素を返す)
-int pop() {
-    if (st_isEmpty()) {
-        //cout << "error: stack is empty." << endl;
-        return -1;
-    }
-    return st[--top]; // --top; と return st[top]; をまとめてこのように表せます
-}
-
-// enqueue (tail に要素を格納してインクリメント)
-void enqueue(int v) {
-    if (isFull()) {
-        //cout << "error: queue is full." << endl;
-        return;
-    }
-    qu[tail++] = v;
-    if (tail == MAX) tail = 0; // リングバッファの終端に来たら 0 に
-}
-
-// dequeue (head にある要素を返して head をインクリメント)
-int dequeue() {
-    if (isEmpty()) {
-        //cout << "error: stack is empty." << endl;
-        return -1;
-    }
-    int res = qu[head];
-    ++head;
-    if (head == MAX) head = 0;
-    return res;
-}
-*/
-
-
 /*アルゴリズム用変数*/
 int8_t toutatu_zahyou[90][90];//そのマスの到達回数
 int RightWeight = 0;
@@ -2084,10 +1987,7 @@ void TileStatus()
 }
 
 
-
-
-
-
+  
 
 
 /*******************************************************************************************/
@@ -2852,7 +2752,8 @@ void setup(){
         kabe_zahyou[t][j] = 16;
         reach_time[t][j] = 0;
         cost[t][j] = 0;
-        toutatu_zahyou[t][j] = 0; 
+        toutatu_zahyou[t][j] = 0;
+        VictimisAlready[t][j] = false;
         }
     }
     toutatu_zahyou[GoalX][GoalY] = 1;
