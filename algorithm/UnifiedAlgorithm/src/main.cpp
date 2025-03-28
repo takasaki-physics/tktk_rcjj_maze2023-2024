@@ -2128,7 +2128,7 @@ void TileStatus()
 /*       吉ノ薗2025/03/26 delay(300)を削除。遅かったのお前が原因だろ
 /*
 /*******************************************************************************************/
-void BFS()
+void BFS(uint8_t x, uint8_t y)
 {
     //hidari();//デバッグ用
     uint8_t a = x;
@@ -2219,7 +2219,7 @@ void BFS()
 
     S.push(4);//停止用
 
-    uint8_t TheWay = 0;
+    int TheWay = 0;
 
     while(!((a == x) && (b == y))){
 
@@ -2398,57 +2398,57 @@ void BFS()
 /*更新者：吉ノ薗2025/01/22
 /*
 /*******************************************************************************************/
-void WriteDownWall()
+void WriteDownWall(uint8_t x, uint8_t y,uint8_t Direction)
 {
     //壁情報の記入(ここは帰還アルゴリズム用の関数)
-    if(kabe_zahyou[x][y] & 16){//記録されていない場合（そうしないと延々と加算されちゃう）
+    if(kabe_zahyou[x][y] == 16){//記録されていない場合（そうしないと延々と加算されちゃう）
         kabe_zahyou[x][y] = 0;//4ビットの情報のみが残る
         switch (Direction){
             case East:
                 if(right_wall){
-                    kabe_zahyou[x][y] |= 2;
+                    kabe_zahyou[x][y] += 2;
                 }
                 if(front_wall){
-                    kabe_zahyou[x][y] |= 8;
+                    kabe_zahyou[x][y] += 8;
                 }
                 if(left_wall){
-                    kabe_zahyou[x][y] |= 1;
+                    kabe_zahyou[x][y] += 1;
                 }
                 break;
             
             case North:
                 if(right_wall){
-                    kabe_zahyou[x][y] |= 8;
+                    kabe_zahyou[x][y] += 8;
                 }
                 if(front_wall){
-                    kabe_zahyou[x][y] |= 1;
+                    kabe_zahyou[x][y] += 1;
                 }
                 if(left_wall){
-                    kabe_zahyou[x][y] |= 4;
+                    kabe_zahyou[x][y] += 4;
                 }
                 break;
 
             case West:
                 if(right_wall){
-                    kabe_zahyou[x][y] |= 1;
+                    kabe_zahyou[x][y] += 1;
                 }
                 if(front_wall){
-                    kabe_zahyou[x][y] |= 4;
+                    kabe_zahyou[x][y] += 4;
                 }
                 if(left_wall){
-                    kabe_zahyou[x][y] |= 2;
+                    kabe_zahyou[x][y] += 2;
                 }
                 break;
 
             case South:
                 if(right_wall){
-                    kabe_zahyou[x][y] |= 4;
+                    kabe_zahyou[x][y] += 4;
                 }
                 if(front_wall){
-                    kabe_zahyou[x][y] |= 2;
+                    kabe_zahyou[x][y] += 2;
                 }
                 if(left_wall){
-                    kabe_zahyou[x][y] |= 8;
+                    kabe_zahyou[x][y] += 8;
                 }
                 break;
             }
@@ -2626,6 +2626,7 @@ void ForBFSLeftGo(){
     break;
     }
 }
+
 /*******************************************************************************************/
 /* 帰還                                                                             
 /*処理：スタックから値をpopして順番に動いていく
@@ -2709,7 +2710,7 @@ void GoHome()
                   }
 
                 }*/
-                delay(30000):                
+                delay(30000);               
                 break;
         }
         S.pop();//要素の削除
@@ -2798,7 +2799,7 @@ void setup(){
   /*アルゴリズムのセットアップ***********************************************************************************************************/
   for (int t = 0; t < 90; t++) {
     for (int j = 0; j < 90; j++) {
-        kabe_zahyou[t][j] |= 16;
+        kabe_zahyou[t][j] = 16;
         reach_time[t][j] = 0;
         cost[t][j] = 0;
         toutatu_zahyou[t][j] = 0; 
@@ -2879,7 +2880,7 @@ void loop(){
         break;
 
     case 1://座標更新と探索
-        WriteDownWall();//帰還用の記録
+        WriteDownWall(x,y,Direction);//帰還用の記録
         //send_display();/*デバッグ用*/
 
         /*デバッグ用*/
@@ -2909,7 +2910,7 @@ void loop(){
     
     case 2://帰還(このとき探索に戻らないよう入れ子構造にする or ここだけは関数内に直接migi()とかを入れてwhile文)
         NeoPixel_Color(0,0,255);   
-        BFS();
+        BFS(x,y);
         pixels.clear();
         pixels.show();
         GoHome();
