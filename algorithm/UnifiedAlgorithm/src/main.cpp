@@ -127,6 +127,8 @@ Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800); //8個のNeoPixe
 /*..................レスキューキット排出用のサーボモーターの変数の定義............*/
 const int SERVO_PIN = 10; //servo2 36
 const int SERVO_PIN2 = 36;
+int servo1_kit = 6; //レスキューキットの残数
+int servo2_kit = 6; //上に同じ
 /*..........................................................*/
 /*センサー類変数*/
 unsigned int SERVO_POS = 0; //変数SERVO_POS=0とする
@@ -441,6 +443,7 @@ void servo_res(){
   motor_servo(-100,200);
   motor_servo(0,1000);
   delay(150);
+  servo1_kit--;
 }
 
 void servo_res2(){
@@ -449,6 +452,7 @@ void servo_res2(){
   motor_servo2(-100,200);
   motor_servo2(0,1000);
   delay(150);
+  servo2_kit--;
 }
 
 /*******************************************************************************************/
@@ -471,6 +475,115 @@ void serialEvent7(){
         pixels.show();
         delay(500);
       }
+      if(servo1_kit >= 2){
+        servo_res();
+        delay(500);
+        servo_res();
+        delay(500);
+      }else if(servo1_kit == 1 && servo2_kit >= 1 ){
+        servo_res();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        servo_res2();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+      }else if(servo2_kit >= 2){
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        servo_res2();
+        delay(500);
+        servo_res2();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        
+      }else if(servo1_kit == 1){
+          servo_res();
+          delay(500);
+      }else if(servo2_kit == 1){
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        servo_res2();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+      }
+
+
     }else if (recivedData7 == 2){
         Serial.println("S_victim");
         for ( int i =0;i < 5 ;i++){
@@ -479,6 +592,41 @@ void serialEvent7(){
           pixels.clear();
           pixels.show();
           delay(500);
+        }
+        if (servo1_kit >= 1){
+          servo_res();
+          delay(500);
+        }else if (servo2_kit >= 1){
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        servo_res2();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+          delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+          delay(300);
         }
       }else if(recivedData7 == 3){
         Serial.println("U_victim");
@@ -498,6 +646,113 @@ void serialEvent7(){
           pixels.show();
           delay(1000);
         }
+      if(servo1_kit >= 2){
+        servo_res();
+        delay(500);
+        servo_res();
+        delay(500);
+      }else if(servo1_kit == 1 && servo2_kit >= 1 ){
+        servo_res();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        servo_res2();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+      }else if(servo2_kit >= 2){
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        servo_res2();
+        delay(500);
+        servo_res2();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        
+      }else if(servo1_kit == 1){
+          servo_res();
+          delay(500);
+      }else if(servo2_kit == 1){
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        servo_res2();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+      }
       }else if(recivedData7 == 5){
         Serial.println("yellow_victim");
         for ( int i =0;i < 3 ;i++){
@@ -506,6 +761,42 @@ void serialEvent7(){
           pixels.clear();
           pixels.show();
           delay(1000);
+        }
+        if (servo1_kit >= 1){
+          servo_res();
+          delay(500);
+        }else if (servo2_kit >= 1){
+          
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        servo_res2();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
         }
       }else if(recivedData7 == 6){
         Serial.println("green_victim");
@@ -542,6 +833,113 @@ void serialEvent8(){
         pixels.show();
         delay(500);
       }
+      if(servo2_kit >= 2){
+        servo_res2();
+        delay(500);
+        servo_res2();
+        delay(500);
+      }else if(servo2_kit == 1 && servo1_kit >= 1 ){
+        servo_res2();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        servo_res();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+      }else if(servo1_kit >= 2){
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        servo_res();
+        delay(500);
+        servo_res();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        
+      }else if(servo2_kit == 1){
+          servo_res();
+          delay(500);
+      }else if(servo1_kit == 1){
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        servo_res();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+      }
     }else if (recivedData == 2){
         Serial.println("S_victim");
         for ( int i =0;i < 5 ;i++){
@@ -550,6 +948,41 @@ void serialEvent8(){
           pixels.clear();
           pixels.show();
           delay(500);
+        }
+        if (servo2_kit >= 1){
+          servo_res2();
+          delay(500);
+        }else if (servo1_kit >= 1){
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        servo_res();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+          delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+          delay(300);
         }
       }else if(recivedData == 3){
         Serial.println("U_victim");
@@ -569,6 +1002,113 @@ void serialEvent8(){
           pixels.show();
           delay(1000);
         }
+      if(servo2_kit >= 2){
+        servo_res2();
+        delay(500);
+        servo_res2();
+        delay(500);
+      }else if(servo2_kit == 1 && servo1_kit >= 1 ){
+        servo_res2();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        servo_res();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+      }else if(servo1_kit >= 2){
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        servo_res();
+        delay(500);
+        servo_res();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        
+      }else if(servo2_kit == 1){
+          servo_res();
+          delay(500);
+      }else if(servo1_kit == 1){
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        servo_res();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+      }
       }else if(recivedData == 5){
         Serial.println("yellow_victim");
         for ( int i =0;i < 3 ;i++){
@@ -577,6 +1117,41 @@ void serialEvent8(){
           pixels.clear();
           pixels.show();
           delay(1000);
+        }
+        if (servo2_kit >= 1){
+          servo_res2();
+          delay(500);
+        }else if (servo1_kit >= 1){
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+        delay(300);
+        servo_res();
+        delay(500);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+          delay(300);
+        Position[0] = 7450; //右に回転
+        Position[1] = 7450;
+        Position[2] = 7450;
+        Position[3] = 7450;
+        sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+        delay(1700);
+          delay(300);
         }
       }else if(recivedData == 6){
         Serial.println("green_victim");
