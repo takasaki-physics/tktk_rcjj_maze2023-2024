@@ -2541,7 +2541,7 @@ void ForBFSLeftGo(){
     uint8_t GoTo = 0;
     if     (!left_wall) {GoTo = Left ;}
     else if(!front_wall){GoTo = Front;}
-    else if(!Right_wall){GoTo = Right;}
+    else if(!right_wall){GoTo = Right;}
     else                {GoTo = Back ;}
 
     switch (GoTo)
