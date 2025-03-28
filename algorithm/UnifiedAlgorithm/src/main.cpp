@@ -2226,16 +2226,16 @@ void BFS(uint8_t x, uint8_t y)
         if(cost[a][b] - cost[a+1][b] == 1){
             TheWay = East;
         }
-        else if(cost[a][b] - cost[a][b-1] == 1){
+        if(cost[a][b] - cost[a][b-1] == 1){
             TheWay = North;
         }
-        else if(cost[a][b] - cost[a-1][b] == 1){
+        if(cost[a][b] - cost[a-1][b] == 1){
             TheWay = West;
         }
-        else if(cost[a][b] - cost[a][b+1] == 1){
+        if(cost[a][b] - cost[a][b+1] == 1){
             TheWay = South;
         }
-        else {
+        if(TheWay == 0){
           Serial.println("Error");
           pixels.clear();
           pixels.show();
@@ -2459,6 +2459,13 @@ void WriteDownWall(uint8_t x, uint8_t y,uint8_t Direction)
     }
 }
 
+/*******************************************************************************************/
+/* BFSで使う左手法                                                                            
+/*処理：現在は使ってない
+/*
+/*更新者：吉ノ薗2025/03/28
+/*
+/*******************************************************************************************/
 void ForBFSLeftGo(){
     //WriteDownWall
     int BFSWallZahyou = 0;
