@@ -25,8 +25,8 @@ int x = 4;
 int y = 1;
 uint8_t Direction = South;
 
-const uint8_t GoalX = 3;
-const uint8_t GoalY = 1;
+const uint8_t GoalX = 5;
+const uint8_t GoalY = 3;
 
 const uint8_t Xfactor = 7; // 迷路の大きさ
 const uint8_t Yfactor = 5;

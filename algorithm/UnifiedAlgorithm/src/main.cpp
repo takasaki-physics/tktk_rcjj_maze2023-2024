@@ -1720,6 +1720,7 @@ int cost[90][90];//マス目のコスト
 bool reach_time[90][90];//到達の有無（帰還用）
 long now_seconds;
 long firstseconds;
+bool StopFlag = false; //帰還アルゴリズムの停止フラグ
 
 /*******************************************************************************************/
 /* 座標などのデータ送信                                                                             
@@ -2484,7 +2485,7 @@ void ForBFSLeftGo(){
     switch (Direction){
     case East:
       if(right_wall){
-        BFSWallZahyou |= 2;
+        //BFSWallZahyou |= 2;
       }
       if(front_wall){
         BFSWallZahyou |= 8;
@@ -2514,7 +2515,7 @@ void ForBFSLeftGo(){
         BFSWallZahyou |= 4;
       }
       if(left_wall){
-        BFSWallZahyou |= 2;
+        //BFSWallZahyou |= 2;
       }
       break;
 
@@ -2523,126 +2524,112 @@ void ForBFSLeftGo(){
         BFSWallZahyou |= 4;
       }
       if(front_wall){
-        BFSWallZahyou |= 2;
+        //BFSWallZahyou |= 2;
       }
       if(left_wall){
         BFSWallZahyou |= 8;
       }
       break;
       }
-    //進行方向に対して背後の壁情報をなくす
-    switch (Direction)
-    {
-    case East:
-    kabe_zahyou[GoalX][GoalY] &= ~4;
-    break;
-
-    case North:
-    kabe_zahyou[GoalX][GoalY] &= ~2;
-    break;
-
-    case West:
-    kabe_zahyou[GoalX][GoalY] &= ~8;
-    break;
-
-    case South:
-    kabe_zahyou[GoalX][GoalY] &= ~1;
-    break;
+    //南の壁情報をなくす
+    //BFSWallZahyou &= ~2;
+    if(BFSWallZahyou == kabe_zahyou[GoalX][GoalY]){
+      StopFlag = true;
+      return;
     }
-    if(BFSWallZahyou == kabe_zahyou[GoalX][GoalY]){delay(30000);}
     //左手法
     uint8_t GoTo = 0;
-    if     (right_wall){GoTo = Right;}
-    else if(front_wall){GoTo = Front;}
-    else if(left_wall) {GoTo = Left ;}
-    else               {GoTo = Back ;}
+    if     (!left_wall) {GoTo = Left ;}
+    else if(!front_wall){GoTo = Front;}
+    else if(!Right_wall){GoTo = Right;}
+    else                {GoTo = Back ;}
 
     switch (GoTo)
     {
     case Right:
-    switch (Direction)
-    {
-    case North:
-      Direction = East;
-      break;
+      switch (Direction)
+      {
+      case North:
+        Direction = East;
+        break;
 
-    case East:
-      Direction = South;
-      break;
+      case East:
+        Direction = South;
+        break;
 
-    case South:
-      Direction = West;
-      break;
+      case South:
+        Direction = West;
+        break;
 
-    case West:
-      Direction = North;
+      case West:
+        Direction = North;
+        break;
+      }
+      Status = 4;
       break;
-    }
-    Status = 4;
-    break;
 
     case Front:
-    /*switch (Direction)
-    {
-    case North:
-      break;
+      /*switch (Direction)
+      {
+      case North:
+        break;
 
-    case East:
-      break;
+      case East:
+        break;
 
-    case South:
-      break;
+      case South:
+        break;
 
-    case West:
+      case West:
+        break;
+      }*/
+      Status = 2;
       break;
-    }*/
-    Status = 2;
-    break;
 
     case Left:
-    switch (Direction)
-    {
-    case North:
-      Direction = West;
-      break;
+      switch (Direction)
+      {
+      case North:
+        Direction = West;
+        break;
 
-    case East:
-      Direction = North;
-      break;
+      case East:
+        Direction = North;
+        break;
 
-    case South:
-      Direction = East;
-      break;
+      case South:
+        Direction = East;
+        break;
 
-    case West:
-      Direction = South;
+      case West:
+        Direction = South;
+        break;
+      }
+      Status = 3;
       break;
-    }
-    Status = 3;
-    break;
 
     case Back:
-    switch (Direction)
-    {
-    case North:
-      Direction = South;
-      break;
+      switch (Direction)
+      {
+      case North:
+        Direction = South;
+        break;
 
-    case East:
-      Direction = West;
-      break;
+      case East:
+        Direction = West;
+        break;
 
-    case South:
-      Direction = North;
-      break;
+      case South:
+        Direction = North;
+        break;
 
-    case West:
-      Direction = East;
+      case West:
+        Direction = East;
+        break;
+      }
+      Status = 5;
       break;
-    }
-    Status = 5;
-    break;
-    }
+      }
 }
 
 /*******************************************************************************************/
@@ -2653,6 +2640,7 @@ void ForBFSLeftGo(){
 /*更新者：吉ノ薗2025/01/22
 /*　　　　吉ノ薗2025/01/29：20秒停止するようにした
 /*       吉ノ薗2025/03/26 whileの条件を「スタックが空でなかった場合」に変更
+/*       吉ノ薗2025/03/28 座標がずれても戻れるように南以外の壁座標が間違っていた場合（スタート時Northで南がわからないため）左手法を走行するようにした
 /*
 /*******************************************************************************************/
 void GoHome()
@@ -2681,7 +2669,7 @@ void GoHome()
                 //Stop
                 /*ここに壁情報が合ってないとうろうろさせるコード入れる*/
                 /*壁情報取得　→　kabe_zahyou[50][50]と照合　→　会ってなかったら(x,y)=(51,50),(51,51),(50,51),(49,51),(49.50),(49,49),(50,49),(51,49)をそれぞれBFSで行って照合（いけなかったらどうするん）*/
-                /*while(1)
+                while(!StopFlag)
                 {
                   switch (Status)
                   {
@@ -2727,8 +2715,8 @@ void GoHome()
                     break;
                   }
 
-                }*/
-                delay(30000);               
+                }
+                delay(20000);               
                 break;
         }
         S.pop();//要素の削除
