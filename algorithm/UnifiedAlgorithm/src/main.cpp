@@ -127,8 +127,8 @@ Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800); //8個のNeoPixe
 /*..................レスキューキット排出用のサーボモーターの変数の定義............*/
 const int SERVO_PIN = 10; //servo2 36
 const int SERVO_PIN2 = 36;
-int servo1_kit = 6; //レスキューキットの残数
-int servo2_kit = 6; //上に同じ
+int servo1_kit = 8; //レスキューキットの残数
+int servo2_kit = 1; //上に同じ
 /*..........................................................*/
 /*センサー類変数*/
 unsigned int SERVO_POS = 0; //変数SERVO_POS=0とする
