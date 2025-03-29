@@ -466,6 +466,7 @@ void servo_res2(){
 //右側のカメラ
 void serialEvent7(){
   if (Serial7.available()>0 && !VictimisAlready[x][y]){
+    VictimisAlready[x][y] = true;
     int recivedData7 = Serial7.read();
     if (recivedData7 == 1){
       Serial.println("H_victim");
@@ -810,7 +811,6 @@ void serialEvent7(){
 
         }
       }
-      VictimisAlready[x][y] = true;
     }
 }
 
@@ -825,6 +825,7 @@ void serialEvent7(){
 
 void serialEvent8(){
   if (Serial8.available()>0 && !VictimisAlready[x][y]){
+    VictimisAlready[x][y] = true;
     int recivedData = Serial8.read();
     if (recivedData == 1){
       Serial.println("H_victim");
@@ -1166,7 +1167,6 @@ void serialEvent8(){
 
         }
       }
-      VictimisAlready[x][y] = true;
     }
 }
 
@@ -1786,7 +1786,7 @@ int8_t judge(){
         toutatu_zahyou[x][y] = 50;//行き止まりだから効率化のため二度と行かないようにする
     }
 
-    send_display();
+    //send_display();
     RightWeight = 0;//怖いから初期化
     FrontWeight = 0;
     LeftWeight = 0;
@@ -2591,6 +2591,7 @@ void GoHome()
 {
         //ここ以下を「相手(モーター)から動き終わったという信号が送られたら」とかにしないとバババッて送られちゃうかも
     while(!S.empty()){
+        //send_display();
         switch(S.top()){
             case 1:
                 //TurnRight
