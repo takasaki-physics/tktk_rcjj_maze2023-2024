@@ -1188,6 +1188,7 @@ void migi(){
     mawasu = kakudo_true2-80;
   }
   //90度回転させる
+  /*
   Position[0] = 7450; //右に回転
   Position[1] = 7450;
   Position[2] = 7450;
@@ -1201,6 +1202,7 @@ void migi(){
   if (kakudo_true2 - mawasu >= 300){
     mawasu = 360;
   }
+  */
   
   //仮にバンプなどで90度回らなかったら90度回るまで補正し続ける
   while (kakudo_true2 > mawasu){
@@ -1248,6 +1250,7 @@ void hidari(){
   }else if (kakudo_true2 >= 0){
     mawasu = kakudo_true2 + 80;
   }
+  /*
   Position[0] = -7450; //左に回転
   Position[1] = -7450;
   Position[2] = -7450;
@@ -1260,7 +1263,7 @@ void hidari(){
   if(kakudo_true2 <= -300){
       mawasu = 0;
   }
-    
+    */
     //90度回転しなかったときに角度の補正を行う
   while (kakudo_true2 < mawasu){
   Position[0] = -440; //左に回転
@@ -1341,8 +1344,8 @@ void serialEvent1() {
     
   }
   */
-  else if(receivedData2 == 5 || bump_giveup_count > 3){
-    if(receivedData2== 5 || bump_giveup_count > 3){
+  else if(receivedData2 == 5 || bump_giveup_count > 2){
+    if(receivedData2== 5 || bump_giveup_count > 2){
         Position[0] = -2025; //後ろに下がる
         Position[1] = 2025;
         Position[2] = 2025;
@@ -1484,6 +1487,7 @@ void serialEvent1() {
 /*
 /*******************************************************************************************/
 void susumu_heitan() {
+  susumu_kaisuu = 0; //いったん初期化
   if (right_wall == true && bump_giveup_count == 0 &&(receivedData[4] - receivedData[5] >= 10 || receivedData[4] - receivedData[5] <=-10)){
     if (receivedData[4] - receivedData[5] < 0){
         rag = receivedData[5] - receivedData[4];
@@ -2851,7 +2855,7 @@ void loop(){
         now_seconds = static_cast<long>(NowTime); 
 
         //330秒（＝5分半）経ったら幅優先探索を始める
-        if(now_seconds - firstseconds >= /*330*/ 120){
+        if(now_seconds - firstseconds >= 360){
             Status = 2;//帰還開始
             start_Gohome = true;
         }
