@@ -1786,7 +1786,7 @@ int8_t judge(){
         toutatu_zahyou[x][y] = 50;//行き止まりだから効率化のため二度と行かないようにする
     }
 
-    send_display();
+    //send_display();
     RightWeight = 0;//怖いから初期化
     FrontWeight = 0;
     LeftWeight = 0;
@@ -2553,7 +2553,7 @@ void GoHome()
 {
         //ここ以下を「相手(モーター)から動き終わったという信号が送られたら」とかにしないとバババッて送られちゃうかも
     while(!S.empty()){
-        send_display();
+        //send_display();
         switch(S.top()){
             case 1:
                 //TurnRight
