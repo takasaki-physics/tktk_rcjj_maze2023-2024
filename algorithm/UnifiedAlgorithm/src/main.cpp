@@ -1405,7 +1405,7 @@ void serialEvent1() {
             count2 = 40;  
       }
     }
-    count2= count2-10;
+    count2= count2-6;
     bump_giveup_count++;
   }else if(receivedData2 == 4){
     Serial.println("right");
@@ -1455,7 +1455,7 @@ void serialEvent1() {
           count2 = 40;  
     }
   }
-    count2= count2-10;
+    count2= count2-6;
     bump_giveup_count++;
   }else if(receivedData2 == 6){
         Serial.println("Check_Point");
