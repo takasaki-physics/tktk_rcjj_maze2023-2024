@@ -23,7 +23,7 @@ std::queue<int> Q;
 
 int x = 5;
 int y = 3;
-uint8_t Direction = South;
+uint8_t Direction = North;
 uint8_t NowDirection = 0;
 uint8_t Status = 1;
 
@@ -407,9 +407,11 @@ void ForBFSLeftGo(){
       return;
     }*/
     BFSWallZahyou &= ~2;
+    cout << "BFSWallZahyou = " << BFSWallZahyou << endl;
     kabe_zahyou[1][3] &= ~2;
     if(BFSWallZahyou == kabe_zahyou[1][3]){
       StopFlag = true;
+      cout << "Finish" << endl;
       return;
     }
     
@@ -600,6 +602,8 @@ void GoHome() {
                 break;
             case 4:
                 cout << "Stop" << endl;
+                cout << Direction << endl;
+                Direction = North;
                 while(!StopFlag)
                 {
                   switch (Status)
@@ -616,7 +620,7 @@ void GoHome() {
                      switch (Direction)
                      {
                      case North:
-                       y += -1;;
+                       y += -1;
                        break;
                      
                      case East:
@@ -668,7 +672,7 @@ void GoHome() {
                       break;
     
                     case South:
-                      y += 1;
+                      y += 1;//
                       break;
     
                     case West:
