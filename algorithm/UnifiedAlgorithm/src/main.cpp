@@ -466,6 +466,7 @@ void servo_res2(){
 //右側のカメラ
 void serialEvent7(){
   if (Serial7.available()>0 && !VictimisAlready[x][y]){
+    VictimisAlready[x][y] = true;
     int recivedData7 = Serial7.read();
     if (recivedData7 == 1){
       Serial.println("H_victim");
@@ -810,7 +811,6 @@ void serialEvent7(){
 
         }
       }
-      VictimisAlready[x][y] = true;
     }
 }
 
@@ -825,6 +825,7 @@ void serialEvent7(){
 
 void serialEvent8(){
   if (Serial8.available()>0 && !VictimisAlready[x][y]){
+    VictimisAlready[x][y] = true;
     int recivedData = Serial8.read();
     if (recivedData == 1){
       Serial.println("H_victim");
@@ -1166,7 +1167,6 @@ void serialEvent8(){
 
         }
       }
-      VictimisAlready[x][y] = true;
     }
 }
 
