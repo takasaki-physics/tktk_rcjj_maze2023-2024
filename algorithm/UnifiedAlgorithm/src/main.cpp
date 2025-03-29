@@ -448,9 +448,9 @@ void servo_res(){
 }
 
 void servo_res2(){
-  motor_servo2(100,200);
-  motor_servo2(0,1000);
   motor_servo2(-100,200);
+  motor_servo2(0,1000);
+  motor_servo2(100,200);
   motor_servo2(0,1000);
   delay(150);
   servo2_kit--;
@@ -472,16 +472,16 @@ void serialEvent7(){
       Serial.println("H_victim");
       for ( int i =0;i < 5 ;i++){
         NeoPixel_Color(255,0,0);
-        delay(500);
+        delay(650);
         pixels.clear();
         pixels.show();
-        delay(500);
+        delay(650);
       }
       if(servo1_kit >= 2){
         servo_res();
-        delay(500);
+        delay(650);
         servo_res();
-        delay(500);
+        delay(650);
       }else if(servo1_kit == 1 && servo2_kit >= 1 ){
         servo_res();
         delay(500);
@@ -590,10 +590,10 @@ void serialEvent7(){
         Serial.println("S_victim");
         for ( int i =0;i < 5 ;i++){
           NeoPixel_Color(255,200,0);
-          delay(500);
+          delay(650);
           pixels.clear();
           pixels.show();
-          delay(500);
+          delay(650);
         }
         if (servo1_kit >= 1){
           servo_res();
@@ -634,10 +634,10 @@ void serialEvent7(){
         Serial.println("U_victim");
         for ( int i =0;i < 5 ;i++){
           NeoPixel_Color(0,255,0);
-          delay(500);
+          delay(650);
           pixels.clear();
           pixels.show();
-          delay(500);
+          delay(650);
         }
       }else if (recivedData7 == 4){
         Serial.println("red_victim");
@@ -831,16 +831,16 @@ void serialEvent8(){
       Serial.println("H_victim");
       for ( int i =0;i < 5 ;i++){
         NeoPixel_Color(255,0,0);
-        delay(500);
+        delay(650);
         pixels.clear();
         pixels.show();
-        delay(500);
+        delay(650);
       }
       if(servo2_kit >= 2){
         servo_res2();
-        delay(500);
+        delay(650);
         servo_res2();
-        delay(500);
+        delay(650);
       }else if(servo2_kit == 1 && servo1_kit >= 1 ){
         servo_res2();
         delay(500);
@@ -947,10 +947,10 @@ void serialEvent8(){
         Serial.println("S_victim");
         for ( int i =0;i < 5 ;i++){
           NeoPixel_Color(255,200,0);
-          delay(500);
+          delay(650);
           pixels.clear();
           pixels.show();
-          delay(500);
+          delay(650);
         }
         if (servo2_kit >= 1){
           servo_res2();
@@ -991,7 +991,7 @@ void serialEvent8(){
         Serial.println("U_victim");
         for ( int i =0;i < 5 ;i++){
           NeoPixel_Color(0,255,0);
-          delay(500);
+          delay(650);
           pixels.clear();
           pixels.show();
           delay(500);
@@ -1187,6 +1187,7 @@ void migi(){
   }else if (kakudo_true2 <= 360){
     mawasu = kakudo_true2-80;
   }
+  /*
   //90度回転させる
   Position[0] = 7450; //右に回転
   Position[1] = 7450;
@@ -1201,7 +1202,7 @@ void migi(){
   if (kakudo_true2 - mawasu >= 300){
     mawasu = 360;
   }
-  
+  */
   //仮にバンプなどで90度回らなかったら90度回るまで補正し続ける
   while (kakudo_true2 > mawasu){
   Position[0] = 440; //右に回転
@@ -1248,6 +1249,7 @@ void hidari(){
   }else if (kakudo_true2 >= 0){
     mawasu = kakudo_true2 + 80;
   }
+  /*
   Position[0] = -7450; //左に回転
   Position[1] = -7450;
   Position[2] = -7450;
@@ -1260,7 +1262,7 @@ void hidari(){
   if(kakudo_true2 <= -300){
       mawasu = 0;
   }
-    
+    */
     //90度回転しなかったときに角度の補正を行う
   while (kakudo_true2 < mawasu){
   Position[0] = -440; //左に回転
@@ -1380,7 +1382,7 @@ void serialEvent1() {
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     delay(471);
     delay(500);
-    if (bump_giveup_count == 0){
+    //if (bump_giveup_count == 0){
       while (Serial3.available() > 0) {
         char receivedChar = Serial3.read(); // データを読み取る
         // 必要に応じて受信データを処理する
@@ -1391,20 +1393,22 @@ void serialEvent1() {
           get_tof_data();
       }
       if (receivedData[0] <= 90 && receivedData[3] <= 90&& receivedData[0] - receivedData[3] < 30 && receivedData[0] - receivedData[3] > -30){
+            /*
             Position[0] = -1000; //後ろに下がる
             Position[1] = 1000;
             Position[2] = 1000;
             Position[3] = -1000;
             sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
             Serial.println("Backing...");
-            delay(500);           
+            delay(500);  
+            */         
             if (count2 < 20 ){
                 //座標の変更をもとに戻す
                 Gap = true;
             }
-            count2 = 40;  
+            count2 = 46;  
       }
-    }
+    //}
     count2= count2-6;
     bump_giveup_count++;
   }else if(receivedData2 == 4){
@@ -1430,7 +1434,7 @@ void serialEvent1() {
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     delay(471);
     delay(500);
-    if (bump_giveup_count == 0){
+    //if (bump_giveup_count == 0){
     while (Serial3.available() > 0) {
       char receivedChar = Serial3.read(); // データを読み取る
       // 必要に応じて受信データを処理する
@@ -1441,20 +1445,22 @@ void serialEvent1() {
         get_tof_data();
     }
     if (receivedData[0] <= 90 && receivedData[3] <= 90 && receivedData[0] - receivedData[3] < 30 && receivedData[0] - receivedData[3] > -30){
+          /*
           Position[0] = -1000; //後ろに下がる
           Position[1] = 1000;
           Position[2] = 1000;
           Position[3] = -1000;
           sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
           Serial.println("Backing...");
-          delay(500);             
+          delay(500);
+          */             
           if (count2 < 20 ){
               //座標の変更をもとに戻す
               Gap = true;
           }
-          count2 = 40;  
+          count2 = 46;  
     }
-  }
+  //}
     count2= count2-6;
     bump_giveup_count++;
   }else if(receivedData2 == 6){
@@ -1484,6 +1490,7 @@ void serialEvent1() {
 /*
 /*******************************************************************************************/
 void susumu_heitan() {
+  count2 = 0; //いったん初期化
   if (right_wall == true && bump_giveup_count == 0 &&(receivedData[4] - receivedData[5] >= 10 || receivedData[4] - receivedData[5] <=-10)){
     if (receivedData[4] - receivedData[5] < 0){
         rag = receivedData[5] - receivedData[4];
