@@ -1623,6 +1623,7 @@ int LeftWeight = 0;
 const uint8_t GoalX = 50;
 const uint8_t GoalY = 50;
 bool start_Gohome = false; //SSD1306に帰還アルゴリズムに入っているかどうかを送信するかの変数
+uint8_t NowDirection = 0; //現在の方向
 
 /*帰還用変数*/
 int kabe_zahyou[90][90];//0000 の4ビットに絶対方向の東8西4南2北1をそれぞれ割り当てるみたいな
@@ -2119,7 +2120,7 @@ void BFS()
     //スタックを使って逆探索
     a = GoalX;
     b = GoalY;
-    uint8_t NowDirection = Direction;
+    NowDirection = Direction;
     Direction = North;
 
     S.push(4);//停止用
@@ -2458,6 +2459,7 @@ void ForBFSLeftGo(){
     }
     //南の壁情報をなくす
     BFSWallZahyou &= ~2;
+    kabe_zahyou[GoalX][GoalY] &= ~2;
     if(BFSWallZahyou == kabe_zahyou[GoalX][GoalY]){
       StopFlag = true;
       return;
@@ -2473,24 +2475,6 @@ void ForBFSLeftGo(){
     switch (GoTo)
     {
     case Right:
-      switch (Direction)
-      {
-      case North:
-        Direction = East;
-        break;
-
-      case East:
-        Direction = South;
-        break;
-
-      case South:
-        Direction = West;
-        break;
-
-      case West:
-        Direction = North;
-        break;
-      }
       Status = 4;
       break;
 
@@ -2499,46 +2483,10 @@ void ForBFSLeftGo(){
       break;
 
     case Left:
-      switch (Direction)
-      {
-      case North:
-        Direction = West;
-        break;
-
-      case East:
-        Direction = North;
-        break;
-
-      case South:
-        Direction = East;
-        break;
-
-      case West:
-        Direction = South;
-        break;
-      }
       Status = 3;
       break;
 
     case Back:
-      switch (Direction)
-      {
-      case North:
-        Direction = South;
-        break;
-
-      case East:
-        Direction = West;
-        break;
-
-      case South:
-        Direction = North;
-        break;
-
-      case West:
-        Direction = East;
-        break;
-      }
       Status = 5;
       break;
       }
@@ -2558,7 +2506,7 @@ void ForBFSLeftGo(){
 /*******************************************************************************************/
 void GoHome()
 {
-        //ここ以下を「相手(モーター)から動き終わったという信号が送られたら」とかにしないとバババッて送られちゃうかも
+    Direction = NowDirection;
     while(!S.empty()){
         //send_display();
         switch(S.top()){
@@ -2616,7 +2564,7 @@ void GoHome()
                 switch (Direction)
                 {
                 case North:
-                  y += -1;;
+                  y += -1;
                   break;
                 
                 case East:
@@ -2636,8 +2584,8 @@ void GoHome()
             case 4:
                 //Stop
                 /*ここに壁情報が合ってないとうろうろさせるコード入れる*/
-                /*壁情報取得　→　kabe_zahyou[50][50]と照合　→　会ってなかったら(x,y)=(51,50),(51,51),(50,51),(49,51),(49.50),(49,49),(50,49),(51,49)をそれぞれBFSで行って照合（いけなかったらどうするん）*/
-                /*while(!StopFlag)
+                /*壁情報取得*/
+                while(!StopFlag)
                 {
                   switch (Status)
                   {
@@ -2652,22 +2600,112 @@ void GoHome()
 
                   case 2://直進
                     susumu_heitan();
+                    switch (Direction)
+                    {
+                    case North:
+                      y += -1;
+                      break;
+                    
+                    case East:
+                      x += 1;
+                      break;
+    
+                    case South:
+                      y += 1;
+                      break;
+    
+                    case West:
+                      x += -1;
+                      break;
+                    }
                     delay(200);
                     TileStatus();
                     break;
                   
                   case 3://左折
                     hidari();
+                    switch (Direction)
+                    {
+                    case North:
+                      Direction = West;
+                      break;
+                    
+                    case East:
+                      Direction = North;
+                      break;
+    
+                    case South:
+                      Direction = East;
+                      break;
+    
+                    case West:
+                      Direction = South;
+                      break;
+                    }
                     delay(500);
                     susumu_heitan();
+                    switch (Direction)
+                    {
+                    case North:
+                      y += -1;
+                      break;
+                    
+                    case East:
+                      x += 1;
+                      break;
+    
+                    case South:
+                      y += 1;//
+                      break;
+    
+                    case West:
+                      x += -1;
+                      break;
+                    }
                     delay(200);
                     TileStatus();
                     break;
                   
                   case 4://右折
                     migi();
+                    switch (Direction)
+                    {
+                    case North:
+                      Direction = East;
+                      break;
+                    
+                    case East:
+                      Direction = South;
+                      break;
+    
+                    case South:
+                      Direction = West;
+                      break;
+    
+                    case West:
+                      Direction = North;
+                      break;
+                    }
                     delay(500);
                     susumu_heitan();
+                    switch (Direction)
+                    {
+                    case North:
+                      y += -1;
+                      break;
+                    
+                    case East:
+                      x += 1;
+                      break;
+    
+                    case South:
+                      y += 1;
+                      break;
+    
+                    case West:
+                      x += -1;
+                      break;
+                    }
                     delay(200);
                     TileStatus();
                     break;
@@ -2676,14 +2714,50 @@ void GoHome()
                     migi();
                     delay(500);
                     migi();
+                    switch (Direction)
+                    {
+                    case North:
+                      Direction = South;
+                      break;
+                    
+                    case East:
+                      Direction = West;
+                      break;
+    
+                    case South:
+                      Direction = North;
+                      break;
+    
+                    case West:
+                      Direction = East;
+                      break;
+                    }
                     delay(500);
                     susumu_heitan();
+                    switch (Direction)
+                    {
+                    case North:
+                      y += -1;
+                      break;
+                    
+                    case East:
+                      x += 1;
+                      break;
+    
+                    case South:
+                      y += 1;
+                      break;
+    
+                    case West:
+                      x += -1;
+                      break;
+                    }
                     delay(200);
                     TileStatus();
                     break;
                   }
 
-                }*/
+                }
                 NeoPixel_Color(0,0,255);    
                 delay(20000);               
                 break;

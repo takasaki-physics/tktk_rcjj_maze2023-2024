@@ -22,15 +22,18 @@ std::queue<int> Q;
 #define Back 4
 
 int x = 5;
-int y = 3;
-uint8_t Direction = North;
+int y = 2;
+uint8_t Direction = East;
 uint8_t NowDirection = 0;
 uint8_t Status = 1;
 
 bool StopFlag = false;
 
-const uint8_t GoalX = 2;
-const uint8_t GoalY = 3;
+const uint8_t GoalX = 3;
+const uint8_t GoalY = 2;
+
+const uint8_t RealGoalX = 3;
+const uint8_t RealGoalY = 1;
 
 const uint8_t Xfactor = 7; // 迷路の大きさ
 const uint8_t Yfactor = 5;
@@ -143,11 +146,12 @@ void BFS() {
     }*/
 
     S.push(4);//停止用
+    cout << "a = " << a << ",b = " << b << endl;
     while(!((a == x) && (b == y))){
         delay(10);
         //cout << "a = " << a << ",b = " << b << ",Direction = " << Direction << endl;
-        cout << "a = " << a << ",b = " << b << endl;
-        cout << "GoTo = " << WhichWay(a,b) << endl;
+        
+        cout << "WhichWay = " << WhichWay(a,b) << endl;
         switch(Direction){
             case East:
                 switch(WhichWay(a,b)){//前後左右のどこが最短になるか
@@ -266,9 +270,7 @@ void BFS() {
                 //Serial.println("Error");
                 break;
         }
-        /*if((a == x)&&(b == y)){
-            break;
-        }*/
+        cout << "a = " << a << ",b = " << b << endl;
     }
     switch (NowDirection)//1：右折、2：左折、3：直進
     {
@@ -400,16 +402,11 @@ void ForBFSLeftGo(){
       break;
     }*/
     //南の壁情報をなくす
-    /*BFSWallZahyou &= ~2;
-    kabe_zahyou[GoalX][GoalY] &= ~2;
-    if(BFSWallZahyou == kabe_zahyou[GoalX][GoalY]){
-      StopFlag = true;
-      return;
-    }*/
     BFSWallZahyou &= ~2;
+    kabe_zahyou[RealGoalX][RealGoalY] &= ~2;
     cout << "BFSWallZahyou = " << BFSWallZahyou << endl;
-    kabe_zahyou[1][3] &= ~2;
-    if(BFSWallZahyou == kabe_zahyou[1][3]){
+    
+    if(BFSWallZahyou == kabe_zahyou[RealGoalX][RealGoalY]){
       StopFlag = true;
       cout << "Finish" << endl;
       return;
@@ -456,24 +453,6 @@ void ForBFSLeftGo(){
     switch (GoTo)
     {
     case Right:
-      switch (Direction)
-      {
-      case North:
-        Direction = East;
-        break;
-
-      case East:
-        Direction = South;
-        break;
-
-      case South:
-        Direction = West;
-        break;
-
-      case West:
-        Direction = North;
-        break;
-      }
       Status = 4;
       break;
 
@@ -482,46 +461,10 @@ void ForBFSLeftGo(){
       break;
 
     case Left:
-      switch (Direction)
-      {
-      case North:
-        Direction = West;
-        break;
-
-      case East:
-        Direction = North;
-        break;
-
-      case South:
-        Direction = East;
-        break;
-
-      case West:
-        Direction = South;
-        break;
-      }
       Status = 3;
       break;
 
     case Back:
-      switch (Direction)
-      {
-      case North:
-        Direction = South;
-        break;
-
-      case East:
-        Direction = West;
-        break;
-
-      case South:
-        Direction = North;
-        break;
-
-      case West:
-        Direction = East;
-        break;
-      }
       Status = 5;
       break;
       }
@@ -531,6 +474,7 @@ void ForBFSLeftGo(){
 
 
 void GoHome() {
+    cout << " " << endl;
     Direction = NowDirection;
     while (!S.empty()) {
         switch (S.top()) {
@@ -583,7 +527,7 @@ void GoHome() {
                 switch (Direction)
                 {
                 case North:
-                  y += -1;;
+                  y += -1;
                   break;
                 
                 case East:
@@ -603,7 +547,9 @@ void GoHome() {
             case 4:
                 cout << "Stop" << endl;
                 cout << Direction << endl;
-                Direction = North;
+                cout << "kabe_zahyou[RealGoalX][RealGoalY] = " << kabe_zahyou[RealGoalX][RealGoalY] << endl;
+
+                //Direction = North;
                 while(!StopFlag)
                 {
                   switch (Status)
@@ -664,7 +610,7 @@ void GoHome() {
                     switch (Direction)
                     {
                     case North:
-                      y += -1;;
+                      y += -1;
                       break;
                     
                     case East:
@@ -708,7 +654,7 @@ void GoHome() {
                     switch (Direction)
                     {
                     case North:
-                      y += -1;;
+                      y += -1;
                       break;
                     
                     case East:
@@ -772,7 +718,7 @@ void GoHome() {
                     switch (Direction)
                     {
                     case North:
-                      y += -1;;
+                      y += -1;
                       break;
                     
                     case East:
