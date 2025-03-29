@@ -1487,7 +1487,7 @@ void serialEvent1() {
 /*
 /*******************************************************************************************/
 void susumu_heitan() {
-  susumu_kaisuu = 0; //いったん初期化
+  count2 = 0; //いったん初期化
   if (right_wall == true && bump_giveup_count == 0 &&(receivedData[4] - receivedData[5] >= 10 || receivedData[4] - receivedData[5] <=-10)){
     if (receivedData[4] - receivedData[5] < 0){
         rag = receivedData[5] - receivedData[4];
