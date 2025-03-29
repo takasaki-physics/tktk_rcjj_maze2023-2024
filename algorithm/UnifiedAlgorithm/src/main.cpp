@@ -2407,7 +2407,7 @@ void ForBFSLeftGo(){
       }
       if(front_wall){
         BFSWallZahyou += 8;
-      }
+      }Wa
       if(left_wall){
         BFSWallZahyou += 1;
       }

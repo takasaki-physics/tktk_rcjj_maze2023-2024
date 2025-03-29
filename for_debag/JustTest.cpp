@@ -24,6 +24,7 @@ std::queue<int> Q;
 int x = 5;
 int y = 3;
 uint8_t Direction = South;
+uint8_t NowDirection = 0;
 uint8_t Status = 1;
 
 bool StopFlag = false;
@@ -133,7 +134,7 @@ void BFS() {
     //スタックを使って逆探索
     a = GoalX;
     b = GoalY;
-    uint8_t NowDirection = Direction;
+    NowDirection = Direction;
     Direction = North;
 
     /*デバッグ用*/
@@ -528,6 +529,7 @@ void ForBFSLeftGo(){
 
 
 void GoHome() {
+    Direction = NowDirection;
     while (!S.empty()) {
         switch (S.top()) {
             case 1:
