@@ -2449,12 +2449,7 @@ void ForBFSLeftGo(){
       }
       break;
       }
-    //南の壁情報をなくす
-    //BFSWallZahyou &= ~2;
-    if(BFSWallZahyou == kabe_zahyou[GoalX][GoalY]){
-      StopFlag = true;
-      return;
-    }
+    
     //左手法
     uint8_t GoTo = 0;
     if     (!left_wall) {GoTo = Left ;}
@@ -2534,6 +2529,12 @@ void ForBFSLeftGo(){
       Status = 5;
       break;
       }
+      //南の壁情報をなくす
+    BFSWallZahyou &= ~2;
+    if(BFSWallZahyou == kabe_zahyou[GoalX][GoalY]){
+      StopFlag = true;
+      return;
+    }
 }
 
 /*******************************************************************************************/
