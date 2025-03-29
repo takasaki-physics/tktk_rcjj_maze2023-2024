@@ -604,6 +604,8 @@ void GoHome() {
                   {
                   case 1:
                     //WriteDownWall
+                    
+                    cout << "x = " << x << ",y = " << y << endl;
                     ForBFSLeftGo();
                     break;
 
@@ -789,8 +791,8 @@ void GoHome() {
                 delay(20000);
                 break;
                 
-                cout << "x = " << x << ",y = " << y << endl;
         }
+        cout << "x = " << x << ",y = " << y << endl;
         S.pop();
     }
 }
