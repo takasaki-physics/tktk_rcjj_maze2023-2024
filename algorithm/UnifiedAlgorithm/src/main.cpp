@@ -472,10 +472,10 @@ void serialEvent7(){
       Serial.println("H_victim");
       for ( int i =0;i < 5 ;i++){
         NeoPixel_Color(255,0,0);
-        delay(500);
+        delay(650);
         pixels.clear();
         pixels.show();
-        delay(500);
+        delay(650);
       }
       if(servo1_kit >= 2){
         servo_res();
@@ -590,10 +590,10 @@ void serialEvent7(){
         Serial.println("S_victim");
         for ( int i =0;i < 5 ;i++){
           NeoPixel_Color(255,200,0);
-          delay(500);
+          delay(650);
           pixels.clear();
           pixels.show();
-          delay(500);
+          delay(650);
         }
         if (servo1_kit >= 1){
           servo_res();
@@ -634,19 +634,19 @@ void serialEvent7(){
         Serial.println("U_victim");
         for ( int i =0;i < 5 ;i++){
           NeoPixel_Color(0,255,0);
-          delay(500);
+          delay(650);
           pixels.clear();
           pixels.show();
-          delay(500);
+          delay(650);
         }
       }else if (recivedData7 == 4){
         Serial.println("red_victim");
         for ( int i =0;i < 3 ;i++){
           NeoPixel_Color(255,0,0);
-          delay(1000);
+          delay(1200);
           pixels.clear();
           pixels.show();
-          delay(1000);
+          delay(1200);
         }
       if(servo1_kit >= 2){
         servo_res();
@@ -759,10 +759,10 @@ void serialEvent7(){
         Serial.println("yellow_victim");
         for ( int i =0;i < 3 ;i++){
           NeoPixel_Color(255,200,0);
-          delay(1000);
+          delay(1200);
           pixels.clear();
           pixels.show();
-          delay(1000);
+          delay(1200);
         }
         if (servo1_kit >= 1){
           servo_res();
@@ -804,10 +804,10 @@ void serialEvent7(){
         Serial.println("green_victim");
         for ( int i =0;i < 3 ;i++){
           NeoPixel_Color(0,255,0);
-          delay(1000);
+          delay(1200);
           pixels.clear();
           pixels.show();
-          delay(1000);
+          delay(1200);
 
         }
       }
@@ -838,9 +838,9 @@ void serialEvent8(){
       }
       if(servo2_kit >= 2){
         servo_res2();
-        delay(500);
+        delay(650);
         servo_res2();
-        delay(500);
+        delay(650);
       }else if(servo2_kit == 1 && servo1_kit >= 1 ){
         servo_res2();
         delay(500);
@@ -947,10 +947,10 @@ void serialEvent8(){
         Serial.println("S_victim");
         for ( int i =0;i < 5 ;i++){
           NeoPixel_Color(255,200,0);
-          delay(500);
+          delay(650);
           pixels.clear();
           pixels.show();
-          delay(500);
+          delay(650);
         }
         if (servo2_kit >= 1){
           servo_res2();
@@ -991,19 +991,19 @@ void serialEvent8(){
         Serial.println("U_victim");
         for ( int i =0;i < 5 ;i++){
           NeoPixel_Color(0,255,0);
-          delay(500);
+          delay(650);
           pixels.clear();
           pixels.show();
-          delay(500);
+          delay(650);
         }
       }else if (recivedData == 4){
         Serial.println("red_victim");
         for ( int i =0;i < 3 ;i++){
           NeoPixel_Color(255,0,0);
-          delay(1000);
+          delay(1200);
           pixels.clear();
           pixels.show();
-          delay(1000);
+          delay(1200);
         }
       if(servo2_kit >= 2){
         servo_res2();
@@ -1116,10 +1116,10 @@ void serialEvent8(){
         Serial.println("yellow_victim");
         for ( int i =0;i < 3 ;i++){
           NeoPixel_Color(255,200,0);
-          delay(1000);
+          delay(1200);
           pixels.clear();
           pixels.show();
-          delay(1000);
+          delay(1200);
         }
         if (servo2_kit >= 1){
           servo_res2();
@@ -1160,10 +1160,10 @@ void serialEvent8(){
         Serial.println("green_victim");
         for ( int i =0;i < 3 ;i++){
           NeoPixel_Color(0,255,0);
-          delay(1000);
+          delay(1200);
           pixels.clear();
           pixels.show();
-          delay(1000);
+          delay(1200);
 
         }
       }
