@@ -2683,7 +2683,8 @@ void GoHome()
                     break;
                   }
 
-                }*/         
+                }*/
+                NeoPixel_Color(0,0,255);    
                 delay(20000);               
                 break;
         }
