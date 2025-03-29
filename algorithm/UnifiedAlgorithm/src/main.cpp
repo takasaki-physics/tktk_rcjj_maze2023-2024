@@ -2012,11 +2012,6 @@ int WhichWay(uint8_t a,uint8_t b)
         return South;
     }
     Serial.println("Error");
-    pixels.clear();
-    pixels.show();
-    delay(500);
-    NeoPixel_Color(0,0,255);
-    delay(500);
     return 0;
 }
 
@@ -2120,8 +2115,6 @@ void BFS()
     uint8_t NowDirection = Direction;
     Direction = North;
 
-    NeoPixel_Color(0,255,0);
-
     S.push(4);//停止用
 
 
@@ -2148,10 +2141,6 @@ void BFS()
                         Direction = North;
                         break;
                     case East:
-                        pixels.clear();
-                        pixels.show();
-                        NeoPixel_Color(255,0,0);
-                        delay(300);
                         Direction =North;
                         break;
 
@@ -2180,10 +2169,6 @@ void BFS()
                         break;
 
                     case North:
-                        pixels.clear();
-                        pixels.show();
-                        NeoPixel_Color(0,255,0);
-                        delay(300);
                         S.push(1);
                         S.push(1);
                         S.push(3);
@@ -2216,10 +2201,6 @@ void BFS()
                         break;
 
                     case West:
-                        pixels.clear();
-                        pixels.show();
-                        NeoPixel_Color(255,0,0);
-                        delay(300);
                         Direction =North;
                         break;
 
@@ -2248,10 +2229,6 @@ void BFS()
                         break;
 
                     case South:
-                        pixels.clear();
-                        pixels.show();
-                        NeoPixel_Color(255,0,0);
-                        delay(300);
                         Direction = North;
                         break;
 
@@ -2338,9 +2315,6 @@ void BFS()
         }
         break;
     }
-    pixels.clear();
-    pixels.show();
-    NeoPixel_Color(255,255,0);
 }
 
 
@@ -2432,31 +2406,31 @@ void ForBFSLeftGo(){
         //BFSWallZahyou |= 2;
       }
       if(front_wall){
-        BFSWallZahyou |= 8;
+        BFSWallZahyou += 8;
       }
       if(left_wall){
-        BFSWallZahyou |= 1;
+        BFSWallZahyou += 1;
       }
       break;
             
     case North:
       if(right_wall){
-        BFSWallZahyou |= 8;
+        BFSWallZahyou += 8;
       }
       if(front_wall){
-        BFSWallZahyou |= 1;
+        BFSWallZahyou += 1;
       }
       if(left_wall){
-        BFSWallZahyou |= 4;
+        BFSWallZahyou += 4;
       }
       break;
 
     case West:
       if(right_wall){
-        BFSWallZahyou |= 1;
+        BFSWallZahyou += 1;
       }
       if(front_wall){
-        BFSWallZahyou |= 4;
+        BFSWallZahyou += 4;
       }
       if(left_wall){
         //BFSWallZahyou |= 2;
@@ -2465,13 +2439,13 @@ void ForBFSLeftGo(){
 
     case South:
       if(right_wall){
-        BFSWallZahyou |= 4;
+        BFSWallZahyou += 4;
       }
       if(front_wall){
         //BFSWallZahyou |= 2;
       }
       if(left_wall){
-        BFSWallZahyou |= 8;
+        BFSWallZahyou += 8;
       }
       break;
       }
@@ -2513,20 +2487,6 @@ void ForBFSLeftGo(){
       break;
 
     case Front:
-      /*switch (Direction)
-      {
-      case North:
-        break;
-
-      case East:
-        break;
-
-      case South:
-        break;
-
-      case West:
-        break;
-      }*/
       Status = 2;
       break;
 
@@ -2591,22 +2551,77 @@ void GoHome()
 {
         //ここ以下を「相手(モーター)から動き終わったという信号が送られたら」とかにしないとバババッて送られちゃうかも
     while(!S.empty()){
+        send_display();
         switch(S.top()){
             case 1:
                 //TurnRight
                 migi();
+                switch (Direction)
+                {
+                case North:
+                  Direction = East;
+                  break;
+                
+                case East:
+                  Direction = South;
+                  break;
+
+                case South:
+                  Direction = West;
+                  break;
+
+                case West:
+                  Direction = North;
+                  break;
+                }
                 delay(500);
                 break;
 
             case 2:
                 //TurnLeft
                 hidari();
+                switch (Direction)
+                {
+                case North:
+                  Direction = West;
+                  break;
+                
+                case East:
+                  Direction = North;
+                  break;
+
+                case South:
+                  Direction = East;
+                  break;
+
+                case West:
+                  Direction = South;
+                  break;
+                }
                 delay(500);
                 break;
 
             case 3:
                 //GoStraight
                 susumu_heitan();
+                switch (Direction)
+                {
+                case North:
+                  y += -1;;
+                  break;
+                
+                case East:
+                  x += 1;
+                  break;
+
+                case South:
+                  y += 1;
+                  break;
+
+                case West:
+                  x += -1;
+                  break;
+                }
                 delay(200);
                 break;
             case 4:
@@ -2860,10 +2875,10 @@ void loop(){
         break;
     
     case 2://帰還(このとき探索に戻らないよう入れ子構造にする or ここだけは関数内に直接migi()とかを入れてwhile文)
-        NeoPixel_Color(0,0,255);   
+        //NeoPixel_Color(0,0,255);   
         BFS();
-        pixels.clear();
-        pixels.show();
+        //pixels.clear();
+        //pixels.show();
         GoHome();
         break;
 
