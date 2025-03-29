@@ -2448,7 +2448,13 @@ void ForBFSLeftGo(){
         BFSWallZahyou += 8;
       }
       break;
-      }
+    }
+    //南の壁情報をなくす
+    BFSWallZahyou &= ~2;
+    if(BFSWallZahyou == kabe_zahyou[GoalX][GoalY]){
+      StopFlag = true;
+      return;
+    }
     
     //左手法
     uint8_t GoTo = 0;
@@ -2529,12 +2535,7 @@ void ForBFSLeftGo(){
       Status = 5;
       break;
       }
-      //南の壁情報をなくす
-    BFSWallZahyou &= ~2;
-    if(BFSWallZahyou == kabe_zahyou[GoalX][GoalY]){
-      StopFlag = true;
-      return;
-    }
+      
 }
 
 /*******************************************************************************************/
@@ -2629,7 +2630,7 @@ void GoHome()
                 //Stop
                 /*ここに壁情報が合ってないとうろうろさせるコード入れる*/
                 /*壁情報取得　→　kabe_zahyou[50][50]と照合　→　会ってなかったら(x,y)=(51,50),(51,51),(50,51),(49,51),(49.50),(49,49),(50,49),(51,49)をそれぞれBFSで行って照合（いけなかったらどうするん）*/
-                while(!StopFlag)
+                /*while(!StopFlag)
                 {
                   switch (Status)
                   {
@@ -2675,7 +2676,7 @@ void GoHome()
                     break;
                   }
 
-                }
+                }*/         
                 delay(20000);               
                 break;
         }
@@ -2866,7 +2867,7 @@ void loop(){
         now_seconds = static_cast<long>(NowTime); 
 
         //330秒（＝5分半）経ったら幅優先探索を始める
-        if(now_seconds - firstseconds >= /*330*/ 120){
+        if(now_seconds - firstseconds >= 330 /*60*/){
             Status = 2;//帰還開始
             start_Gohome = true;
         }
