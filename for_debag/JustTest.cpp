@@ -24,8 +24,11 @@ std::queue<int> Q;
 int x = 5;
 int y = 3;
 uint8_t Direction = South;
+uint8_t Status = 1;
 
-const uint8_t GoalX = 1;
+bool StopFlag = false;
+
+const uint8_t GoalX = 2;
 const uint8_t GoalY = 3;
 
 const uint8_t Xfactor = 7; // 迷路の大きさ
@@ -342,26 +345,451 @@ void BFS() {
     }
 }
 
+void ForBFSLeftGo(){
+    //WriteDownWall
+    int BFSWallZahyou = kabe_zahyou[x][y];
+    //壁情報の記入(ここは帰還アルゴリズム用の関数)
+    /*switch (Direction){
+    case East:
+      if(right_wall){
+        //BFSWallZahyou |= 2;
+      }
+      if(front_wall){
+        BFSWallZahyou += 8;
+      }
+      if(left_wall){
+        BFSWallZahyou += 1;
+      }
+      break;
+            
+    case North:
+      if(right_wall){
+        BFSWallZahyou += 8;
+      }
+      if(front_wall){
+        BFSWallZahyou += 1;
+      }
+      if(left_wall){
+        BFSWallZahyou += 4;
+      }
+      break;
+
+    case West:
+      if(right_wall){
+        BFSWallZahyou += 1;
+      }
+      if(front_wall){
+        BFSWallZahyou += 4;
+      }
+      if(left_wall){
+        //BFSWallZahyou |= 2;
+      }
+      break;
+
+    case South:
+      if(right_wall){
+        BFSWallZahyou += 4;
+      }
+      if(front_wall){
+        //BFSWallZahyou |= 2;
+      }
+      if(left_wall){
+        BFSWallZahyou += 8;
+      }
+      break;
+    }*/
+    //南の壁情報をなくす
+    /*BFSWallZahyou &= ~2;
+    kabe_zahyou[GoalX][GoalY] &= ~2;
+    if(BFSWallZahyou == kabe_zahyou[GoalX][GoalY]){
+      StopFlag = true;
+      return;
+    }*/
+    BFSWallZahyou &= ~2;
+    kabe_zahyou[1][3] &= ~2;
+    if(BFSWallZahyou == kabe_zahyou[1][3]){
+      StopFlag = true;
+      return;
+    }
+    
+    //左手法
+    uint8_t GoTo = 0;
+    bool left_wall = false;
+    bool front_wall = false;
+    bool right_wall = false;
+    switch (Direction)
+    {
+    case North:
+        if(kabe_zahyou[x][y] & 4) {left_wall = true;}
+        if(kabe_zahyou[x][y] & 1) {front_wall = true;}
+        if(kabe_zahyou[x][y] & 8) {right_wall = true;}
+        break;
+    
+    case East:
+        if(kabe_zahyou[x][y] & 1) {left_wall = true;}
+        if(kabe_zahyou[x][y] & 8) {front_wall = true;}
+        if(kabe_zahyou[x][y] & 2) {right_wall = true;}
+        break;
+
+    case South:
+        if(kabe_zahyou[x][y] & 8) {left_wall = true;}
+        if(kabe_zahyou[x][y] & 2) {front_wall = true;}
+        if(kabe_zahyou[x][y] & 4) {right_wall = true;}
+        break;
+
+    case West:
+        if(kabe_zahyou[x][y] & 2) {left_wall = true;}
+        if(kabe_zahyou[x][y] & 4) {front_wall = true;}
+        if(kabe_zahyou[x][y] & 1) {right_wall = true;}
+        break;
+    }
+
+
+    if     (!left_wall) {GoTo = Left ;}
+    else if(!front_wall){GoTo = Front;}
+    else if(!right_wall){GoTo = Right;}
+    else                {GoTo = Back ;}
+
+    switch (GoTo)
+    {
+    case Right:
+      switch (Direction)
+      {
+      case North:
+        Direction = East;
+        break;
+
+      case East:
+        Direction = South;
+        break;
+
+      case South:
+        Direction = West;
+        break;
+
+      case West:
+        Direction = North;
+        break;
+      }
+      Status = 4;
+      break;
+
+    case Front:
+      Status = 2;
+      break;
+
+    case Left:
+      switch (Direction)
+      {
+      case North:
+        Direction = West;
+        break;
+
+      case East:
+        Direction = North;
+        break;
+
+      case South:
+        Direction = East;
+        break;
+
+      case West:
+        Direction = South;
+        break;
+      }
+      Status = 3;
+      break;
+
+    case Back:
+      switch (Direction)
+      {
+      case North:
+        Direction = South;
+        break;
+
+      case East:
+        Direction = West;
+        break;
+
+      case South:
+        Direction = North;
+        break;
+
+      case West:
+        Direction = East;
+        break;
+      }
+      Status = 5;
+      break;
+      }
+      
+}
+
+
+
 void GoHome() {
     while (!S.empty()) {
         switch (S.top()) {
             case 1:
                 cout << "migi" << endl;
+                switch (Direction)
+                {
+                case North:
+                  Direction = East;
+                  break;
+                
+                case East:
+                  Direction = South;
+                  break;
+
+                case South:
+                  Direction = West;
+                  break;
+
+                case West:
+                  Direction = North;
+                  break;
+                }
                 delay(300);
                 break;
             case 2:
                 cout << "hidari" << endl;
+                switch (Direction)
+                {
+                case North:
+                  Direction = West;
+                  break;
+                
+                case West:
+                  Direction = South;
+                  break;
+
+                case South:
+                  Direction = East;
+                  break;
+
+                case East:
+                  Direction = North;
+                  break;
+                }
                 delay(300);
                 break;
             case 3:
                 cout << "susumu_heitan" << endl;
+                switch (Direction)
+                {
+                case North:
+                  y += -1;;
+                  break;
+                
+                case East:
+                  x += 1;
+                  break;
+
+                case South:
+                  y += 1;
+                  break;
+
+                case West:
+                  x += -1;
+                  break;
+                }
                 delay(300);
                 break;
             case 4:
                 cout << "Stop" << endl;
+                while(!StopFlag)
+                {
+                  switch (Status)
+                  {
+                  case 1:
+                    //WriteDownWall
+                    ForBFSLeftGo();
+                    break;
+
+                  case 2://直進
+                     cout << "susumu_heitan" << endl;
+                     switch (Direction)
+                     {
+                     case North:
+                       y += -1;;
+                       break;
+                     
+                     case East:
+                       x += 1;
+                       break;
+     
+                     case South:
+                       y += 1;
+                       break;
+     
+                     case West:
+                       x += -1;
+                       break;
+                     }
+                    delay(200);
+                    Status = 1;
+                    break;
+                  
+                  case 3://左折
+                    cout << "hidari" << endl;
+                    switch (Direction)
+                    {
+                    case North:
+                      Direction = West;
+                      break;
+                    
+                    case East:
+                      Direction = North;
+                      break;
+    
+                    case South:
+                      Direction = East;
+                      break;
+    
+                    case West:
+                      Direction = South;
+                      break;
+                    }
+                    delay(500);
+                    cout << "susumu_heitan" << endl;
+                    switch (Direction)
+                    {
+                    case North:
+                      y += -1;;
+                      break;
+                    
+                    case East:
+                      x += 1;
+                      break;
+    
+                    case South:
+                      y += 1;
+                      break;
+    
+                    case West:
+                      x += -1;
+                      break;
+                    }
+                    delay(200);
+                    Status = 1;
+                    break;
+                  
+                  case 4://右折
+                    cout << "migi" << endl;
+                    switch (Direction)
+                    {
+                    case North:
+                      Direction = East;
+                      break;
+                    
+                    case East:
+                      Direction = South;
+                      break;
+    
+                    case South:
+                      Direction = West;
+                      break;
+    
+                    case West:
+                      Direction = North;
+                      break;
+                    }
+                    delay(500);
+                    cout << "susumu_heitan" << endl;
+                    switch (Direction)
+                    {
+                    case North:
+                      y += -1;;
+                      break;
+                    
+                    case East:
+                      x += 1;
+                      break;
+    
+                    case South:
+                      y += 1;
+                      break;
+    
+                    case West:
+                      x += -1;
+                      break;
+                    }
+                    delay(200);
+                    Status = 1;
+                    break;
+                  
+                  case 5://後進
+                    cout << "migi" << endl;
+                    switch (Direction)
+                    {
+                    case North:
+                      Direction = East;
+                      break;
+                    
+                    case East:
+                      Direction = South;
+                      break;
+    
+                    case South:
+                      Direction = West;
+                      break;
+    
+                    case West:
+                      Direction = North;
+                      break;
+                    }
+                    delay(500);
+                    cout << "migi" << endl;
+                    switch (Direction)
+                    {
+                    case North:
+                      Direction = East;
+                      break;
+                    
+                    case East:
+                      Direction = South;
+                      break;
+    
+                    case South:
+                      Direction = West;
+                      break;
+    
+                    case West:
+                      Direction = North;
+                      break;
+                    }
+                    delay(500);
+                    cout << "susumu_heitan" << endl;
+                    switch (Direction)
+                    {
+                    case North:
+                      y += -1;;
+                      break;
+                    
+                    case East:
+                      x += 1;
+                      break;
+    
+                    case South:
+                      y += 1;
+                      break;
+    
+                    case West:
+                      x += -1;
+                      break;
+                    }
+                    delay(200);
+                    Status = 1;
+                    break;
+                  }
+
+                }
                 
                 delay(20000);
                 break;
+                
+                cout << "x = " << x << ",y = " << y << endl;
         }
         S.pop();
     }
