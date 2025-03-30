@@ -2667,6 +2667,8 @@ void GoHome()
             case 4:
                 //Stop
                 /*ここに壁情報が合ってないとうろうろさせるコード入れる*/
+                NeoPixel_Color(0,0,255);    
+                delay(20000);               
                 /*壁情報取得*/
                 while(!StopFlag)
                 {
