@@ -29,11 +29,11 @@ uint8_t Status = 1;
 
 bool StopFlag = false;
 
-const uint8_t GoalX = 1;
-const uint8_t GoalY = 2;
+const uint8_t GoalX = 2;
+const uint8_t GoalY = 3;
 
-const uint8_t RealGoalX = 2;
-const uint8_t RealGoalY = 1;
+const uint8_t RealGoalX = 3;
+const uint8_t RealGoalY = 2;
 
 const uint8_t Xfactor = 7; // 迷路の大きさ
 const uint8_t Yfactor = 5;
