@@ -400,7 +400,7 @@ void get_tof_data() {
                 left_wall = false;
             }
             
-            if (receivedData[4] <= 170 && receivedData[5] <= 170) {
+            if (receivedData[4] <= 175 && receivedData[5] <= 175) {
                 right_wall = true;
                 Serial.println("right_wall");
             } else {
