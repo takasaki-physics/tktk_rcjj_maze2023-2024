@@ -111,6 +111,13 @@ float rag = 0; //前と後ろのtofの値の差
 float tan_value = 0; //rag/body_lenからくるtanθの値
 float theta_rad = 0; //θ・弧度法
 float theta_deg = 0; //θ・度数法
+float ave_tof_data = 0; //右側のTofの平均値
+float rag2 = 0; //中心線15㎝との差
+float tan_value2 = 0; //中心補正をかけるときのtanθの値
+float theta_rad2 = 0; //θ・弧度法
+float theta_deg2 = 0; //θ・度数法
+float run_len = 0; //走る長さ
+float run_len_time = 1; //30㎝の何倍か
 /*.....tof受信用の変数.......................................*/
 
 const byte HEADER = 255;  // ヘッダー (送信側と一致すること)
@@ -379,14 +386,14 @@ void get_tof_data() {
               Serial.println(receivedData[i], DEC); // 受信データを10進数で表示
             }
               //壁の有無を変数に代入
-            if (receivedData[0] <= 170 && receivedData[3] <= 170) {
+            if (receivedData[0] <= 175 && receivedData[3] <= 175) {
                 front_wall = true;
                 Serial.println("front_wall");
             } else {
                 front_wall = false;
             }
             
-            if (receivedData[1] <= 170 && receivedData[2] <= 170) {
+            if (receivedData[1] <= 175 && receivedData[2] <= 175) {
                 left_wall = true;
                 Serial.println("left_wall");
             } else {
@@ -1527,7 +1534,41 @@ void susumu_heitan() {
   }else if (Status != 3) {
     delay(100);
     tiziki();
-
+    delay(300);
+  }
+  ave_tof_data = (receivedData[4] + receivedData[5])/2;
+  rag2 = 9.75 - ave_tof_data;
+  if((rag2 >= 1.5 || rag2 <= -1.5)&&right_wall == true){
+    if(rag2 < 0){
+      rag2 = 0-rag2;
+    }
+    tan_value2 = rag2/30;
+    theta_rad2 = atan(tan_value2);
+    theta_deg2 = theta_rad2 * 180.0 / PI;  // 度数法に変換
+    if( rag2 > 0){
+        Serial.println(theta_deg2);
+        for (int i; i < theta_deg2; i++){
+          Position[0] = -82; //左に回転
+          Position[1] = -82;
+          Position[2] = -82;
+          Position[3] = -82;
+          sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+          delay(20);
+        }
+    }else if(rag2 < 0){
+        Serial.println(theta_deg2);
+        for (int i; i < theta_deg2; i++){
+          Position[0] = 82; //右に回転
+          Position[1] = 82;
+          Position[2] = 82;
+          Position[3] = 82;
+          sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+          delay(20);
+        }
+    }
+    run_len = sqrt(pow(rag2, 2) + pow(30, 2));
+    run_len_time = run_len/30;
+    delay(200);
   }
     while (Serial1.available() > 0) {
       char receivedChar = Serial1.read(); // データを読み取る
@@ -1535,10 +1576,10 @@ void susumu_heitan() {
     }
   while (count2  <susumu_kaisuu) {
     Serial.println("Going...");
-    Position[0] = 303; //go
-    Position[1] = -303;
-    Position[2] = -303;
-    Position[3] = 303;
+    Position[0] = 303*run_len_time; //go
+    Position[1] = -303*run_len_time;
+    Position[2] = -303*run_len_time;
+    Position[3] = 303*run_len_time;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
     delay(90);
     serialEvent1(); //color_load
@@ -1546,7 +1587,29 @@ void susumu_heitan() {
     serialEvent8();//_victim_camera2
     count2++;
   }
-    
+    if( (rag2 >= 1.5 || rag2 <= -1.5)&& right_wall == true){
+      if( rag2 > 0){
+        Serial.println(theta_deg2);
+        for (int i; i < theta_deg2; i++){
+          Position[0] = 82; //に右回転
+          Position[1] = 82;
+          Position[2] = 82;
+          Position[3] = 82;
+          sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+          delay(20);
+        }
+    }else if(rag2 < 0){
+        Serial.println(theta_deg2);
+        for (int i; i < theta_deg2; i++){
+          Position[0] = -82; //左に回転
+          Position[1] = -82;
+          Position[2] = -82;
+          Position[3] = -82;
+          sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
+          delay(20);
+        }
+    }
+    }
     /*...........坂があるかどうか..............*/
     tiziki_2(); //get_roll_data
     delay(50);
@@ -1610,6 +1673,7 @@ void susumu_heitan() {
   bump_giveup_count =0;
   Status = 0;
   blue_count = false;
+  run_len_time = 1;
 }
 
 
