@@ -2180,6 +2180,7 @@ void BFS()
                         S.push(1);
                         S.push(1);
                         S.push(3);
+                        b += -1;
                         Direction = South;
                         //Direction = East;
                         break;
