@@ -2112,7 +2112,7 @@ void BFS()
     cost[a][b] = 1;//現在地のコストを1にする
     Serial.println("GotoHome:");
 
-    while(!(a == GoalX && b == GoalY)){
+    while(!(a == GoalX && b == GoalY)){//ここ詰まったら中断するようにしたかった
 
         reach_time[a][b] = 1;//そのマスを訪問済みにする
 
