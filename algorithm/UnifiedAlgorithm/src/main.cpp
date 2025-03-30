@@ -2524,7 +2524,24 @@ void ForBFSLeftGo(){
     }
     //南の壁情報をなくす
     BFSWallZahyou &= ~2;
-    kabe_zahyou[GoalX][GoalY] &= ~2;
+    switch (Direction)
+    {
+    case North:
+      kabe_zahyou[GoalX][GoalY] &= ~2;
+      break;
+    
+    case East:
+      kabe_zahyou[GoalX][GoalY] &= ~4;
+      break;
+
+    case South:
+      kabe_zahyou[GoalX][GoalY] &= ~1;
+      break;
+
+    case West:
+      kabe_zahyou[GoalX][GoalY] &= ~8;
+      break;
+    }
     if(BFSWallZahyou == kabe_zahyou[GoalX][GoalY]){
       StopFlag = true;
       return;

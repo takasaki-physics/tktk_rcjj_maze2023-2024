@@ -29,8 +29,8 @@ uint8_t Status = 1;
 
 bool StopFlag = false;
 
-const uint8_t GoalX = 2;
-const uint8_t GoalY = 3;
+const uint8_t GoalX = 3;
+const uint8_t GoalY = 1;
 
 const uint8_t RealGoalX = 3;
 const uint8_t RealGoalY = 2;
