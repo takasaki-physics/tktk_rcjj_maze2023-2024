@@ -2794,9 +2794,9 @@ void GoHome()
                     break;
                   
                   case 5://後進
-                    migi();
+                    hidari();
                     delay(500);
-                    migi();
+                    hidari();
                     switch (Direction)
                     {
                     case North:
@@ -3072,9 +3072,9 @@ void loop(){
         break;
 
     case 6://後進
-        migi();
+        hidari();
         delay(500);
-        migi();
+        hidari();
         delay(500);
         susumu_heitan();
         delay(200);
