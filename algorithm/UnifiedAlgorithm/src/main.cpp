@@ -1537,37 +1537,37 @@ void susumu_heitan() {
     delay(300);
   }
   ave_tof_data = (receivedData[4] + receivedData[5])/2;
-  rag2 = 9.75 - ave_tof_data;
-  if((rag2 >= 1.5 || rag2 <= -1.5)&&right_wall == true){
+  rag2 = 97.5 - ave_tof_data;
+  if((rag2 >= 20 || rag2 <= -20)&&right_wall == true){
     if(rag2 < 0){
       rag2 = 0-rag2;
     }
-    tan_value2 = rag2/30;
+    tan_value2 = rag2/300;
     theta_rad2 = atan(tan_value2);
     theta_deg2 = theta_rad2 * 180.0 / PI;  // 度数法に変換
     if( rag2 > 0){
         Serial.println(theta_deg2);
         for (int i; i < theta_deg2; i++){
-          Position[0] = -82; //左に回転
-          Position[1] = -82;
-          Position[2] = -82;
-          Position[3] = -82;
+          Position[0] = -70; //左に回転
+          Position[1] = -70;
+          Position[2] = -70;
+          Position[3] = -70;
           sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
           delay(20);
         }
     }else if(rag2 < 0){
         Serial.println(theta_deg2);
         for (int i; i < theta_deg2; i++){
-          Position[0] = 82; //右に回転
-          Position[1] = 82;
-          Position[2] = 82;
-          Position[3] = 82;
+          Position[0] = 70; //右に回転
+          Position[1] = 70;
+          Position[2] = 70;
+          Position[3] = 70;
           sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
           delay(20);
         }
     }
-    run_len = sqrt(pow(rag2, 2) + pow(30, 2));
-    run_len_time = run_len/30;
+    run_len = sqrt(pow(rag2, 2) + pow(300, 2));
+    run_len_time = run_len/300;
     delay(200);
   }
     while (Serial1.available() > 0) {
@@ -1581,30 +1581,30 @@ void susumu_heitan() {
     Position[2] = -303*run_len_time;
     Position[3] = 303*run_len_time;
     sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
-    delay(90);
+    delay(90*run_len_time);
     serialEvent1(); //color_load
     serialEvent7();//_victim_camera1
     serialEvent8();//_victim_camera2
     count2++;
   }
-    if( (rag2 >= 1.5 || rag2 <= -1.5)&& right_wall == true){
+    if( (rag2 >= 15 || rag2 <= -15)&& right_wall == true){
       if( rag2 > 0){
         Serial.println(theta_deg2);
         for (int i; i < theta_deg2; i++){
-          Position[0] = 82; //に右回転
-          Position[1] = 82;
-          Position[2] = 82;
-          Position[3] = 82;
+          Position[0] = 70; //に右回転
+          Position[1] = 70;
+          Position[2] = 70;
+          Position[3] = 70;
           sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
           delay(20);
         }
     }else if(rag2 < 0){
         Serial.println(theta_deg2);
         for (int i; i < theta_deg2; i++){
-          Position[0] = -82; //左に回転
-          Position[1] = -82;
-          Position[2] = -82;
-          Position[3] = -82;
+          Position[0] = -70; //左に回転
+          Position[1] = -70;
+          Position[2] = -70;
+          Position[3] = -70;
           sms_sts.SyncWritePosEx(ID, 4, Position, Speed, ACC);
           delay(20);
         }
