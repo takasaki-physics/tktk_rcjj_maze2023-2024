@@ -2524,6 +2524,7 @@ void ForBFSLeftGo(){
     }
     //南の壁情報をなくす
     BFSWallZahyou &= ~2;
+    //ゴールマスの壁情報のうち、現在の向きの後ろ側になる壁の情報をなくす
     switch (Direction)
     {
     case North:
