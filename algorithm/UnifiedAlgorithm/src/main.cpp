@@ -2000,7 +2000,8 @@ void MoveTo(int8_t GoTo)
 /*******************************************************************************************/
 /* タイルの状態                                                                              
 /*処理：それぞれの方向について、
-/*      黒タイルまたは"少しずれている"の信号が送られていたらそのマスの重みを100にして一マス戻る
+/*      黒タイルの場合そのマスの重みを100にする
+/*      黒タイルまたは"少しずれている"の信号が送られていたら一マス戻る
 /*      坂の信号が送られていたら一マス進む
 /*      黒タイルと坂信号の初期化
 /*
@@ -2314,6 +2315,7 @@ void BFS()
                 break;
         }
     }
+
     switch (NowDirection)//今の向きを逆探索終了時の向きに変更する
     {
     case North:
@@ -2464,7 +2466,9 @@ void WriteDownWall(uint8_t x, uint8_t y,uint8_t Direction)
 
 /*******************************************************************************************/
 /* BFSで使う左手法                                                                            
-/*処理：現在は使ってない
+/*処理：今いるマスの壁情報をBFSWallZahyouに記入（スタート時の南方向は今回の場合わからないので記入しない）
+/*　　　ゴールマスの壁情報のうち、現在の向きの後ろ側になる壁の情報をなくす
+/*    　スタート時のマスの壁情報と照合
 /*
 /*更新者：吉ノ薗2025/03/28
 /*
@@ -2524,6 +2528,7 @@ void ForBFSLeftGo(){
     }
     //南の壁情報をなくす
     BFSWallZahyou &= ~2;
+
     //ゴールマスの壁情報のうち、現在の向きの後ろ側になる壁の情報をなくす
     switch (Direction)
     {
@@ -2543,7 +2548,7 @@ void ForBFSLeftGo(){
       kabe_zahyou[GoalX][GoalY] &= ~8;
       break;
     }
-    if(BFSWallZahyou == kabe_zahyou[GoalX][GoalY]){
+    if(BFSWallZahyou == kabe_zahyou[GoalX][GoalY]){////スタート時のマスの壁情報と合ってる場合停止フラグを立てる
       StopFlag = true;
       return;
     }
@@ -2558,19 +2563,19 @@ void ForBFSLeftGo(){
     switch (GoTo)
     {
     case Right:
-      Status = 4;
+      Status = 4;//右折
       break;
 
     case Front:
-      Status = 2;
+      Status = 2;//直進
       break;
 
     case Left:
-      Status = 3;
+      Status = 3;//左折
       break;
 
     case Back:
-      Status = 5;
+      Status = 5;//後進
       break;
       }
       
@@ -2666,10 +2671,10 @@ void GoHome()
                 break;
             case 4:
                 //Stop
-                /*ここに壁情報が合ってないとうろうろさせるコード入れる*/
-                NeoPixel_Color(0,0,255);    
-                delay(20000);               
-                /*壁情報取得*/
+                NeoPixel_Color(0,0,255);//うろうろさせない場合このコードで停止
+                delay(20000);
+
+                /*壁情報取得してうろうろさせる*/
                 while(!StopFlag)
                 {
                   switch (Status)
@@ -3043,7 +3048,7 @@ void loop(){
 
         break;
     
-    case 2://帰還(このとき探索に戻らないよう入れ子構造にする or ここだけは関数内に直接migi()とかを入れてwhile文)
+    case 2://帰還
         //NeoPixel_Color(0,0,255);   
         BFS();
         //pixels.clear();
