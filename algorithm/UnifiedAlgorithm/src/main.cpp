@@ -2524,7 +2524,24 @@ void ForBFSLeftGo(){
     }
     //南の壁情報をなくす
     BFSWallZahyou &= ~2;
-    kabe_zahyou[GoalX][GoalY] &= ~2;
+    switch (Direction)
+    {
+    case North:
+      kabe_zahyou[GoalX][GoalY] &= ~2;
+      break;
+    
+    case East:
+      kabe_zahyou[GoalX][GoalY] &= ~4;
+      break;
+
+    case South:
+      kabe_zahyou[GoalX][GoalY] &= ~1;
+      break;
+
+    case West:
+      kabe_zahyou[GoalX][GoalY] &= ~8;
+      break;
+    }
     if(BFSWallZahyou == kabe_zahyou[GoalX][GoalY]){
       StopFlag = true;
       return;
@@ -2649,8 +2666,6 @@ void GoHome()
             case 4:
                 //Stop
                 /*ここに壁情報が合ってないとうろうろさせるコード入れる*/
-                NeoPixel_Color(0,0,255);    
-                delay(20000); 
                 /*壁情報取得*/
                 while(!StopFlag)
                 {
