@@ -2241,8 +2241,8 @@ void BFS()
                         break;
 
                     case North:
-                        S.push(1);
-                        S.push(1);
+                        S.push(2);
+                        S.push(2);
                         S.push(3);
                         b += -1;
                         Direction = South;
