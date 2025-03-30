@@ -3034,7 +3034,7 @@ void loop(){
         now_seconds = static_cast<long>(NowTime); 
 
         //330秒（＝5分半）経ったら幅優先探索を始める
-        if(now_seconds - firstseconds >= 120/*360*/){
+        if(now_seconds - firstseconds >= 360){
             Status = 2;//帰還開始
             start_Gohome = true;
         }
