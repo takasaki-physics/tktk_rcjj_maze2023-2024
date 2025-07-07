@@ -11,6 +11,6 @@
 
 * **Handover**
     引き継ぎのためのPDFが入っています。
-* **↓リンク先**
-<https://takasaki-hs.gsn.ed.jp/>
+* **↓リンク先**  
+<https://takasaki-hs.gsn.ed.jp/>  
 <https://www.robocupjunior.jp/>
