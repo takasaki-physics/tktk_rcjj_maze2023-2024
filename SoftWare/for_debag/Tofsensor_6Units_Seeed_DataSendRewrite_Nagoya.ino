@@ -61,7 +61,7 @@ void setup() {
   initializeSensor(sensor5, 4, 0x34);
   initializeSensor(sensor6, 2, 0x35);
 }
-
+/*........Tofセンサーの値によって壁との距離を測定しメインマイコンに送信する...........*/
 void loop() {
   while (isI2CInUse) {
     delayMicroseconds(100); // I2Cが使用中なら待機
@@ -174,7 +174,7 @@ void setup1() {
   display.setCursor(0, 0);
   updateDisplay();
 }
-
+/*........メインマイコンから送信されたデータをもとにディスプレイに座標と座標の重みを表示する...........*/
 void loop1() {
   while (isI2CInUse) {
     delayMicroseconds(100); // I2Cが使用中なら待機
